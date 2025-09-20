@@ -1,0 +1,966 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7557C5222E7E6A5F00B6970A /* PetPet Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 7557C5212E7E6A5F00B6970A /* PetPet Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7557C50C2E7E6A5F00B6970A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7557C4F32E7E6A5C00B6970A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7557C4FA2E7E6A5C00B6970A;
+			remoteInfo = PetPet;
+		};
+		7557C5162E7E6A5F00B6970A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7557C4F32E7E6A5C00B6970A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7557C4FA2E7E6A5C00B6970A;
+			remoteInfo = PetPet;
+		};
+		7557C5232E7E6A5F00B6970A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7557C4F32E7E6A5C00B6970A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7557C5202E7E6A5F00B6970A;
+			remoteInfo = "PetPet Watch App";
+		};
+		7557C5342E7E6A6000B6970A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7557C4F32E7E6A5C00B6970A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7557C5202E7E6A5F00B6970A;
+			remoteInfo = "PetPet Watch App";
+		};
+		7557C53E2E7E6A6000B6970A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7557C4F32E7E6A5C00B6970A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7557C5202E7E6A5F00B6970A;
+			remoteInfo = "PetPet Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7557C54A2E7E6A6100B6970A /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				7557C5222E7E6A5F00B6970A /* PetPet Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		7557C4FB2E7E6A5C00B6970A /* PetPet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PetPet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7557C50B2E7E6A5F00B6970A /* PetPetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PetPetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7557C5152E7E6A5F00B6970A /* PetPetUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PetPetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7557C5212E7E6A5F00B6970A /* PetPet Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PetPet Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7557C5332E7E6A6000B6970A /* PetPet Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PetPet Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7557C53D2E7E6A6000B6970A /* PetPet Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "PetPet Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		7557C4FD2E7E6A5C00B6970A /* PetPet */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PetPet;
+			sourceTree = "<group>";
+		};
+		7557C50E2E7E6A5F00B6970A /* PetPetTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PetPetTests;
+			sourceTree = "<group>";
+		};
+		7557C5182E7E6A5F00B6970A /* PetPetUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PetPetUITests;
+			sourceTree = "<group>";
+		};
+		7557C5252E7E6A5F00B6970A /* PetPet Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "PetPet Watch App";
+			sourceTree = "<group>";
+		};
+		7557C5362E7E6A6000B6970A /* PetPet Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "PetPet Watch AppTests";
+			sourceTree = "<group>";
+		};
+		7557C5402E7E6A6000B6970A /* PetPet Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "PetPet Watch AppUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7557C4F82E7E6A5C00B6970A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C5082E7E6A5F00B6970A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C5122E7E6A5F00B6970A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C51E2E7E6A5F00B6970A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C5302E7E6A6000B6970A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C53A2E7E6A6000B6970A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7557C4F22E7E6A5C00B6970A = {
+			isa = PBXGroup;
+			children = (
+				7557C4FD2E7E6A5C00B6970A /* PetPet */,
+				7557C50E2E7E6A5F00B6970A /* PetPetTests */,
+				7557C5182E7E6A5F00B6970A /* PetPetUITests */,
+				7557C5252E7E6A5F00B6970A /* PetPet Watch App */,
+				7557C5362E7E6A6000B6970A /* PetPet Watch AppTests */,
+				7557C5402E7E6A6000B6970A /* PetPet Watch AppUITests */,
+				7557C4FC2E7E6A5C00B6970A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7557C4FC2E7E6A5C00B6970A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7557C4FB2E7E6A5C00B6970A /* PetPet.app */,
+				7557C50B2E7E6A5F00B6970A /* PetPetTests.xctest */,
+				7557C5152E7E6A5F00B6970A /* PetPetUITests.xctest */,
+				7557C5212E7E6A5F00B6970A /* PetPet Watch App.app */,
+				7557C5332E7E6A6000B6970A /* PetPet Watch AppTests.xctest */,
+				7557C53D2E7E6A6000B6970A /* PetPet Watch AppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7557C4FA2E7E6A5C00B6970A /* PetPet */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7557C54B2E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPet" */;
+			buildPhases = (
+				7557C4F72E7E6A5C00B6970A /* Sources */,
+				7557C4F82E7E6A5C00B6970A /* Frameworks */,
+				7557C4F92E7E6A5C00B6970A /* Resources */,
+				7557C54A2E7E6A6100B6970A /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7557C5242E7E6A5F00B6970A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7557C4FD2E7E6A5C00B6970A /* PetPet */,
+			);
+			name = PetPet;
+			packageProductDependencies = (
+			);
+			productName = PetPet;
+			productReference = 7557C4FB2E7E6A5C00B6970A /* PetPet.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7557C50A2E7E6A5F00B6970A /* PetPetTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7557C54E2E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPetTests" */;
+			buildPhases = (
+				7557C5072E7E6A5F00B6970A /* Sources */,
+				7557C5082E7E6A5F00B6970A /* Frameworks */,
+				7557C5092E7E6A5F00B6970A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7557C50D2E7E6A5F00B6970A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7557C50E2E7E6A5F00B6970A /* PetPetTests */,
+			);
+			name = PetPetTests;
+			packageProductDependencies = (
+			);
+			productName = PetPetTests;
+			productReference = 7557C50B2E7E6A5F00B6970A /* PetPetTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7557C5142E7E6A5F00B6970A /* PetPetUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7557C5512E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPetUITests" */;
+			buildPhases = (
+				7557C5112E7E6A5F00B6970A /* Sources */,
+				7557C5122E7E6A5F00B6970A /* Frameworks */,
+				7557C5132E7E6A5F00B6970A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7557C5172E7E6A5F00B6970A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7557C5182E7E6A5F00B6970A /* PetPetUITests */,
+			);
+			name = PetPetUITests;
+			packageProductDependencies = (
+			);
+			productName = PetPetUITests;
+			productReference = 7557C5152E7E6A5F00B6970A /* PetPetUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		7557C5202E7E6A5F00B6970A /* PetPet Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7557C5472E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPet Watch App" */;
+			buildPhases = (
+				7557C51D2E7E6A5F00B6970A /* Sources */,
+				7557C51E2E7E6A5F00B6970A /* Frameworks */,
+				7557C51F2E7E6A5F00B6970A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				7557C5252E7E6A5F00B6970A /* PetPet Watch App */,
+			);
+			name = "PetPet Watch App";
+			packageProductDependencies = (
+			);
+			productName = "PetPet Watch App";
+			productReference = 7557C5212E7E6A5F00B6970A /* PetPet Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7557C5322E7E6A6000B6970A /* PetPet Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7557C5542E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPet Watch AppTests" */;
+			buildPhases = (
+				7557C52F2E7E6A6000B6970A /* Sources */,
+				7557C5302E7E6A6000B6970A /* Frameworks */,
+				7557C5312E7E6A6000B6970A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7557C5352E7E6A6000B6970A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7557C5362E7E6A6000B6970A /* PetPet Watch AppTests */,
+			);
+			name = "PetPet Watch AppTests";
+			packageProductDependencies = (
+			);
+			productName = "PetPet Watch AppTests";
+			productReference = 7557C5332E7E6A6000B6970A /* PetPet Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7557C53C2E7E6A6000B6970A /* PetPet Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7557C5572E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPet Watch AppUITests" */;
+			buildPhases = (
+				7557C5392E7E6A6000B6970A /* Sources */,
+				7557C53A2E7E6A6000B6970A /* Frameworks */,
+				7557C53B2E7E6A6000B6970A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7557C53F2E7E6A6000B6970A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7557C5402E7E6A6000B6970A /* PetPet Watch AppUITests */,
+			);
+			name = "PetPet Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "PetPet Watch AppUITests";
+			productReference = 7557C53D2E7E6A6000B6970A /* PetPet Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7557C4F32E7E6A5C00B6970A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					7557C4FA2E7E6A5C00B6970A = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					7557C50A2E7E6A5F00B6970A = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 7557C4FA2E7E6A5C00B6970A;
+					};
+					7557C5142E7E6A5F00B6970A = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 7557C4FA2E7E6A5C00B6970A;
+					};
+					7557C5202E7E6A5F00B6970A = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					7557C5322E7E6A6000B6970A = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 7557C5202E7E6A5F00B6970A;
+					};
+					7557C53C2E7E6A6000B6970A = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 7557C5202E7E6A5F00B6970A;
+					};
+				};
+			};
+			buildConfigurationList = 7557C4F62E7E6A5C00B6970A /* Build configuration list for PBXProject "PetPet" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 7557C4F22E7E6A5C00B6970A;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 7557C4FC2E7E6A5C00B6970A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7557C4FA2E7E6A5C00B6970A /* PetPet */,
+				7557C50A2E7E6A5F00B6970A /* PetPetTests */,
+				7557C5142E7E6A5F00B6970A /* PetPetUITests */,
+				7557C5202E7E6A5F00B6970A /* PetPet Watch App */,
+				7557C5322E7E6A6000B6970A /* PetPet Watch AppTests */,
+				7557C53C2E7E6A6000B6970A /* PetPet Watch AppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7557C4F92E7E6A5C00B6970A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C5092E7E6A5F00B6970A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C5132E7E6A5F00B6970A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C51F2E7E6A5F00B6970A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C5312E7E6A6000B6970A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C53B2E7E6A6000B6970A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7557C4F72E7E6A5C00B6970A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C5072E7E6A5F00B6970A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C5112E7E6A5F00B6970A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C51D2E7E6A5F00B6970A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C52F2E7E6A6000B6970A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7557C5392E7E6A6000B6970A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7557C50D2E7E6A5F00B6970A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7557C4FA2E7E6A5C00B6970A /* PetPet */;
+			targetProxy = 7557C50C2E7E6A5F00B6970A /* PBXContainerItemProxy */;
+		};
+		7557C5172E7E6A5F00B6970A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7557C4FA2E7E6A5C00B6970A /* PetPet */;
+			targetProxy = 7557C5162E7E6A5F00B6970A /* PBXContainerItemProxy */;
+		};
+		7557C5242E7E6A5F00B6970A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7557C5202E7E6A5F00B6970A /* PetPet Watch App */;
+			targetProxy = 7557C5232E7E6A5F00B6970A /* PBXContainerItemProxy */;
+		};
+		7557C5352E7E6A6000B6970A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7557C5202E7E6A5F00B6970A /* PetPet Watch App */;
+			targetProxy = 7557C5342E7E6A6000B6970A /* PBXContainerItemProxy */;
+		};
+		7557C53F2E7E6A6000B6970A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7557C5202E7E6A5F00B6970A /* PetPet Watch App */;
+			targetProxy = 7557C53E2E7E6A6000B6970A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		7557C5452E7E6A6100B6970A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		7557C5462E7E6A6100B6970A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		7557C5482E7E6A6100B6970A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"PetPet Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PetPet;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.calmkeen.PetPet;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.calmkeen.PetPet.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		7557C5492E7E6A6100B6970A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"PetPet Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PetPet;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.calmkeen.PetPet;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.calmkeen.PetPet.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
+		7557C54C2E7E6A6100B6970A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"PetPet/Preview Content\"";
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PetPet;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.calmkeen.PetPet;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7557C54D2E7E6A6100B6970A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"PetPet/Preview Content\"";
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = PetPet;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.calmkeen.PetPet;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7557C54F2E7E6A6100B6970A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.calmkeen.PetPetTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PetPet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PetPet";
+			};
+			name = Debug;
+		};
+		7557C5502E7E6A6100B6970A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.calmkeen.PetPetTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PetPet.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PetPet";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7557C5522E7E6A6100B6970A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.calmkeen.PetPetUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PetPet;
+			};
+			name = Debug;
+		};
+		7557C5532E7E6A6100B6970A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.calmkeen.PetPetUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PetPet;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7557C5552E7E6A6100B6970A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.calmkeen.PetPet-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PetPet Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PetPet Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		7557C5562E7E6A6100B6970A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.calmkeen.PetPet-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PetPet Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PetPet Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
+		7557C5582E7E6A6100B6970A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.calmkeen.PetPet-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "PetPet Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		7557C5592E7E6A6100B6970A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7N2TRX73U6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.calmkeen.PetPet-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "PetPet Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7557C4F62E7E6A5C00B6970A /* Build configuration list for PBXProject "PetPet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7557C5452E7E6A6100B6970A /* Debug */,
+				7557C5462E7E6A6100B6970A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7557C5472E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPet Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7557C5482E7E6A6100B6970A /* Debug */,
+				7557C5492E7E6A6100B6970A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7557C54B2E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPet" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7557C54C2E7E6A6100B6970A /* Debug */,
+				7557C54D2E7E6A6100B6970A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7557C54E2E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPetTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7557C54F2E7E6A6100B6970A /* Debug */,
+				7557C5502E7E6A6100B6970A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7557C5512E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPetUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7557C5522E7E6A6100B6970A /* Debug */,
+				7557C5532E7E6A6100B6970A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7557C5542E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPet Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7557C5552E7E6A6100B6970A /* Debug */,
+				7557C5562E7E6A6100B6970A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7557C5572E7E6A6100B6970A /* Build configuration list for PBXNativeTarget "PetPet Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7557C5582E7E6A6100B6970A /* Debug */,
+				7557C5592E7E6A6100B6970A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7557C4F32E7E6A5C00B6970A /* Project object */;
+}
