@@ -8,15 +8,40 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var motionManager = userMotionCheckManager()
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        GeometryReader { geometry in
+            ZStack{
+                Image("home_bg")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                VStack {
+                    Text(Date(), style: .time)
+                        .foregroundColor(.black)
+                    Image("snowfox_baby_sitting")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                    Text("Step Count: \(motionManager.steps)")
+                        .foregroundColor(.black)
+                        
+                }
+                .padding()
+            }
         }
-        .padding()
+        .ignoresSafeArea(.all)
+        .navigationBarHidden(true)
+        .background(OverlayPlayerForTimeRemove())
+        .onAppear {
+            motionManager.startPedometerUpdates()
+        }
+        .onDisappear {
+            motionManager.stopPedometerUpdates()
+        }
     }
+
 }
 
 #Preview {
