@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var motionManager = userMotionCheckManager()
+    @StateObject private var motionManager = UserMotionCheckManager()
     
     var body: some View {
         GeometryReader { geometry in

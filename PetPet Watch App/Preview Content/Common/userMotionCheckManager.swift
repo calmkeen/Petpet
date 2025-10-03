@@ -8,7 +8,7 @@
 import Foundation
 import CoreMotion
 
-class userMotionCheckManager : ObservableObject{
+class UserMotionCheckManager : ObservableObject{
     
     private let pedometer = CMPedometer()
      @Published var steps: Int = 0
