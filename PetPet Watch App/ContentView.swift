@@ -13,7 +13,7 @@ struct ContentView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack{
-                Image("home_bg")
+                Image("background")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: geometry.size.width, height: geometry.size.height)
