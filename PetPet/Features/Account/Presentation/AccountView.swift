@@ -8,6 +8,13 @@ struct AccountView: View {
 
     var body: some View {
         List {
+            if viewModel.configuration.isDevelopment {
+                Section {
+                    Label("Debug 테스트 모드", systemImage: "hammer.fill").font(.headline)
+                    Text("모의 계정과 백업은 이 아이폰 안에 저장돼요. Apple 인증과 운영 서버에는 연결하지 않아요.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                }
+            }
             Section("계정") {
                 if let session = viewModel.session {
                     Label(session.nickname ?? session.name ?? "내 계정", systemImage: "person.crop.circle.fill")
@@ -16,6 +23,17 @@ struct AccountView: View {
                     Button("로그아웃", role: .destructive) { Task { await viewModel.signOut() } }
                         .disabled(viewModel.isSigningIn)
                 } else {
+                    #if DEBUG
+                    Button { Task { await viewModel.signInForDevelopment() } } label: {
+                        Label("개발용 계정으로 로그인", systemImage: "person.badge.key")
+                            .frame(maxWidth: .infinity).padding(.vertical, 8)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!viewModel.canSignIn || viewModel.isSigningIn)
+                    .accessibilityIdentifier("phone.developmentSignIn")
+                    Text("로그인 없이도 걸음수·먹이·성장 기능을 사용할 수 있어요.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                    #else
                     SignInWithAppleButton(.signIn, onRequest: viewModel.beginSignIn) { result in
                         Task { await viewModel.completeSignIn(result) }
                     }
@@ -23,6 +41,7 @@ struct AccountView: View {
                         .frame(height: 50)
                         .disabled(!viewModel.canSignIn || viewModel.isSigningIn)
                         .accessibilityIdentifier("phone.appleSignIn")
+                    #endif
                     if !viewModel.canSignIn {
                         Text("계정 연결 설정이 아직 완료되지 않았어요.")
                             .font(.footnote).foregroundStyle(.secondary)
@@ -31,7 +50,7 @@ struct AccountView: View {
             }
             Section {
                 Button { Task { await viewModel.backup() } } label: {
-                    Label("워치 기록 백업", systemImage: "icloud.and.arrow.up")
+                    Label(viewModel.configuration.isDevelopment ? "워치 기록 모의 백업" : "워치 기록 백업", systemImage: "icloud.and.arrow.up")
                 }
                 .disabled(viewModel.session == nil || viewModel.isBusy)
                 .accessibilityIdentifier("phone.serverBackup")
@@ -39,16 +58,18 @@ struct AccountView: View {
                     Text("최근 백업 \(date.formatted(date: .abbreviated, time: .shortened))")
                         .font(.footnote).foregroundStyle(.secondary)
                 }
-            } header: { Text("서버 백업") } footer: {
-                Text("워치의 전체 걸음수 기록과 펫 능력치를 저장해요. 백업이 완료되면 워치에서 걸음수 보상을 받아요.")
+            } header: { Text(viewModel.configuration.isDevelopment ? "개발용 백업" : "서버 백업") } footer: {
+                Text(viewModel.configuration.isDevelopment
+                     ? "워치 기록을 이 아이폰의 모의 저장소에 저장해요. 완료되면 워치에 테스트 보상을 지급해요."
+                     : "워치의 전체 걸음수 기록과 펫 능력치를 저장해요. 백업이 완료되면 워치에서 걸음수 보상을 받아요.")
             }
             Section {
                 Button { Task { await viewModel.prepareRestore() } } label: {
-                    Label("서버 기록 불러오기", systemImage: "icloud.and.arrow.down")
+                    Label(viewModel.configuration.isDevelopment ? "모의 백업 불러오기" : "서버 기록 불러오기", systemImage: "icloud.and.arrow.down")
                 }
                 .disabled(viewModel.session == nil || viewModel.isBusy)
                 .accessibilityIdentifier("phone.previewServerRestore")
-            } header: { Text("서버 복원") } footer: {
+            } header: { Text(viewModel.configuration.isDevelopment ? "개발용 복원" : "서버 복원") } footer: {
                 Text("저장된 기록을 먼저 확인한 뒤 복원할 수 있어요. 아이폰과 워치에서 PetPet을 열어 주세요.")
             }
             if viewModel.isBusy { ProgressView(progressText).font(.footnote) }
@@ -56,7 +77,9 @@ struct AccountView: View {
                 Text(feedback).font(.footnote).foregroundStyle(viewModel.cloudState.error == nil ? Color.secondary : Color.orange)
                     .accessibilityIdentifier("phone.cloudFeedback")
             }
-            if let host = viewModel.configuration.baseURL?.host {
+            if viewModel.configuration.isDevelopment {
+                Text("백업 위치: 이 아이폰의 개발용 저장소").font(.caption).foregroundStyle(.secondary)
+            } else if let host = viewModel.configuration.baseURL?.host {
                 Text("연결 서버: \(host)").font(.caption).foregroundStyle(.secondary)
             }
         }
@@ -79,7 +102,7 @@ struct AccountView: View {
             List {
                 Section("복원할 펫") {
                     LabeledContent("현재 워치", value: "Lv.\(preview.target.pet.level)")
-                    LabeledContent("서버 기록", value: "Lv.\(preview.state.pet.level)")
+                    LabeledContent(viewModel.configuration.isDevelopment ? "모의 백업 기록" : "서버 기록", value: "Lv.\(preview.state.pet.level)")
                     LabeledContent("경험치", value: "\(preview.state.pet.experience)")
                     Text("공격 \(preview.state.pet.attack) · 방어 \(preview.state.pet.defense) · 체력 \(preview.state.pet.health)")
                 }

@@ -10,22 +10,29 @@ final class PhoneAppModel: ObservableObject {
     private let transport: WatchConnectivityTransport
 
     init() {
-        let directory = URL.applicationSupportDirectory.appendingPathComponent("PetPet", isDirectory: true)
-        let transport = WatchConnectivityTransport()
+        let configuration = AccountConfiguration()
+        let root = URL.applicationSupportDirectory.appendingPathComponent("PetPet", isDirectory: true)
+        let directory = configuration.environment.storageDirectory(in: root)
+        let transport = WatchConnectivityTransport(environment: configuration.environment)
         self.transport = transport
         let receiver = PhoneSnapshotReceiver(
             repository: FilePhoneSnapshotRepository(fileURL: directory.appendingPathComponent("watch-snapshot-v1.json")),
             transport: transport
         )
         home = PhoneHomeViewModel(receiver: receiver)
-        let configuration = AccountConfiguration()
         let backend = configuration.baseURL.flatMap { url in
+            #if DEBUG
+            return try? BackendClient(baseURL: url,
+                transport: LocalDevelopmentBackend(fileURL: directory.appendingPathComponent("mock-backend-v1.json")),
+                store: KeychainSessionStore(serverOrigin: url.absoluteString))
+            #else
             try? BackendClient(baseURL: url, store: KeychainSessionStore(serverOrigin: url.absoluteString))
+            #endif
         }
         let cloud = backend.map { client in
             PhoneCloudCoordinator(backend: client, transport: transport,
                 receipts: FileCloudReceiptStore(fileURL: directory.appendingPathComponent("cloud-receipts-v1.json")),
-                directory: directory.appendingPathComponent("CloudOutbox", isDirectory: true))
+                directory: directory.appendingPathComponent("CloudOutbox", isDirectory: true), environment: configuration.environment)
         }
         let account = AccountViewModel(backend: backend, cloud: cloud, configuration: configuration)
         self.account = account

@@ -12,6 +12,8 @@ public final class WatchConnectivityTransport: NSObject, SnapshotTransport, Clou
     private static let cloudControlKey = "petpet.cloudControl.v1"
     private static let cloudChallengeKey = "petpet.cloudChallenge.v1"
     private static let cloudFileKey = "petpet.cloudFile.v1"
+    private static let cloudEnvironmentKey = "petpet.cloudEnvironment"
+    private static let immediateCloudFileKey = "petpet.cloudFileData.v1"
     public private(set) var connection = SnapshotConnection()
     public var onConnectionChange: ((SnapshotConnection) -> Void)?
     public var onSnapshot: ((Data, String) -> Void)?
@@ -21,9 +23,11 @@ public final class WatchConnectivityTransport: NSObject, SnapshotTransport, Clou
     public var onCloudChallenge: (() async throws -> Data)?
     public var onCloudTransferError: ((String?) -> Void)?
     private let session: WCSession?
+    private nonisolated let environment: CloudEnvironment
     private var deliveredCloudFiles: Set<URL> = []
 
-    public override init() {
+    public init(environment: CloudEnvironment = .production) {
+        self.environment = environment
         session = WCSession.isSupported() ? .default : nil
         super.init()
         session?.delegate = self
@@ -71,13 +75,24 @@ public final class WatchConnectivityTransport: NSObject, SnapshotTransport, Clou
         guard data.count <= 60_000 else { throw BackendError.transferTooLarge }
         guard let session, session.activationState == .activated else { throw BackendError.watchUnavailable }
         session.transferUserInfo([Self.cloudControlKey: data])
+        if session.isReachable {
+            session.sendMessage([Self.cloudControlKey: data], replyHandler: nil, errorHandler: { _ in
+                // The reliable user-info transfer remains queued.
+            })
+        }
     }
 
     public func enqueueCloudFile(_ url: URL) throws {
         guard let session, session.activationState == .activated else { throw BackendError.watchUnavailable }
         let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? Int.max
         guard size <= CloudWire.maximumFileBytes else { throw BackendError.transferTooLarge }
-        session.transferFile(url, metadata: [Self.cloudFileKey: true])
+        session.transferFile(url, metadata: [Self.cloudFileKey: true, Self.cloudEnvironmentKey: environment.rawValue])
+        if session.isReachable, size <= 60_000, let data = try? Data(contentsOf: url) {
+            session.sendMessage([Self.immediateCloudFileKey: data, Self.cloudEnvironmentKey: environment.rawValue],
+                                replyHandler: nil, errorHandler: { _ in
+                // Full history still has the durable file-transfer fallback.
+            })
+        }
     }
 
     public func requestCloudChallenge() async throws -> Data {
@@ -158,9 +173,22 @@ public final class WatchConnectivityTransport: NSObject, SnapshotTransport, Clou
         onCloudFile(url)
     }
 
+    private func receiveImmediateCloudFile(_ data: Data, environment raw: String?) {
+        guard data.count <= 60_000, raw == environment.rawValue else { return }
+        let directory = environment.storageDirectory(in: URL.applicationSupportDirectory.appendingPathComponent("PetPet", isDirectory: true))
+            .appendingPathComponent("CloudInbox", isDirectory: true)
+        do {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            let file = directory.appendingPathComponent(UUID().uuidString).appendingPathExtension("json")
+            try data.write(to: file, options: .atomic)
+            deliverCloudFile(file)
+        } catch { onCloudTransferError?(nil) }
+    }
+
     private func recoverCloudInbox() {
         // A process may stop after moving an SDK file but before handling it.
-        let directory = URL.applicationSupportDirectory.appendingPathComponent("PetPet/CloudInbox", isDirectory: true)
+        let directory = environment.storageDirectory(in: URL.applicationSupportDirectory.appendingPathComponent("PetPet", isDirectory: true))
+            .appendingPathComponent("CloudInbox", isDirectory: true)
         guard let files = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) else { return }
         for file in files where file.pathExtension == "json" { deliverCloudFile(file) }
     }
@@ -191,7 +219,12 @@ extension WatchConnectivityTransport: WCSessionDelegate {
 
     nonisolated public func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         let data = message[Self.snapshotKey] as? Data
+        let control = message[Self.cloudControlKey] as? Data
+        let file = message[Self.immediateCloudFileKey] as? Data
+        let environment = message[Self.cloudEnvironmentKey] as? String
         Task { @MainActor [weak self] in
+            if let control { self?.onCloudControl?(control); return }
+            if let file { self?.receiveImmediateCloudFile(file, environment: environment); return }
             guard let self, let data, let peer = self.connection.peerID else { return }
             self.recordDiagnostic("receivedMessage")
             self.onSnapshot?(data, peer)
@@ -226,12 +259,20 @@ extension WatchConnectivityTransport: WCSessionDelegate {
         do {
             let size = try file.fileURL.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? Int.max
             guard size <= CloudWire.maximumFileBytes else { throw BackendError.transferTooLarge }
-            let directory = URL.applicationSupportDirectory.appendingPathComponent("PetPet/CloudInbox", isDirectory: true)
+            let incomingEnvironment: CloudEnvironment
+            if let raw = file.metadata?[Self.cloudEnvironmentKey] as? String {
+                guard let parsed = CloudEnvironment(rawValue: raw) else { throw BackendError.environmentMismatch }
+                incomingEnvironment = parsed
+            } else { incomingEnvironment = .production }
+            let directory = incomingEnvironment.storageDirectory(in: URL.applicationSupportDirectory.appendingPathComponent("PetPet", isDirectory: true))
+                .appendingPathComponent("CloudInbox", isDirectory: true)
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             let destination = directory.appendingPathComponent(UUID().uuidString).appendingPathExtension("json")
             // The system deletes WCSessionFile after this callback returns.
             try FileManager.default.moveItem(at: file.fileURL, to: destination)
-            Task { @MainActor [weak self] in self?.deliverCloudFile(destination) }
+            if incomingEnvironment == environment {
+                Task { @MainActor [weak self] in self?.deliverCloudFile(destination) }
+            }
         } catch {
             Task { @MainActor [weak self] in self?.onCloudTransferError?(nil) }
         }

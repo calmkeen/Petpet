@@ -20,6 +20,9 @@ struct PhoneHomeView: View {
                     }
                     Text("함께 걷고, 함께 자라는 하루")
                         .foregroundStyle(.secondary)
+                    if accountViewModel.configuration.isDevelopment {
+                        Label("Debug 테스트 모드", systemImage: "hammer.fill").font(.caption).foregroundStyle(.orange)
+                    }
                     Label(viewModel.connectionText,
                           systemImage: viewModel.state.connection.isReachable ? "checkmark.circle.fill" : "clock")
                         .font(.footnote).foregroundStyle(green)

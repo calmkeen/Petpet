@@ -1,10 +1,17 @@
 import Foundation
+import PetPetCore
 
 struct AccountConfiguration {
     let baseURL: URL?
+    let environment = CloudEnvironment.current
+    var isDevelopment: Bool { environment == .development }
 
     init(bundle: Bundle = .main) {
+        #if DEBUG
+        baseURL = LocalDevelopmentBackend.baseURL
+        #else
         baseURL = URL(string: bundle.object(forInfoDictionaryKey: "PetPetAPIBaseURL") as? String ?? "")
+        #endif
     }
 
     var canSignIn: Bool {

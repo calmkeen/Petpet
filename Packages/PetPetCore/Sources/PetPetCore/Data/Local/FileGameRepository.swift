@@ -84,6 +84,7 @@ public actor FileGameRepository: StepHistoryRepository, PetProgressRepository {
         try await ensureLoaded()
         var next = cached!
         guard next.ownerID == nil || next.ownerID == accountID else { throw BackendError.accountMismatch }
+        guard !next.appliedBackups.contains(operationID) else { throw BackendError.operationExpired }
         if let pending = next.pending[operationID.uuidString] { return pending }
         guard next.pending.count < 32 else { throw BackendError.operationExpired }
         guard next.exportSequence < Int64.max else { throw BackendError.invalidResponse }
@@ -187,6 +188,11 @@ public actor FileGameRepository: StepHistoryRepository, PetProgressRepository {
         try await ensureLoaded()
         var next = cached!
         if next.pending.removeValue(forKey: operationID.uuidString) != nil { try commit(next) }
+    }
+
+    public func isBackupComplete(operationID: UUID) async throws -> Bool {
+        try await ensureLoaded()
+        return cached!.appliedBackups.contains(operationID)
     }
 
     private func mergedRecords() -> [String: Int] {

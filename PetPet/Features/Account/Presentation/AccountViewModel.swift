@@ -43,6 +43,19 @@ final class AccountViewModel: ObservableObject {
         await cloud?.synchronizeAccount()
     }
 
+    #if DEBUG
+    func signInForDevelopment() async {
+        guard let backend, !isSigningIn else { return }
+        isSigningIn = true; message = nil
+        defer { isSigningIn = false }
+        do {
+            session = try await backend.signInForDevelopment()
+            preview = nil
+            await cloud?.synchronizeAccount()
+        } catch { message = error.localizedDescription }
+    }
+    #endif
+
     func beginSignIn(_ request: ASAuthorizationAppleIDRequest) {
         guard canSignIn, !isSigningIn else { return }
         isSigningIn = true; message = nil

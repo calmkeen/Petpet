@@ -3,6 +3,17 @@ import XCTest
 @testable import PetPetCore
 
 final class DevelopmentModeTests: XCTestCase {
+    func testDelayedDuplicateExportRequestCannotCreateAnotherPendingBackup() async throws {
+        let root = folder(); defer { try? FileManager.default.removeItem(at: root) }
+        let game = FileGameRepository(directory: root)
+        let id = UUID()
+        let export = try await game.prepareBackup(operationID: id, accountID: "test")
+        _ = try await game.confirmBackup(CloudBackupReceipt(export: export, completedAt: Date()))
+        let completed = try await game.isBackupComplete(operationID: id)
+        XCTAssertTrue(completed)
+        do { _ = try await game.prepareBackup(operationID: id, accountID: "test"); XCTFail() }
+        catch { XCTAssertEqual(error as? BackendError, .operationExpired) }
+    }
     func testMockLoginCannotUseProductionClientOrAnyNetworkTransport() async throws {
         let http = RejectDevelopmentHTTP()
         for url in [URL(string: "https://api.example.test/")!, LocalDevelopmentBackend.baseURL] {

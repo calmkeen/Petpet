@@ -38,13 +38,13 @@ struct FoodInventoryView: View {
                     let pending = progress.pendingRewards(for: record)
                     Text("우유 \(pending.milk)개 · 사과 \(pending.apple)개")
                         .font(.caption).foregroundStyle(.green)
-                    Button("서버 백업·보상 받기") {
+                    Button(cloudViewModel.isDevelopment ? "모의 백업·보상 받기" : "서버 백업·보상 받기") {
                         Task { await cloudViewModel.requestBackup() }
                     }
                     .disabled(viewModel.isBusy || cloudViewModel.isBusy || steps.isLoading || cloudViewModel.account == nil)
                     .accessibilityIdentifier("watch.claimStepRewards")
                     if cloudViewModel.account == nil {
-                        Text("아이폰에서 로그인하면 서버 백업 후 보상을 받아요.")
+                        Text(cloudViewModel.isDevelopment ? "아이폰의 개발용 계정으로 로그인하면 모의 백업을 테스트할 수 있어요." : "아이폰에서 로그인하면 서버 백업 후 보상을 받아요.")
                             .font(.caption2).foregroundStyle(.secondary)
                     }
                     if let message = cloudViewModel.message {
