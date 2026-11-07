@@ -6,11 +6,15 @@
 
 기본 Debug는 모의 로그인과 아이폰 내부 영구 모의 백엔드를 사용하며, 무료 Personal Team으로 기기에 설치한다. 게임·수신 캐시·백업·Keychain을 Release와 분리하고, 기존 워치 상태를 개발용 공간에 한 번 복사한다. [개발 모드](DebugTesting.md).
 
+워치의 월별 로컬 스트릭과 아이폰의 서버 기록 히트맵, 양쪽 닉네임 편집기를 구현했다. `StepStreak`와 `NicknameEditor`는 공용 규칙을, `PhoneProfileCoordinator`·`WatchNicknameRelay`는 인증 API와 워치 요청의 경계를 담당한다. [규칙과 검증](StreakAndNickname.md).
+
 ```text
 PetPet/                         iPhone 앱 타깃
   App/                          앱 시작점과 의존성 조립
   Features/Home/Presentation/    SwiftUI 화면과 ViewModel
   Features/Account/Presentation/ Apple 로그인·백업·복원 미리보기
+  Features/Streak/Presentation/  서버 백업 기록·365일 히트맵
+  Features/Profile/Presentation/ 닉네임 입력과 중복·변경 상태
   Infrastructure/Account/       AuthenticationServices·Keychain 어댑터
   Preview Content/              Debug 전용 미리보기
 PetPet Watch App/               watchOS 앱 타깃
@@ -19,6 +23,8 @@ PetPet Watch App/               watchOS 앱 타깃
   Features/Pet/Presentation/     성장·스탯 화면과 펫 상태
   Features/Food/Presentation/    먹이 목록·소비·보상 수령 화면
   Features/Account/Presentation/ 계정·서버 백업 상태
+  Features/Streak/Presentation/  로컬 스트릭·월별 기록·날짜 선택
+  Features/Profile/Presentation/ watchOS 시스템 입력 기반 닉네임 편집
   Features/Character/Presentation/ 캐릭터 반응 초안
   Infrastructure/Motion/        CoreMotion 어댑터
   Infrastructure/Connectivity/ 워치 변경 감지와 전송 조립
@@ -56,7 +62,7 @@ flowchart LR
 
 - View는 화면과 사용자 입력을 담당한다. 센서·네트워크·저장소에 직접 접근하지 않는다.
 - ViewModel은 `@MainActor`에서 화면 상태를 발행한다. 센서 구현은 생성자로 주입한다.
-- 워치 루트는 `NavigationStack` 안의 `TabView(.verticalPage)`다. 크라운으로 홈·성장·먹이·계정 요약 섹션을 전환하며, 상세 목록은 스택에 연다. 루트의 추적 수명은 섹션·상세 화면 이동과 분리한다. [Apple의 크라운 페이지 전환 지침](https://developer.apple.com/videos/play/wwdc2023/10031/?time=347)을 따른다.
+- 워치 루트는 `NavigationStack` 안의 `TabView(.verticalPage)`다. 크라운으로 홈·성장·먹이·스트릭·계정 요약 섹션을 전환하며, 상세 목록은 스택에 연다. 루트의 추적 수명은 섹션·상세 화면 이동과 분리한다. [Apple의 크라운 페이지 전환 지침](https://developer.apple.com/videos/play/wwdc2023/10031/?time=347)을 따른다.
 - `PetPetCore`는 SwiftUI, CoreMotion, WatchConnectivity에 의존하지 않는다. iPhone과 Watch 타깃이 같은 로컬 Swift Package를 참조한다.
 - 같은 패키지의 별도 제품 `PetPetConnectivity`만 WatchConnectivity를 가져온다. 앱마다 WCSession 소유자는 한 개이며, SDK의 백그라운드 콜백을 MainActor로 넘긴다. `PhoneSnapshotReceiver`와 `WatchSnapshotPublisher`는 SDK 대신 주입 가능한 `SnapshotTransport` 계약을 사용한다.
 - `DailyStepTracker`는 저장값 복원, 자정부터의 누적 집계, 최근 기록 복구, 중복/지연 콜백, 날짜 변경을 처리한다. 센서·저장 오류는 화면까지 전달한다.
@@ -81,7 +87,7 @@ flowchart LR
 1. 하루 걸음수 집계·날짜 변경·재실행 복구와 로컬 저장: 완료.
 2. Android와 같은 보상 수치, 먹이 소비, 경험치·레벨·스탯·호감도 규칙: 완료. 기분 표시·터치는 연결했으며, 움직임 애니메이션은 후속 작업이다.
 3. iPhone 보조 홈과 WatchConnectivity 읽기 전용 동기화: 완료. 기기별 센서 값을 단순 합산하지 않는다.
-4. Apple 인증, Keychain 세션, 서버 백업·복원 클라이언트: 코드 구현 완료. 서버 Apple 인증과 개발자 팀 설정·실제 계정 검증 필요. 스트릭·닉네임 수정 UI는 후속 작업이다.
+4. Apple 인증, Keychain 세션, 서버 백업·복원 클라이언트: 코드 구현 완료. 서버 Apple 인증과 개발자 팀 설정·실제 계정 검증 필요. 스트릭·닉네임 UI와 Debug 모의 프로필도 구현했다.
 5. 게임 2종, 랭킹, 음성·AI 대화.
 
 각 단계에서 실제 Android 코드의 규칙·API DTO를 확인한 뒤 이식한다. 워치 백그라운드 동작은 Wear OS의 센서 구독을 그대로 복제하지 않고 Apple 플랫폼에서 지원하는 수집 방식과 실행 수명에 맞춰 구현한다.

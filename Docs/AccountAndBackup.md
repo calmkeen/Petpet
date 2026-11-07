@@ -25,7 +25,7 @@ iOS는 Apple 기본 `SignInWithAppleButton`과 AuthenticationServices를 사용�
 ## 사용자 흐름
 
 - iPhone에서 로그인하면 계정 표시 정보만 워치로 전송한다. 로그인 자체가 기존 워치 기록을 자동으로 덮어쓰거나 업로드하지 않는다.
-- iPhone의 **워치 기록 백업**, 워치의 네 번째 Crown 섹션 또는 먹이 화면의 **서버 백업·보상 받기**로 백업한다. 현재 기록을 로컬에 저장한 뒤 워치가 전체 보관 기록 중 미백업 날짜와 마지막 백업 날짜의 최신 합계를 추출한다. iPhone 홈의 최대 7일 캐시를 백업 원본으로 사용하지 않는다.
+- iPhone의 **워치 기록 백업**, 워치의 다섯 번째 Crown 계정 섹션 또는 먹이·스트릭 상세 화면의 **서버 백업·보상 받기**로 백업한다. 현재 기록을 로컬에 저장한 뒤 워치가 전체 보관 기록 중 미백업 날짜와 마지막 백업 날짜의 최신 합계를 추출한다. iPhone 홈의 최대 7일 캐시를 백업 원본으로 사용하지 않는다.
 - 서버 저장 성공을 iPhone에 먼저 기록하고 워치에 확인 메시지를 보낸다. 워치는 이 확인을 받은 뒤 해당 백업의 날짜·걸음수에 대해 우유와 사과를 지급한다. 실패한 백업과 센서 갱신에는 보상을 지급하지 않는다.
 - iPhone의 **서버 기록 불러오기**는 워치의 현재 상태와 서버 기록을 조회해 미리보기를 보여준다. 사용자가 **이 기록으로 복원**을 누른 경우에만 워치에 적용한다. 조회 이후 펫 상태가 바뀌면 복원을 거절하고 다시 조회하도록 안내한다.
 - 같은 계정의 걸음수는 날짜별 큰 값을 유지한다. 다른 계정으로 복원할 때는 이전 계정의 로컬 상태를 별도로 보관한다. 다른 계정의 기존 워치 상태를 바로 백업하는 동작은 거절한다.
@@ -41,6 +41,9 @@ iOS는 Apple 기본 `SignInWithAppleButton`과 AuthenticationServices를 사용�
 | 백업 | `POST /api/v1/backup`, Bearer access token |
 | 펫 복원 | `GET /api/v1/usermates/1`, Bearer access token |
 | 걸음수 복원 | `GET /api/v1/stepcounts/me`, Bearer access token |
+| 프로필·닉네임 | `GET /api/v1/users/me`, `GET /api/v1/users/nickname/check?nickname=…`, `PATCH /api/v1/users/nickname` |
+
+닉네임 편집·워치 중계와 백업 기록 기반 스트릭은 [스트릭·닉네임](StreakAndNickname.md)을 따른다. 새 Apple 인증을 제외한 이 프로필 경로들은 기존 서버 계약이다.
 
 백업의 `userMateId`는 서버 행 ID가 아니라 **카탈로그 mate ID 1**이다. 날짜는 `yyyy-MM-dd`, 걸음수는 정수, `lastFedAt`은 Android와 같은 시간대 없는 LocalDateTime 표현이다. 실제 서버의 로그인 응답에는 선택된 mate와 신규 사용자 여부가 없으므로 기본 mate 1을 사용한다. 복원 응답의 두 userId와 로그인 계정이 일치하는지 검증한다.
 
