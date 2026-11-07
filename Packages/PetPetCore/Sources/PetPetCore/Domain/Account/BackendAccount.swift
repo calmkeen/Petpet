@@ -48,4 +48,5 @@ public enum BackendError: Error, Equatable, Sendable {
     case http(Int), network, storage, watchUnavailable, transferTooLarge, operationExpired
     case invalidAppleCredential, appleLoginUnavailable
     case noBackup, environmentMismatch
+    case nicknameTooShort, nicknameTooLong, nicknameUnavailable
 }

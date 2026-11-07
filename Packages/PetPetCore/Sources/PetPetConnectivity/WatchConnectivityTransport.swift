@@ -14,6 +14,7 @@ public final class WatchConnectivityTransport: NSObject, SnapshotTransport, Clou
     private static let cloudFileKey = "petpet.cloudFile.v1"
     private static let cloudEnvironmentKey = "petpet.cloudEnvironment"
     private static let immediateCloudFileKey = "petpet.cloudFileData.v1"
+    private static let profileKey = "petpet.profile.request.v1"
     public private(set) var connection = SnapshotConnection()
     public var onConnectionChange: ((SnapshotConnection) -> Void)?
     public var onSnapshot: ((Data, String) -> Void)?
@@ -22,6 +23,7 @@ public final class WatchConnectivityTransport: NSObject, SnapshotTransport, Clou
     public var onCloudFile: ((URL) -> Void)?
     public var onCloudChallenge: (() async throws -> Data)?
     public var onCloudTransferError: ((String?) -> Void)?
+    public var onProfileRequest: ((Data) async throws -> Data)?
     private let session: WCSession?
     private nonisolated let environment: CloudEnvironment
     private var deliveredCloudFiles: Set<URL> = []
@@ -102,6 +104,19 @@ public final class WatchConnectivityTransport: NSObject, SnapshotTransport, Clou
         return try await withCheckedThrowingContinuation { continuation in
             session.sendMessage([Self.cloudChallengeKey: true], replyHandler: { reply in
                 guard let data = reply[Self.cloudChallengeKey] as? Data else {
+                    continuation.resume(throwing: BackendError.watchUnavailable); return
+                }
+                continuation.resume(returning: data)
+            }, errorHandler: { _ in continuation.resume(throwing: BackendError.watchUnavailable) })
+        }
+    }
+
+    public func requestProfile(_ data: Data) async throws -> Data {
+        guard data.count <= 60_000 else { throw BackendError.transferTooLarge }
+        guard let session, session.activationState == .activated, session.isReachable else { throw BackendError.watchUnavailable }
+        return try await withCheckedThrowingContinuation { continuation in
+            session.sendMessage([Self.profileKey: data], replyHandler: { reply in
+                guard let data = reply[Self.profileKey] as? Data, data.count <= 60_000 else {
                     continuation.resume(throwing: BackendError.watchUnavailable); return
                 }
                 continuation.resume(returning: data)
@@ -234,7 +249,14 @@ extension WatchConnectivityTransport: WCSessionDelegate {
     nonisolated public func session(_ session: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         let requestsSnapshot = message[Self.requestKey] as? Bool == true
         let requestsCloud = message[Self.cloudChallengeKey] as? Bool == true
+        let profileData = message[Self.profileKey] as? Data
         Task { @MainActor [weak self] in
+            if let profileData {
+                guard profileData.count <= 60_000, let handler = self?.onProfileRequest else { replyHandler(["error": true]); return }
+                do { replyHandler([Self.profileKey: try await handler(profileData)]) }
+                catch { replyHandler(["error": true]) }
+                return
+            }
             if requestsCloud {
                 guard let request = self?.onCloudChallenge else { replyHandler(["error": true]); return }
                 do { replyHandler([Self.cloudChallengeKey: try await request()]) }

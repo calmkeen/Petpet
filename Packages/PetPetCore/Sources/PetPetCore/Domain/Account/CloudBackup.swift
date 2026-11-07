@@ -115,6 +115,30 @@ public enum CloudWire {
         return try JSONDecoder().decode(WatchRestoreChallenge.self, from: data)
     }
 
+    public static func encodeProfileRequest(_ value: NicknameRequest, environment: CloudEnvironment) throws -> Data {
+        try encodeProfile(value, environment: environment)
+    }
+    public static func decodeProfileRequest(_ data: Data, environment: CloudEnvironment) throws -> NicknameRequest {
+        try decodeProfile(data, environment: environment)
+    }
+    public static func encodeProfileReply(_ value: NicknameReply, environment: CloudEnvironment) throws -> Data {
+        try encodeProfile(value, environment: environment)
+    }
+    public static func decodeProfileReply(_ data: Data, environment: CloudEnvironment) throws -> NicknameReply {
+        try decodeProfile(data, environment: environment)
+    }
+    private static func encodeProfile<Value: Codable>(_ value: Value, environment: CloudEnvironment) throws -> Data {
+        let data = try JSONEncoder().encode(Envelope(value: value, environment: environment))
+        guard data.count <= 60_000 else { throw BackendError.transferTooLarge }
+        return data
+    }
+    private static func decodeProfile<Value: Codable>(_ data: Data, environment: CloudEnvironment) throws -> Value {
+        guard data.count <= 60_000 else { throw BackendError.transferTooLarge }
+        let decoded = try JSONDecoder().decode(Envelope<Value>.self, from: data)
+        try validate(version: decoded.version, environment: decoded.environment, expected: environment)
+        return decoded.value
+    }
+
     private static func validate(version: Int, environment: CloudEnvironment?, expected: CloudEnvironment) throws {
         guard (environment ?? .production) == expected else { throw BackendError.environmentMismatch }
         guard version == (expected == .development ? 2 : 1) else { throw BackendError.invalidResponse }
@@ -131,4 +155,11 @@ public protocol CloudTransport: AnyObject {
     func enqueueCloudControl(_ data: Data) throws
     func enqueueCloudFile(_ url: URL) throws
     func requestCloudChallenge() async throws -> Data
+    var onProfileRequest: ((Data) async throws -> Data)? { get set }
+    func requestProfile(_ data: Data) async throws -> Data
+}
+
+extension CloudTransport {
+    public var onProfileRequest: ((Data) async throws -> Data)? { get { nil } set {} }
+    public func requestProfile(_ data: Data) async throws -> Data { throw BackendError.watchUnavailable }
 }

@@ -8,12 +8,14 @@ import FoundationNetworking
 public actor LocalDevelopmentBackend: BackendHTTPTransport {
     public static let baseURL = URL(string: "https://debug.petpet.invalid/")!
     public static let accountID: Int64 = 900_000_001
+    public static let reservedNicknames: Set<String> = ["사용중닉네임", "StepMate"]
     private struct Archive: Codable {
         var version = 1
         var accessToken: String?
         var refreshToken: String?
         var pet: ServerBackupRequest?
         var records: [String: Int] = [:]
+        var nickname: String?
     }
     private let fileURL: URL
     private var cached: Archive?
@@ -22,7 +24,8 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport {
 
     public func send(_ request: URLRequest) async throws -> BackendHTTPResponse {
         guard let url = request.url, url.scheme == Self.baseURL.scheme, url.host == Self.baseURL.host,
-              url.port == nil, url.user == nil, url.password == nil, url.query == nil, url.fragment == nil else {
+              url.port == nil, url.user == nil, url.password == nil, url.fragment == nil,
+              url.query == nil || (url.path == "/api/v1/users/nickname/check" && request.httpMethod == "GET") else {
             throw BackendError.configurationMissing
         }
         try load()
@@ -38,6 +41,25 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport {
                   request.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)" else { return response(401) }
         }
         switch (request.httpMethod ?? "GET", url.path) {
+        case ("GET", "/api/v1/users/me"):
+            return try json(["nickname": currentNickname])
+        case ("GET", "/api/v1/users/nickname/check"):
+            let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+            guard items.count == 1, items.first?.name == "nickname", let nickname = items.first?.value else { return response(400) }
+            do { try NicknameRules.validate(nickname) } catch { return response(400) }
+            let duplicated = Self.reservedNicknames.contains(nickname) || nickname == currentNickname
+            return try json(["duplicated": duplicated, "nickname": nickname, "message": duplicated ? "중복된 닉네임입니다." : "사용 가능한 닉네임입니다."])
+        case ("PATCH", "/api/v1/users/nickname"):
+            guard let body = try? JSONDecoder().decode([String: String].self, from: request.httpBody ?? Data()),
+                  let nickname = body["nickname"] else { return response(400) }
+            do { try NicknameRules.validate(nickname) } catch { return response(400) }
+            let duplicated = Self.reservedNicknames.contains(nickname)
+            if !duplicated {
+                var next = cached!; next.nickname = nickname
+                try write(next)
+            }
+            return try json(["duplicated": duplicated, "nickname": nickname,
+                             "message": duplicated ? "중복된 닉네임입니다." : "닉네임을 변경했습니다."])
         case ("POST", "/api/v1/backup"):
             let backup: ServerBackupRequest
             do {
@@ -71,8 +93,10 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport {
         // Commit first, just as a server must finish its transaction before 200.
         try write(next)
         return try json(["userId": Self.accountID, "accessToken": next.accessToken!, "refreshToken": next.refreshToken!,
-                         "name": "개발 테스트 계정", "nickname": "개발 테스트 계정", "selectedMateId": 1])
+                         "name": "개발 테스트 계정", "nickname": currentNickname, "selectedMateId": 1])
     }
+
+    private var currentNickname: String { cached?.nickname ?? "개발 테스트 계정" }
 
     private func validate(_ backup: ServerBackupRequest) throws {
         guard !backup.stepCounts.isEmpty, let mood = PetMood(rawValue: backup.status) else { throw BackendError.invalidResponse }

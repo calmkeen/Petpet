@@ -15,6 +15,8 @@ public actor BackendClient {
     private var refreshTask: Task<BackendSession, Error>?
     private var refreshID: UUID?
     private var storageTail: Task<Void, Error>?
+    private var nicknameTail: Task<String, Error>?
+    private var nicknameRevision = 0
 
     public init(baseURL: URL, transport: any BackendHTTPTransport = URLSessionBackendTransport(),
                 store: any BackendSessionStore) throws {
@@ -59,7 +61,7 @@ public actor BackendClient {
         )
         try await persist(result, epoch: token)
         try checkEpoch(token)
-        cached = result; loaded = true
+        loaded = true
         return result
     }
 
@@ -91,7 +93,7 @@ public actor BackendClient {
                                     identityProvider: .apple, providerSubject: identity.userIdentifier)
         try await persist(result, epoch: token)
         try checkEpoch(token)
-        cached = result; loaded = true
+        loaded = true
         return result
     }
 
@@ -125,7 +127,6 @@ public actor BackendClient {
                                      name: auth.name, nickname: auth.nickname)
         try await persist(session, epoch: token)
         try checkEpoch(token)
-        cached = session
         return session
     }
     #endif
@@ -133,6 +134,73 @@ public actor BackendClient {
     public func saveBackup(_ request: ServerBackupRequest, accountID: String) async throws {
         _ = try await authorized(path: "api/v1/backup", method: "POST",
                                  data: JSONEncoder().encode(request), accountID: accountID)
+    }
+
+    public func profileNickname(accountID: String) async throws -> String? {
+        _ = try await session()
+        let token = epoch
+        let revision = nicknameRevision
+        let data = try await authorized(path: "api/v1/users/me", method: "GET", accountID: accountID)
+        let profile: AccountProfileResponse
+        do { profile = try JSONDecoder().decode(AccountProfileResponse.self, from: data) }
+        catch { throw BackendError.invalidResponse }
+        if revision != nicknameRevision {
+            _ = try? await storageTail?.value
+            try checkEpoch(token)
+            return cached?.nickname
+        }
+        if let nickname = profile.nickname {
+            try await persistNickname(nickname, accountID: accountID, epoch: token)
+        }
+        return profile.nickname
+    }
+
+    public func stepHistory(accountID: String) async throws -> [DailyStepRecord] {
+        let data = try await authorized(path: "api/v1/stepcounts/me", method: "GET", accountID: accountID)
+        let response: ServerStepsResponse
+        do { response = try JSONDecoder().decode(ServerStepsResponse.self, from: data) }
+        catch { throw BackendError.invalidResponse }
+        guard Int64(accountID).map({ $0 == response.userId }) ?? true else { throw BackendError.accountMismatch }
+        let records = try response.stepCounts.map { record -> DailyStepRecord in
+            guard let count = Int(exactly: record.stepCount) else { throw BackendError.invalidResponse }
+            return DailyStepRecord(date: record.date, stepCount: count)
+        }
+        try ServerRestoreState.validate(pet: PetProgress.newUser(at: Date()).pet, steps: records)
+        return records
+    }
+
+    public func checkNickname(_ value: String, accountID: String) async throws -> Bool {
+        try NicknameRules.validate(value)
+        let data = try await authorized(path: "api/v1/users/nickname/check", method: "GET", accountID: accountID,
+                                        query: [URLQueryItem(name: "nickname", value: value)])
+        let response = try nicknameResponse(data)
+        guard response.nickname.utf8.elementsEqual(value.utf8) else { throw BackendError.invalidResponse }
+        return !response.duplicated
+    }
+
+    public func updateNickname(_ value: String, accountID: String) async throws -> String {
+        try NicknameRules.validate(value)
+        guard try await session()?.accountID == accountID else { throw BackendError.authenticationRequired }
+        let token = epoch
+        let previous = nicknameTail
+        let task = Task {
+            _ = try? await previous?.value
+            try self.checkEpoch(token)
+            let data: Data
+            do {
+                data = try await self.authorized(path: "api/v1/users/nickname", method: "PATCH",
+                    data: JSONEncoder().encode(["nickname": value]), accountID: accountID)
+            } catch BackendError.http(409) { throw BackendError.nicknameUnavailable }
+            let response = try self.nicknameResponse(data)
+            guard !response.duplicated else { throw BackendError.nicknameUnavailable }
+            guard response.nickname.utf8.elementsEqual(value.utf8) else { throw BackendError.invalidResponse }
+            try NicknameRules.validate(response.nickname)
+            self.nicknameRevision += 1
+            try await self.persistNickname(response.nickname, accountID: accountID, epoch: token)
+            return response.nickname
+        }
+        nicknameTail = task
+        return try await task.value
     }
 
     public func restore(accountID: String, timeZone: TimeZone = .current) async throws -> ServerRestoreState {
@@ -165,15 +233,16 @@ public actor BackendClient {
         return try ServerRestoreState(accountID: accountID, pet: profile, steps: records)
     }
 
-    private func authorized(path: String, method: String, data: Data? = nil, accountID: String) async throws -> Data {
+    private func authorized(path: String, method: String, data: Data? = nil, accountID: String,
+                            query: [URLQueryItem] = []) async throws -> Data {
         guard let current = try await session(), current.accountID == accountID else { throw BackendError.authenticationRequired }
         let token = epoch
-        var response = try await send(path: path, method: method, data: data, bearer: current.accessToken)
+        var response = try await send(path: path, method: method, data: data, bearer: current.accessToken, query: query)
         try checkEpoch(token)
         if response.statusCode == 401 || response.statusCode == 403 {
             let renewed = try await refresh(rejectedToken: current.accessToken, epoch: token)
             try checkEpoch(token)
-            response = try await send(path: path, method: method, data: data, bearer: renewed.accessToken)
+            response = try await send(path: path, method: method, data: data, bearer: renewed.accessToken, query: query)
             try checkEpoch(token)
             if response.statusCode == 401 || response.statusCode == 403 {
                 try await signOut()
@@ -221,10 +290,9 @@ public actor BackendClient {
                                   isNewUser: current.isNewUser, identityProvider: current.identityProvider,
                                   providerSubject: current.providerSubject)
             try self.checkEpoch(token)
-            try await self.persist(result, epoch: token)
+            try await self.persist(result, epoch: token, preservingNickname: true)
             try self.checkEpoch(token)
-            self.cached = result
-            return result
+            return self.cached ?? result
         }
         refreshTask = task
         do {
@@ -245,8 +313,19 @@ public actor BackendClient {
         try await send(path: path, method: "POST", data: JSONEncoder().encode(body))
     }
 
-    private func send(path: String, method: String, data: Data?, bearer: String? = nil) async throws -> BackendHTTPResponse {
-        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+    private func send(path: String, method: String, data: Data?, bearer: String? = nil,
+                      query: [URLQueryItem] = []) async throws -> BackendHTTPResponse {
+        guard var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false) else {
+            throw BackendError.invalidServerURL
+        }
+        if !query.isEmpty {
+            components.queryItems = query
+            // Servlet query decoders treat a bare '+' as a space, while
+            // URLComponents follows RFC 3986. Preserve literal nickname '+'.
+            components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+        }
+        guard let url = components.url else { throw BackendError.invalidServerURL }
+        var request = URLRequest(url: url)
         request.httpMethod = method; request.httpBody = data
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         if data != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
@@ -258,17 +337,42 @@ public actor BackendClient {
         guard value == epoch else { throw BackendError.sessionChanged }
     }
 
-    private func persist(_ session: BackendSession?, epoch token: Int) async throws {
+    private func persist(_ session: BackendSession?, epoch token: Int, preservingNickname: Bool = false) async throws {
         let previous = storageTail
         let task = Task { [store] in
             _ = try? await previous?.value
             try self.checkEpoch(token)
-            if let session { try await store.save(session) }
+            var next = session
+            if preservingNickname, let nickname = self.cached?.nickname { next = next?.replacingNickname(nickname) }
+            if let next { try await store.save(next) }
             else { try await store.clear() }
+            try self.checkEpoch(token)
+            self.cached = next
         }
         storageTail = task
         try await task.value
         try checkEpoch(token)
+    }
+
+    private func persistNickname(_ nickname: String, accountID: String, epoch token: Int) async throws {
+        let previous = storageTail
+        let task = Task { [store] in
+            _ = try? await previous?.value
+            try self.checkEpoch(token)
+            guard let latest = self.cached, latest.accountID == accountID else { throw BackendError.sessionChanged }
+            let updated = latest.replacingNickname(nickname)
+            try await store.save(updated)
+            try self.checkEpoch(token)
+            self.cached = updated
+        }
+        storageTail = task
+        try await task.value
+        try checkEpoch(token)
+    }
+
+    private func nicknameResponse(_ data: Data) throws -> NicknameResponse {
+        do { return try JSONDecoder().decode(NicknameResponse.self, from: data) }
+        catch { throw BackendError.invalidResponse }
     }
     private func requireSuccess(_ response: BackendHTTPResponse) throws {
         guard (200..<300).contains(response.statusCode) else { throw BackendError.http(response.statusCode) }
