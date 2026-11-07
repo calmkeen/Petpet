@@ -73,7 +73,7 @@ struct WatchHomeView: View {
                         }
                         .accessibilityIdentifier("watch.openPetStatistics")
                         NavigationLink {
-                            FoodInventoryView(viewModel: petViewModel, steps: viewModel.state)
+                            FoodInventoryView(viewModel: petViewModel, stepViewModel: viewModel)
                         } label: {
                             Label("먹이", systemImage: "carrot.fill")
                         }

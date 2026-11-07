@@ -3,7 +3,9 @@ import PetPetCore
 
 struct FoodInventoryView: View {
     @ObservedObject var viewModel: PetProgressViewModel
-    let steps: DailyStepState
+    @ObservedObject var stepViewModel: WatchHomeViewModel
+
+    private var steps: DailyStepState { stepViewModel.state }
 
     private var record: DailyStepRecord {
         DailyStepRecord(date: steps.date, stepCount: steps.stepCount)
