@@ -1,27 +1,160 @@
-//
-//  PhoneHomeView.swift
-//  PetPet
-//
-//  Created by calmkeen on 9/20/25.
-//
-
 import SwiftUI
+import PetPetCore
 
 @MainActor
 struct PhoneHomeView: View {
     @ObservedObject var viewModel: PhoneHomeViewModel
-    var body: some View {
-        ZStack{
-            VStack {
-                Text(Date(), style: .time)
-                Image(systemName: "globe")
-                    .imageScale(.large)
-                    .foregroundStyle(.tint)
-                Text("Step Count: \(viewModel.stepCountText)")
-                    .accessibilityIdentifier("phone.stepCount")
-            }
-            .padding()
-        }
+    @Environment(\.scenePhase) private var scenePhase
+    private let green = Color(red: 0.12, green: 0.42, blue: 0.32)
 
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    HStack {
+                        Label("PetPet", systemImage: "pawprint.fill")
+                            .font(.largeTitle.bold()).foregroundStyle(green)
+                        Spacer()
+                        Image(systemName: "applewatch").font(.title2).foregroundStyle(green)
+                    }
+                    Text("함께 걷고, 함께 자라는 하루")
+                        .foregroundStyle(.secondary)
+                    Label(viewModel.connectionText,
+                          systemImage: viewModel.state.connection.isReachable ? "checkmark.circle.fill" : "clock")
+                        .font(.footnote).foregroundStyle(green)
+                    stepsCard
+                    petCard
+                    if let snapshot = viewModel.snapshot {
+                        card {
+                            Text("보유 먹이").font(.headline)
+                            HStack {
+                                ForEach(FoodCatalog.all) { food in
+                                    let quantity = snapshot.inventory.first { $0.foodID == food.id }?.quantity ?? 0
+                                    VStack(spacing: 8) {
+                                        Text(food.name).foregroundStyle(.secondary)
+                                        Text("\(quantity)개").font(.title3.bold()).monospacedDigit()
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                }
+                            }
+                            .padding(.top, 6)
+                        }
+                    }
+                    VStack(alignment: .leading, spacing: 12) {
+                        if let receivedAt = viewModel.state.cached?.receivedAt {
+                            Text("마지막 동기화 \(receivedAt.formatted(date: .abbreviated, time: .shortened))")
+                                .font(.caption).foregroundStyle(.secondary)
+                                .accessibilityIdentifier("phone.lastSyncedAt")
+                        }
+                        Text(viewModel.syncNote).font(.footnote).foregroundStyle(.secondary)
+                        Button {
+                            Task { await viewModel.refresh() }
+                        } label: {
+                            HStack {
+                                if viewModel.state.isRefreshing { ProgressView().tint(.white) }
+                                Label("지금 동기화", systemImage: "arrow.triangle.2.circlepath")
+                            }
+                            .frame(maxWidth: .infinity).padding(.vertical, 6)
+                        }
+                        .buttonStyle(.borderedProminent).tint(green)
+                        .disabled(viewModel.state.isRefreshing)
+                        .accessibilityIdentifier("phone.refreshWatchData")
+                    }
+                }
+                .padding(20)
+            }
+            .background(Color(uiColor: .systemGroupedBackground))
+            .toolbar(.hidden, for: .navigationBar)
+            .refreshable { await viewModel.refresh() }
+        }
+        .task { await viewModel.start() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                viewModel.refreshDate()
+                Task { await viewModel.refresh() }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in viewModel.refreshDate() }
+        .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in viewModel.refreshDate() }
+    }
+
+    private var stepsCard: some View {
+        card {
+            HStack {
+                Label("오늘의 걸음", systemImage: "figure.walk")
+                    .font(.headline).foregroundStyle(green)
+                Spacer()
+                Text(Date(), format: .dateTime.month().day()).font(.subheadline).foregroundStyle(.secondary)
+            }
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(viewModel.stepCountText).font(.system(size: 48, weight: .bold, design: .rounded))
+                    .minimumScaleFactor(0.6).lineLimit(1).monospacedDigit()
+                    .accessibilityIdentifier("phone.stepCount")
+                Text("걸음").font(.headline).foregroundStyle(.secondary)
+            }
+            Text("Apple Watch에서 측정한 하루 걸음수")
+                .font(.caption).foregroundStyle(.secondary)
+        }
+    }
+
+    private var petCard: some View {
+        card {
+            Text("나의 펫").font(.headline)
+            if let pet = viewModel.snapshot?.pet {
+                HStack(spacing: 20) {
+                    Image("pet_fox").resizable().scaledToFit().frame(width: 94, height: 110)
+                        .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Lv.\(pet.level)").font(.largeTitle.bold())
+                            .accessibilityIdentifier("phone.petLevel")
+                        Text(moodText(pet.mood)).font(.subheadline).foregroundStyle(green)
+                        ProgressView(value: Double(pet.experience), total: Double(pet.level * 2)).tint(green)
+                        Text("경험치 \(pet.experience) / \(pet.level * 2)")
+                            .font(.caption).foregroundStyle(.secondary).monospacedDigit()
+                    }
+                }
+                HStack {
+                    statistic("공격력", value: pet.attack)
+                    statistic("방어력", value: pet.defense)
+                    statistic("체력", value: pet.health)
+                }
+                Divider().padding(.vertical, 4)
+                HStack {
+                    Label("호감도 \(pet.affection)", systemImage: "heart.fill").foregroundStyle(.pink)
+                    Spacer()
+                    Text("스탯 포인트 \(pet.statPoints)").foregroundStyle(.secondary)
+                }
+                .font(.caption)
+                if let lastFed = pet.lastFedAt {
+                    Text("마지막 식사 \(lastFed.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            } else {
+                Label("워치의 펫을 기다리고 있어요", systemImage: "pawprint")
+                    .foregroundStyle(.secondary).padding(.vertical, 24)
+            }
+        }
+    }
+
+    private func statistic(_ name: String, value: Int64) -> some View {
+        VStack(spacing: 5) {
+            Text(name).font(.caption).foregroundStyle(.secondary)
+            Text(value.formatted()).font(.headline).monospacedDigit()
+        }.frame(maxWidth: .infinity)
+    }
+
+    private func card<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 14, content: content)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(20)
+            .background(.background, in: RoundedRectangle(cornerRadius: 24))
+    }
+
+    private func moodText(_ mood: PetMood) -> String {
+        switch mood {
+        case .happy: "행복해요"
+        case .sad: "보고 싶었어요"
+        case .hungry: "배고파요"
+        }
     }
 }

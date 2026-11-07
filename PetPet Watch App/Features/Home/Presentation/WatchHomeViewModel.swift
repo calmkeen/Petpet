@@ -4,6 +4,8 @@ import PetPetCore
 @MainActor
 final class WatchHomeViewModel: ObservableObject {
     @Published private(set) var state: DailyStepState
+    @Published private(set) var syncError: String?
+    var onRecordsReady: (() -> Void)?
     private let tracker: DailyStepTracker
 
     init(stepCounter: any StepCounting, repository: any StepHistoryRepository) {
@@ -23,11 +25,17 @@ final class WatchHomeViewModel: ObservableObject {
         case .updateFailed:
             return "걸음 수를 불러오지 못했어요. 앱을 다시 열어 주세요."
         case nil:
-            return state.hasStorageError ? "걸음 수 기록을 저장하지 못했어요." : nil
+            return state.hasStorageError ? "걸음 수 기록을 저장하지 못했어요." : syncError
         }
     }
 
-    func start() async { await tracker.start() }
+    func start() async {
+        await tracker.start()
+        await tracker.finishHistoryRecovery()
+        onRecordsReady?()
+    }
+    func flush() async { await tracker.flush() }
+    func setSyncError(_ message: String?) { syncError = message }
     func refresh() async { await tracker.refresh() }
     func stop() {
         tracker.stop()

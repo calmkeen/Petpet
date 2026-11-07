@@ -36,6 +36,7 @@ public final class WatchConnectivityTransport: NSObject, SnapshotTransport {
         guard let session, session.activationState == .activated else { throw SnapshotSyncError.notActivated }
         // Context delivery persists while unreachable and coalesces updates.
         try session.updateApplicationContext([Self.snapshotKey: data])
+        recordDiagnostic("queued")
         if session.isReachable {
             session.sendMessage([Self.snapshotKey: data], replyHandler: nil, errorHandler: { _ in
                 // The queued application context remains the fallback.
@@ -63,7 +64,8 @@ public final class WatchConnectivityTransport: NSObject, SnapshotTransport {
         connection = SnapshotConnection(
             isActivated: session.activationState == .activated,
             isPaired: session.isPaired, isCounterpartInstalled: session.isWatchAppInstalled,
-            isReachable: session.isReachable, peerID: session.watchDirectoryURL?.absoluteString
+            isReachable: session.isReachable,
+            peerID: session.activationState == .notActivated ? nil : session.watchDirectoryURL?.absoluteString
         )
         #else
         connection = SnapshotConnection(
@@ -73,6 +75,31 @@ public final class WatchConnectivityTransport: NSObject, SnapshotTransport {
         )
         #endif
         onConnectionChange?(connection)
+        recordDiagnostic("connection")
+    }
+
+    /// Local development diagnostics contain connection flags only, never
+    /// activity values, pet data, account information or a device identifier.
+    private func recordDiagnostic(_ event: String, error: Error? = nil) {
+        #if DEBUG
+        var flags: [String: Any] = [
+            "event": event, "activated": connection.isActivated,
+            "paired": connection.isPaired, "installed": connection.isCounterpartInstalled,
+            "reachable": connection.isReachable, "hasPeerID": connection.peerID != nil,
+            "outgoingKeys": session?.applicationContext.keys.sorted() ?? [],
+            "incomingKeys": session?.receivedApplicationContext.keys.sorted() ?? []
+        ]
+        if let error {
+            flags["errorCode"] = (error as NSError).code
+            flags["errorDomain"] = (error as NSError).domain
+        }
+        let url = URL.applicationSupportDirectory.appendingPathComponent("PetPet", isDirectory: true)
+            .appendingPathComponent("connectivity-debug.json")
+        do {
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try JSONSerialization.data(withJSONObject: flags).write(to: url, options: .atomic)
+        } catch { /* Diagnostics must not affect the actual transfer. */ }
+        #endif
     }
 
     private func receiveContext(_ context: [String: Any]) {
@@ -87,6 +114,7 @@ extension WatchConnectivityTransport: WCSessionDelegate {
     nonisolated public func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         Task { @MainActor [weak self] in
             self?.updateConnection()
+            self?.recordDiagnostic("activation", error: error)
             self?.receiveContext(session.receivedApplicationContext)
         }
     }
@@ -99,6 +127,7 @@ extension WatchConnectivityTransport: WCSessionDelegate {
         let data = applicationContext[Self.snapshotKey] as? Data
         Task { @MainActor [weak self] in
             guard let self, let data, let peer = self.connection.peerID else { return }
+            self.recordDiagnostic("receivedContext")
             self.onSnapshot?(data, peer)
         }
     }
@@ -107,6 +136,7 @@ extension WatchConnectivityTransport: WCSessionDelegate {
         let data = message[Self.snapshotKey] as? Data
         Task { @MainActor [weak self] in
             guard let self, let data, let peer = self.connection.peerID else { return }
+            self.recordDiagnostic("receivedMessage")
             self.onSnapshot?(data, peer)
         }
     }

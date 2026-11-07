@@ -17,6 +17,7 @@ models, repository contracts, and sensor-session logic live in the local
 - [Android feature parity and implementation order](Docs/AndroidParity.md)
 - [Daily steps, persistence, and recovery](Docs/DailySteps.md)
 - [Feeding, growth, and step rewards](Docs/FeedingAndGrowth.md)
+- [iPhone and Apple Watch synchronization](Docs/WatchSynchronization.md)
 
 The watch app displays a pet and today's steps, restores calendar-day totals,
 and saves daily history locally. It refreshes system pedometer history when the
@@ -27,6 +28,9 @@ The Digital Crown switches between home, growth, and food overview pages;
 opening a management screen lets the Crown scroll its detailed list.
 Rewards are claimed after a successful local save; Android's server-backup trigger
 will be connected when authentication and backend integration are implemented.
-Synchronization, backend services, games, and voice remain subsequent milestones.
-The iPhone displays no step value until activity data is synchronized.
+The iPhone receives the watch's daily steps, pet state, and food inventory through
+WatchConnectivity and keeps the latest valid snapshot for offline viewing.
+It shows connection status, last sync time, and a manual refresh action. Missing
+today's data is displayed as a dash. Backend services, games, and voice remain
+subsequent milestones.
 

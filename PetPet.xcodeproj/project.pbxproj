@@ -10,6 +10,8 @@
 		7557C5222E7E6A5F00B6970A /* PetPet Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 7557C5212E7E6A5F00B6970A /* PetPet Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A1B2C3D4E5F6071829300001 /* PetPetCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829300004 /* PetPetCore */; };
 		A1B2C3D4E5F6071829300002 /* PetPetCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829300005 /* PetPetCore */; };
+		A1B2C3D4E5F6071829300006 /* PetPetConnectivity in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829300008 /* PetPetConnectivity */; };
+		A1B2C3D4E5F6071829300007 /* PetPetConnectivity in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829300009 /* PetPetConnectivity */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -112,6 +114,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1B2C3D4E5F6071829300001 /* PetPetCore in Frameworks */,
+				A1B2C3D4E5F6071829300006 /* PetPetConnectivity in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,6 +137,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1B2C3D4E5F6071829300002 /* PetPetCore in Frameworks */,
+				A1B2C3D4E5F6071829300007 /* PetPetConnectivity in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +207,7 @@
 			name = PetPet;
 			packageProductDependencies = (
 				A1B2C3D4E5F6071829300004 /* PetPetCore */,
+				A1B2C3D4E5F6071829300008 /* PetPetConnectivity */,
 			);
 			productName = PetPet;
 			productReference = 7557C4FB2E7E6A5C00B6970A /* PetPet.app */;
@@ -272,6 +277,7 @@
 			name = "PetPet Watch App";
 			packageProductDependencies = (
 				A1B2C3D4E5F6071829300005 /* PetPetCore */,
+				A1B2C3D4E5F6071829300009 /* PetPetConnectivity */,
 			);
 			productName = "PetPet Watch App";
 			productReference = 7557C5212E7E6A5F00B6970A /* PetPet Watch App.app */;
@@ -992,6 +998,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A1B2C3D4E5F6071829300003 /* XCLocalSwiftPackageReference "Packages/PetPetCore" */;
 			productName = PetPetCore;
+		};
+		A1B2C3D4E5F6071829300008 /* PetPetConnectivity */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D4E5F6071829300003 /* XCLocalSwiftPackageReference "Packages/PetPetCore" */;
+			productName = PetPetConnectivity;
+		};
+		A1B2C3D4E5F6071829300009 /* PetPetConnectivity */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D4E5F6071829300003 /* XCLocalSwiftPackageReference "Packages/PetPetCore" */;
+			productName = PetPetConnectivity;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

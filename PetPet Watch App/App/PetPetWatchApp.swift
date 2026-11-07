@@ -14,6 +14,7 @@ import PetPetCore
 struct PetPetWatchApp: App {
     @StateObject private var homeViewModel: WatchHomeViewModel
     @StateObject private var petViewModel: PetProgressViewModel
+    @StateObject private var syncController: WatchSyncController
 
     init() {
         let historyURL = URL.applicationSupportDirectory
@@ -24,17 +25,21 @@ struct PetPetWatchApp: App {
             fileURL: historyURL.deletingLastPathComponent()
                 .appendingPathComponent("pet-progress-v1.json")
         )
-        _homeViewModel = StateObject(
-            wrappedValue: WatchHomeViewModel(stepCounter: CoreMotionStepCounter(), repository: history)
+        let home = WatchHomeViewModel(stepCounter: CoreMotionStepCounter(), repository: history)
+        let pet = PetProgressViewModel(repository: progress, history: history)
+        _homeViewModel = StateObject(wrappedValue: home)
+        _petViewModel = StateObject(wrappedValue: pet)
+        let sync = WatchSyncController(
+            home: home, pet: pet, history: history, progress: progress,
+            outboxURL: historyURL.deletingLastPathComponent().appendingPathComponent("watch-sync-outbox-v1.json")
         )
-        _petViewModel = StateObject(
-            wrappedValue: PetProgressViewModel(repository: progress, history: history)
-        )
+        _syncController = StateObject(wrappedValue: sync)
     }
 
     var body: some Scene {
         WindowGroup {
             WatchHomeView(viewModel: homeViewModel, petViewModel: petViewModel)
+                .environmentObject(syncController)
         }
     }
 }

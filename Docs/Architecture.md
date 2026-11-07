@@ -2,7 +2,7 @@
 
 ## 현재 완료 범위
 
-워치 홈, 하루 걸음수 집계·저장, 먹이 소비·성장·스탯·호감도와 걸음수 보상을 구현했다. iPhone은 Android의 폰 앱처럼 로그인·조회·동기화 보조 역할을 맡는 방향으로 둔다. 서버는 기존 StepMate API 재사용을 기본 방향으로 하되 아직 연결하지 않는다.
+워치 홈, 하루 걸음수 집계·저장, 먹이 소비·성장·스탯·호감도와 걸음수 보상을 구현했다. iPhone은 워치에서 수신한 걸음수·펫·먹이를 읽기 전용으로 표시하며 마지막 수신값을 저장한다. 서버는 기존 StepMate API 재사용을 기본 방향으로 하되 아직 연결하지 않는다.
 
 ```text
 PetPet/                         iPhone 앱 타깃
@@ -16,12 +16,14 @@ PetPet Watch App/               watchOS 앱 타깃
   Features/Food/Presentation/    먹이 목록·소비·보상 수령 화면
   Features/Character/Presentation/ 캐릭터 반응 초안
   Infrastructure/Motion/        CoreMotion 어댑터
+  Infrastructure/Connectivity/ 워치 변경 감지와 전송 조립
   Preview Content/              센서를 사용하지 않는 미리보기
 Packages/PetPetCore/
   Sources/PetPetCore/Domain/     공용 모델과 서비스·저장소 계약
   Sources/PetPetCore/Application/ 하루 집계·구독·복구·날짜 전환
   Sources/PetPetCore/Data/Local/  원자적 로컬 기록 저장
   Tests/PetPetCoreTests/         기기 없이 실행하는 동작 테스트
+  Sources/PetPetConnectivity/   iOS·watchOS 공용 WatchConnectivity 어댑터
 ```
 
 ## 의존성과 상태 흐름
@@ -47,6 +49,7 @@ flowchart LR
 - ViewModel은 `@MainActor`에서 화면 상태를 발행한다. 센서 구현은 생성자로 주입한다.
 - 워치 루트는 `NavigationStack` 안의 `TabView(.verticalPage)`다. 크라운으로 홈·성장·먹이 요약 섹션을 전환하며, 상세 목록은 스택에 열어 크라운 스크롤과 섹션 전환이 경쟁하지 않도록 한다. 루트의 추적 수명은 섹션·상세 화면 이동과 분리한다. [Apple의 크라운 페이지 전환 지침](https://developer.apple.com/videos/play/wwdc2023/10031/?time=347)을 따른다.
 - `PetPetCore`는 SwiftUI, CoreMotion, WatchConnectivity에 의존하지 않는다. iPhone과 Watch 타깃이 같은 로컬 Swift Package를 참조한다.
+- 같은 패키지의 별도 제품 `PetPetConnectivity`만 WatchConnectivity를 가져온다. 앱마다 WCSession 소유자는 한 개이며, SDK의 백그라운드 콜백을 MainActor로 넘긴다. `PhoneSnapshotReceiver`와 `WatchSnapshotPublisher`는 SDK 대신 주입 가능한 `SnapshotTransport` 계약을 사용한다.
 - `DailyStepTracker`는 저장값 복원, 자정부터의 누적 집계, 최근 기록 복구, 중복/지연 콜백, 날짜 변경을 처리한다. 센서·저장 오류는 화면까지 전달한다.
 - 플랫폼 SDK는 `Infrastructure/<Capability>`에 둔다. 공용 Foundation 파일 저장은 `PetPetCore/Data/Local`에서 Domain 계약을 구현한다. SDK 전용 저장소와 서버 구현은 기능별 `Data`에 배치한다. 화면에서 직접 `URLSession`이나 파일에 접근하지 않는다.
 - 인증 토큰 저장은 후속 인증 단계에서 Keychain 어댑터로 구현한다. 서버 DTO와 토큰은 펫 모델이나 View에 섞지 않는다.
@@ -57,17 +60,17 @@ flowchart LR
 - 날짜별 기록은 워치 앱 컨테이너의 Application Support/PetPet/step-history-v1.json에 저장한다. 파일 저장은 actor에서 직렬화하고 원자적으로 교체한다. 저장된 기록은 계속 유지하며, 재실행 시 복구한다.
 - CoreMotion이 제공하는 최근 약 7일 범위에서 오늘과 이전의 완전한 날짜 구간을 복구한다. 앱이 장기간 실행되지 않아 센서 보관 범위를 벗어난 미저장 기록은 복구할 수 없다. 자세한 정책은 [하루 걸음수](DailySteps.md)를 따른다.
 - 워치의 정지 캐릭터, 배경, 시각 표시는 유지한다. 기존 움직임·터치 반응 초안은 별도 ViewModel/센서 어댑터로 분리했으며 홈 애니메이션에는 아직 연결하지 않았다.
-- iPhone의 임의 숫자 표시는 제거했다. 실제 기록을 받기 전에는 `—`를 표시한다. 미리보기 데이터는 `Preview Content`에만 둔다.
+- iPhone은 실제 수신한 오늘 걸음수·펫 상태·보유 먹이와 마지막 동기화 시각을 표시한다. 최초 수신 전과 오늘 날짜의 기록이 없을 때는 `—`를 표시한다. 미리보기 데이터는 `Preview Content`에만 둔다. [동기화 정책](WatchSynchronization.md).
 - `PetProfile`, `PetMood`, `FoodDefinition`, `FoodInventoryItem`, `PetStatistic`, `UserProfile`, `DailyStepRecord`는 Android의 실제 모델을 참고한 공용 타입이다. 이들의 Codable 표현을 서버 요청 DTO로 바로 사용하지 않는다. 날짜 포맷과 JSON 키는 각 API 계약에 맞는 별도 DTO에서 변환한다.
 - `FilePetProgressRepository`는 펫·먹이·날짜별 보상 내역을 하나의 트랜잭션으로 저장한다. 먹이와 펫을 개별 `PetRepository.save`로 나눠 저장하지 않는다. `ClaimStepRewards`는 오늘 기록 저장 성공 후 저장된 최댓값으로 보상을 요청한다. [상세 규칙](FeedingAndGrowth.md).
-- `StepHistoryRepository`는 실제 파일 저장과 날짜별/전체 기록 조회를 구현했다. WatchConnectivity 동기화, 인증·백업·랭킹·음성 API는 후속 단계다.
+- `StepHistoryRepository`는 실제 파일 저장과 날짜별/전체 기록 조회를 구현했다. 인증·서버 백업·랭킹·음성 API는 후속 단계다.
 - 빈 `GestureEvent`와 사용되지 않던 사용자·캐릭터 모델 초안은 정리했다. 캐릭터 기분과 애니메이션 상태는 각각 `PetMood`와 `CharacterActivity`로 구분한다.
 
 ## 기능을 추가하는 순서
 
 1. 하루 걸음수 집계·날짜 변경·재실행 복구와 로컬 저장: 완료.
 2. Android와 같은 보상 수치, 먹이 소비, 경험치·레벨·스탯·호감도 규칙: 완료. 기분 표시·터치는 연결했으며, 움직임 애니메이션은 후속 작업이다.
-3. iPhone 보조 홈과 WatchConnectivity 동기화. 기기별 센서 값을 단순 합산하지 않는다.
+3. iPhone 보조 홈과 WatchConnectivity 읽기 전용 동기화: 완료. 기기별 센서 값을 단순 합산하지 않는다.
 4. Google 인증, Keychain 세션, 기존 서버의 백업·복원·스트릭·닉네임 API.
 5. 게임 2종, 랭킹, 음성·AI 대화.
 
