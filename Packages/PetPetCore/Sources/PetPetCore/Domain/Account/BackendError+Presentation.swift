@@ -4,7 +4,9 @@ extension BackendError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .configurationMissing, .invalidServerURL: "계정 연결 설정이 아직 완료되지 않았어요."
-        case .authenticationRequired: "아이폰에서 Google로 로그인해 주세요."
+        case .authenticationRequired: "아이폰에서 Apple로 로그인해 주세요."
+        case .invalidAppleCredential: "Apple 로그인 응답을 확인하지 못했어요. 다시 로그인해 주세요."
+        case .appleLoginUnavailable: "서버의 Apple 로그인 연결이 아직 준비되지 않았어요."
         case .sessionChanged: "로그인 계정이 바뀌었어요. 다시 시도해 주세요."
         case .accountMismatch: "다른 계정의 워치 기록이에요. 기존 계정으로 로그인하거나 서버 복원으로 계정을 전환해 주세요."
         case .localStateChanged: "워치의 펫 상태가 바뀌었어요. 최신 상태를 불러온 뒤 다시 복원해 주세요."

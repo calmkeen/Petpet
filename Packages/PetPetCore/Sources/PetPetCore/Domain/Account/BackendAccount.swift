@@ -21,14 +21,18 @@ public struct BackendSession: Codable, Equatable, Sendable, CustomStringConverti
     public let nickname: String?
     public let selectedMateID: Int64
     public let isNewUser: Bool
+    public let identityProvider: IdentityProvider?
+    public let providerSubject: String?
     public var description: String { "BackendSession(credentials: redacted)" }
 
     public init(accountID: String, serverOrigin: String, accessToken: String, refreshToken: String?,
-                email: String?, name: String?, nickname: String?, selectedMateID: Int64 = 1, isNewUser: Bool = false) {
+                email: String?, name: String?, nickname: String?, selectedMateID: Int64 = 1, isNewUser: Bool = false,
+                identityProvider: IdentityProvider? = nil, providerSubject: String? = nil) {
         self.accountID = accountID; self.serverOrigin = serverOrigin
         self.accessToken = accessToken; self.refreshToken = refreshToken
         self.email = email; self.name = name; self.nickname = nickname
         self.selectedMateID = selectedMateID; self.isNewUser = isNewUser
+        self.identityProvider = identityProvider; self.providerSubject = providerSubject
     }
 }
 
@@ -42,4 +46,5 @@ public enum BackendError: Error, Equatable, Sendable {
     case configurationMissing, invalidServerURL, invalidResponse, authenticationRequired
     case sessionChanged, unsupportedMate, accountMismatch, localStateChanged
     case http(Int), network, storage, watchUnavailable, transferTooLarge, operationExpired
+    case invalidAppleCredential, appleLoginUnavailable
 }

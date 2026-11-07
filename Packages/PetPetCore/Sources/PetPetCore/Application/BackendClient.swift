@@ -54,8 +54,41 @@ public actor BackendClient {
             serverOrigin: baseURL.absoluteString, accessToken: access,
             refreshToken: auth.refreshToken?.nonBlank, email: auth.email ?? identity.email,
             name: auth.name ?? identity.name, nickname: auth.nickname,
-            selectedMateID: auth.selectedMateID ?? 1, isNewUser: auth.isNewUser
+            selectedMateID: auth.selectedMateID ?? 1, isNewUser: auth.isNewUser,
+            identityProvider: .google, providerSubject: identity.subject
         )
+        try await persist(result, epoch: token)
+        try checkEpoch(token)
+        cached = result; loaded = true
+        return result
+    }
+
+    @discardableResult
+    public func signIn(_ identity: AppleIdentity) async throws -> BackendSession {
+        guard identity.userIdentifier.nonBlank != nil, identity.identityToken.nonBlank != nil,
+              identity.authorizationCode.nonBlank != nil, identity.rawNonce.count >= 32 else {
+            throw BackendError.invalidAppleCredential
+        }
+        epoch += 1
+        let token = epoch
+        refreshTask?.cancel(); refreshTask = nil; refreshID = nil
+        cached = nil; loaded = true
+        try await persist(nil, epoch: token)
+        let response = try await send(path: "api/v1/auth/apple", method: "POST",
+                                      data: JSONEncoder().encode(AppleLoginRequest(identity)))
+        try checkEpoch(token)
+        if [404, 405, 501].contains(response.statusCode) { throw BackendError.appleLoginUnavailable }
+        try requireSuccess(response)
+        let auth = try decodeAuth(response.data)
+        // Only the backend's internal user ID owns backup/restore data.
+        guard let accountID = auth.userID?.nonBlank,
+              let access = auth.accessToken?.nonBlank,
+              let refresh = auth.refreshToken?.nonBlank else { throw BackendError.invalidResponse }
+        let result = BackendSession(accountID: accountID, serverOrigin: baseURL.absoluteString,
+                                    accessToken: access, refreshToken: refresh, email: auth.email,
+                                    name: auth.name ?? identity.name, nickname: auth.nickname,
+                                    selectedMateID: auth.selectedMateID ?? 1, isNewUser: auth.isNewUser,
+                                    identityProvider: .apple, providerSubject: identity.userIdentifier)
         try await persist(result, epoch: token)
         try checkEpoch(token)
         cached = result; loaded = true
@@ -154,7 +187,8 @@ public actor BackendClient {
                                   accessToken: access, refreshToken: auth.refreshToken?.nonBlank ?? current.refreshToken,
                                   email: auth.email ?? current.email, name: auth.name ?? current.name,
                                   nickname: auth.nickname ?? current.nickname, selectedMateID: current.selectedMateID,
-                                  isNewUser: current.isNewUser)
+                                  isNewUser: current.isNewUser, identityProvider: current.identityProvider,
+                                  providerSubject: current.providerSubject)
             try self.checkEpoch(token)
             try await self.persist(result, epoch: token)
             try self.checkEpoch(token)
