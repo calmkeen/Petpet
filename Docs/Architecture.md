@@ -75,7 +75,7 @@ flowchart LR
 - 워치 걸음수는 기기의 현재 시간대에서 자정부터의 합계다. 저장된 오늘 기록을 먼저 표시한 뒤 CoreMotion 구간 조회·실시간 누적값으로 보정한다. 자정 타이머와 날짜/시간대 변경 알림, 앱 복귀 시 새 날짜를 확인한다.
 - 날짜별 기록은 펫·먹이와 함께 Application Support/PetPet/game-state-v1.json에 저장한다. 기존 날짜별 파일과 펫 파일을 최초 이관하고 원본은 보존한다. actor에서 직렬화하고 원자적으로 교체한다.
 - CoreMotion이 제공하는 최근 약 7일 범위에서 오늘과 이전의 완전한 날짜 구간을 복구한다. 앱이 장기간 실행되지 않아 센서 보관 범위를 벗어난 미저장 기록은 복구할 수 없다. 자세한 정책은 [하루 걸음수](DailySteps.md)를 따른다.
-- 워치의 정지 캐릭터, 배경, 시각 표시는 유지한다. 기존 움직임·터치 반응 초안은 별도 ViewModel/센서 어댑터로 분리했으며 홈 애니메이션에는 아직 연결하지 않았다.
+- 워치의 펫·시간대 배경은 Android 원본 PNG를 사용한다. `PetAnimationState`·`PetSpriteAnimation`이 기존 걸음수 변화와 터치로 재생 상태·프레임을 정하며, SwiftUI 타임라인은 홈 표시 중에만 움직인다. 별도 가속도계 구독은 시작하지 않는다. [에셋과 검증](AndroidMedia.md).
 - iPhone은 실제 수신한 오늘 걸음수·펫 상태·보유 먹이와 마지막 동기화 시각을 표시한다. 최초 수신 전과 오늘 날짜의 기록이 없을 때는 `—`를 표시한다. 미리보기 데이터는 `Preview Content`에만 둔다. [동기화 정책](WatchSynchronization.md).
 - `PetProfile`, `PetMood`, `FoodDefinition`, `FoodInventoryItem`, `PetStatistic`, `UserProfile`, `DailyStepRecord`는 Android의 실제 모델을 참고한 공용 타입이다. 이들의 Codable 표현을 서버 요청 DTO로 바로 사용하지 않는다. 날짜 포맷과 JSON 키는 각 API 계약에 맞는 별도 DTO에서 변환한다.
 - `FileGameRepository`는 펫·먹이·걸음수·날짜별 지급 내역·복원을 하나의 트랜잭션으로 저장한다. 보상은 `PhoneCloudCoordinator`가 서버 성공을 기록하고 워치에 보낸 확인 메시지로만 지급한다. 이전 로컬 지급 헬퍼는 기존 파일 구현의 테스트·이관 참고용이며 실제 앱 화면에서 호출하지 않는다. [상세 규칙](FeedingAndGrowth.md).
@@ -85,7 +85,7 @@ flowchart LR
 ## 기능을 추가하는 순서
 
 1. 하루 걸음수 집계·날짜 변경·재실행 복구와 로컬 저장: 완료.
-2. Android와 같은 보상 수치, 먹이 소비, 경험치·레벨·스탯·호감도 규칙: 완료. 기분 표시·터치는 연결했으며, 움직임 애니메이션은 후속 작업이다.
+2. Android와 같은 보상 수치, 먹이 소비, 경험치·레벨·스탯·호감도 규칙: 완료. 기분 표시·터치와 원본 펫 프레임·시간대 배경도 연결했다.
 3. iPhone 보조 홈과 WatchConnectivity 읽기 전용 동기화: 완료. 기기별 센서 값을 단순 합산하지 않는다.
 4. Apple 인증, Keychain 세션, 서버 백업·복원 클라이언트: 코드 구현 완료. 서버 Apple 인증과 개발자 팀 설정·실제 계정 검증 필요. 스트릭·닉네임 UI와 Debug 모의 프로필도 구현했다.
 5. 게임 2종, 랭킹, 음성·AI 대화.

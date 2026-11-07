@@ -18,6 +18,7 @@ models, repository contracts, and sensor-session logic live in the local
 - [Daily steps, persistence, and recovery](Docs/DailySteps.md)
 - [Feeding, growth, and step rewards](Docs/FeedingAndGrowth.md)
 - [Streak calendars and nickname editing](Docs/StreakAndNickname.md)
+- [Android artwork and pet frame animations](Docs/AndroidMedia.md)
 - [iPhone and Apple Watch synchronization](Docs/WatchSynchronization.md)
 - [Apple login, server backup, and restore setup](Docs/AccountAndBackup.md)
 - [Required backend changes for Apple login](Docs/AppleSignInServer.md)
@@ -28,6 +29,9 @@ and saves daily history locally. It refreshes system pedometer history when the
 app resumes and rolls over at local midnight. CoreMotion provides approximately
 seven days of historical recovery; older saved records are retained. Feeding,
 leveling, stat allocation, affection, and daily step rewards persist locally.
+Android's original PNG frames animate running and touch reactions on the watch.
+Both apps use its dawn/day/sunset/night artwork, and the phone's pet portrait
+provides a visual greeting. Animation pauses when offscreen or inactive.
 The Digital Crown switches between home, growth, food, streak, and account overview pages;
 opening a management screen lets the Crown scroll its detailed list.
 Release rewards are granted after a successful server backup, matching Android.
