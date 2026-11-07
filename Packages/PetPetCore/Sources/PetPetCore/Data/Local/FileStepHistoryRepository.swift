@@ -34,7 +34,7 @@ public actor FileStepHistoryRepository: StepHistoryRepository {
     }
 
     public func save(_ record: DailyStepRecord) throws {
-        guard Self.isValidDate(record.date), record.stepCount >= 0 else {
+        guard StepDateKey.isValid(record.date), record.stepCount >= 0 else {
             throw StepHistoryStoreError.invalidRecord
         }
         try loadIfNeeded()
@@ -62,22 +62,10 @@ public actor FileStepHistoryRepository: StepHistoryRepository {
         guard archive.version == 1 else {
             throw StepHistoryStoreError.unsupportedVersion(archive.version)
         }
-        guard archive.records.allSatisfy({ Self.isValidDate($0.key) && $0.value >= 0 }) else {
+        guard archive.records.allSatisfy({ StepDateKey.isValid($0.key) && $0.value >= 0 }) else {
             throw StepHistoryStoreError.invalidRecord
         }
         records = archive.records
     }
 
-    private static func isValidDate(_ value: String) -> Bool {
-        let parts = value.split(separator: "-", omittingEmptySubsequences: false)
-        guard parts.count == 3, parts[0].count == 4, parts[1].count == 2,
-              parts[2].count == 2, let year = Int(parts[0]),
-              let month = Int(parts[1]), let day = Int(parts[2]) else { return false }
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
-        let components = DateComponents(year: year, month: month, day: day)
-        guard let date = calendar.date(from: components) else { return false }
-        let actual = calendar.dateComponents([.year, .month, .day], from: date)
-        return actual.year == year && actual.month == month && actual.day == day
-    }
 }
