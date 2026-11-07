@@ -27,6 +27,16 @@ public actor FileGameRepository: StepHistoryRepository, PetProgressRepository {
     private var cached: Archive?
     private var loading: Task<Archive, Error>?
     private var dirtySteps: [String: Int] = [:]
+    #if DEBUG
+    private var developmentSeedDirectory: URL?
+
+    /// Copies active progress once; account bindings and receipts start fresh.
+    public init(developmentDirectory: URL, seedDirectory: URL,
+                now: @escaping @Sendable () -> Date = { Date() }, calendar: Calendar = .autoupdatingCurrent) {
+        directory = developmentDirectory; self.now = now; self.calendar = calendar
+        developmentSeedDirectory = seedDirectory
+    }
+    #endif
 
     public init(directory: URL, now: @escaping @Sendable () -> Date = { Date() }, calendar: Calendar = .autoupdatingCurrent) {
         self.directory = directory; self.now = now; self.calendar = calendar
@@ -205,6 +215,9 @@ public actor FileGameRepository: StepHistoryRepository, PetProgressRepository {
             if cached == nil { cached = result }
             return
         }
+        #if DEBUG
+        let seedDirectory = developmentSeedDirectory
+        #endif
         let task = Task { [directory, now, calendar] in
             let file = directory.appendingPathComponent("game-state-v1.json")
             if FileManager.default.fileExists(atPath: file.path) {
@@ -212,6 +225,28 @@ public actor FileGameRepository: StepHistoryRepository, PetProgressRepository {
                 try Self.validate(archive)
                 return archive
             }
+            #if DEBUG
+            if let source = seedDirectory {
+                guard source.standardizedFileURL != directory.standardizedFileURL else { throw BackendError.configurationMissing }
+                let sourceFile = source.appendingPathComponent("game-state-v1.json")
+                if FileManager.default.fileExists(atPath: sourceFile.path) {
+                    let old = try JSONDecoder().decode(Archive.self, from: Data(contentsOf: sourceFile))
+                    try Self.validate(old)
+                    let copy = Archive(storeID: UUID(), game: Game(progress: old.game.progress, records: old.game.records))
+                    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+                    try JSONEncoder().encode(copy).write(to: file, options: .atomic)
+                    return copy
+                }
+                try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+                for name in ["step-history-v1.json", "pet-progress-v1.json"] {
+                    let original = source.appendingPathComponent(name)
+                    let destination = directory.appendingPathComponent(name)
+                    if FileManager.default.fileExists(atPath: original.path), !FileManager.default.fileExists(atPath: destination.path) {
+                        try FileManager.default.copyItem(at: original, to: destination)
+                    }
+                }
+            }
+            #endif
             let oldSteps = FileStepHistoryRepository(fileURL: directory.appendingPathComponent("step-history-v1.json"))
             let oldPet = FilePetProgressRepository(fileURL: directory.appendingPathComponent("pet-progress-v1.json"), now: now, calendar: calendar)
             let records = try await oldSteps.allRecords()

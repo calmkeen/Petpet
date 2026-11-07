@@ -47,4 +47,5 @@ public enum BackendError: Error, Equatable, Sendable {
     case sessionChanged, unsupportedMate, accountMismatch, localStateChanged
     case http(Int), network, storage, watchUnavailable, transferTooLarge, operationExpired
     case invalidAppleCredential, appleLoginUnavailable
+    case noBackup, environmentMismatch
 }

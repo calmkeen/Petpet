@@ -18,6 +18,7 @@ public final class PhoneCloudCoordinator {
     public private(set) var state = PhoneCloudState()
     public var onStateChange: ((PhoneCloudState) -> Void)?
     public var onSessionChange: ((BackendSession?) -> Void)?
+    private let environment: CloudEnvironment
     private let backend: BackendClient
     private let transport: any CloudTransport
     private let receipts: FileCloudReceiptStore
@@ -27,9 +28,9 @@ public final class PhoneCloudCoordinator {
     private var work: Task<Void, Never>?
 
     public init(backend: BackendClient, transport: any CloudTransport, receipts: FileCloudReceiptStore,
-                directory: URL, now: @escaping () -> Date = { Date() }) {
+                directory: URL, environment: CloudEnvironment = .production, now: @escaping () -> Date = { Date() }) {
         self.backend = backend; self.transport = transport; self.receipts = receipts
-        self.directory = directory; self.now = now
+        self.directory = directory; self.now = now; self.environment = environment
         transport.onCloudFile = { [weak self] url in self?.enqueue { await self?.receiveFile(url) } }
         transport.onCloudControl = { [weak self] data in self?.enqueue { await self?.receiveControl(data) } }
         transport.onCloudTransferError = { [weak self] _ in self?.fail(.watchUnavailable) }
@@ -45,15 +46,15 @@ public final class PhoneCloudCoordinator {
             onSessionChange?(session)
             emit()
             guard transport.connection.isActivated else { return }
-            try transport.enqueueCloudControl(CloudWire.encodeControl(.account(session.map {
+            try transport.enqueueCloudControl(encodeControl(.account(session.map {
                 CloudAccount(id: $0.accountID, displayName: $0.nickname ?? $0.name ?? $0.email ?? "내 계정")
             })))
             for receipt in try await receipts.pending() {
-                try transport.enqueueCloudControl(CloudWire.encodeControl(.backupSucceeded(receipt)))
+                try transport.enqueueCloudControl(encodeControl(.backupSucceeded(receipt)))
             }
             if let session {
                 for command in try await receipts.pendingRestores(accountID: session.accountID) {
-                    try transport.enqueueCloudFile(outgoingFile(CloudWire.encodeFile(.restore(command)), operationID: command.operationID))
+                    try transport.enqueueCloudFile(outgoingFile(encodeFile(.restore(command)), operationID: command.operationID))
                     state.phase = .restoring; state.operationID = command.operationID
                     state.message = "워치의 복원 완료를 기다리고 있어요."
                 }
@@ -71,7 +72,7 @@ public final class PhoneCloudCoordinator {
             state.operationID = operationID; state.phase = .waitingForWatch
             state.error = nil; state.message = "워치의 전체 기록을 기다리고 있어요."
             emit()
-            try transport.enqueueCloudControl(CloudWire.encodeControl(.exportRequested(
+            try transport.enqueueCloudControl(encodeControl(.exportRequested(
                 operationID: operationID,
                 account: CloudAccount(id: session.accountID, displayName: session.nickname ?? session.email ?? "내 계정")
             )))
@@ -83,7 +84,7 @@ public final class PhoneCloudCoordinator {
         guard state.phase == .idle else { throw BackendError.watchUnavailable }
         let accountID = session.accountID
         let challengeData = try await transport.requestCloudChallenge()
-        let target = try JSONDecoder().decode(WatchRestoreChallenge.self, from: challengeData)
+        let target = try CloudWire.decodeChallenge(challengeData, environment: environment)
         let restored = try await backend.restore(accountID: accountID)
         guard try await backend.session()?.accountID == accountID else { throw BackendError.sessionChanged }
         return WatchRestoreImport(target: target, state: restored)
@@ -95,7 +96,7 @@ public final class PhoneCloudCoordinator {
             state.phase = .restoring; state.operationID = command.operationID
             state.error = nil; state.message = "워치에 복원할 기록을 보내고 있어요."
             emit()
-            let data = try CloudWire.encodeFile(.restore(command))
+            let data = try encodeFile(.restore(command))
             try await receipts.saveRestore(command)
             let url = try outgoingFile(data, operationID: command.operationID)
             try transport.enqueueCloudFile(url)
@@ -109,14 +110,14 @@ public final class PhoneCloudCoordinator {
         var operationID: UUID?
         var serverReceiptSaved = false
         do {
-            guard case let .backup(export) = try CloudWire.decodeFile(Data(contentsOf: url)) else { throw BackendError.invalidResponse }
+            guard case let .backup(export) = try CloudWire.decodeFile(Data(contentsOf: url), environment: environment) else { throw BackendError.invalidResponse }
             operationID = export.operationID
             guard let session = try await backend.session(), session.accountID == export.accountID else { throw BackendError.authenticationRequired }
             activeAccountID = session.accountID
             guard export.sequence > 0 else { throw BackendError.invalidResponse }
             if let receipt = try await receipts.receipt(operationID: export.operationID) {
                 serverReceiptSaved = true
-                try transport.enqueueCloudControl(CloudWire.encodeControl(.backupSucceeded(receipt)))
+                try transport.enqueueCloudControl(encodeControl(.backupSucceeded(receipt)))
                 return
             }
             let latest = try await receipts.latestSequence(accountID: export.accountID, storeID: export.storeID)
@@ -133,7 +134,7 @@ public final class PhoneCloudCoordinator {
             state.phase = .waitingForReceipt; state.lastBackupAt = receipt.completedAt
             state.message = "서버 저장 완료. 워치의 보상 지급을 기다리고 있어요."
             emit()
-            try transport.enqueueCloudControl(CloudWire.encodeControl(.backupSucceeded(receipt)))
+            try transport.enqueueCloudControl(encodeControl(.backupSucceeded(receipt)))
         } catch {
             let reason = error as? BackendError ?? .network
             if serverReceiptSaved {
@@ -144,7 +145,7 @@ public final class PhoneCloudCoordinator {
                 return
             }
             if let operationID {
-                try? transport.enqueueCloudControl(CloudWire.encodeControl(.failed(operationID: operationID, reason: reason.rawDescription)))
+                try? transport.enqueueCloudControl(encodeControl(.failed(operationID: operationID, reason: reason.rawDescription)))
             }
             if state.operationID == nil || state.operationID == operationID { fail(reason) }
             onSessionChange?(try? await backend.session())
@@ -153,7 +154,7 @@ public final class PhoneCloudCoordinator {
 
     private func receiveControl(_ data: Data) async {
         do {
-            switch try CloudWire.decodeControl(data) {
+            switch try CloudWire.decodeControl(data, environment: environment) {
             case let .backupApplied(operationID, storeID):
                 try await receipts.acknowledge(operationID: operationID, storeID: storeID)
                 if state.operationID == operationID { complete("백업과 걸음수 보상을 완료했어요.") }
@@ -168,6 +169,12 @@ public final class PhoneCloudCoordinator {
         } catch { fail(.invalidResponse) }
     }
 
+    private func encodeControl(_ value: CloudControl) throws -> Data {
+        try CloudWire.encodeControl(value, environment: environment)
+    }
+    private func encodeFile(_ value: CloudFile) throws -> Data {
+        try CloudWire.encodeFile(value, environment: environment)
+    }
     private func enqueue(_ operation: @escaping () async -> Void) {
         let previous = work
         work = Task { await previous?.value; await operation() }

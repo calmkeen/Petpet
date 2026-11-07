@@ -5,6 +5,21 @@ import XCTest
 final class PhoneCloudCoordinatorTests: XCTestCase {
     private let now = Date()
 
+    func testDevelopmentExportIsRejectedBeforeProductionServerRequest() async throws {
+        let folder = directory()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let (coordinator, transport, _, http) = try setup(folder: folder)
+        let game = FileGameRepository(directory: folder.appendingPathComponent("watch"))
+        let export = try await game.prepareBackup(operationID: UUID(), accountID: "7")
+        let url = folder.appendingPathComponent("development-export.json")
+        try CloudWire.encodeFile(.backup(export), environment: .development).write(to: url)
+        transport.onCloudFile?(url)
+        await coordinator.finishWork()
+        let count = await http.count
+        XCTAssertEqual(count, 0)
+        XCTAssertEqual(coordinator.state.error, .environmentMismatch)
+    }
+
     func testServerSuccessThenReceiptAndReplayNeverUploadOrRewardTwice() async throws {
         let folder = directory()
         defer { try? FileManager.default.removeItem(at: folder) }
@@ -44,7 +59,7 @@ final class PhoneCloudCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.state.error, .http(500))
         let pending = try await receipts.pending()
         XCTAssertTrue(pending.isEmpty)
-        let controls = try transport.controls.map(CloudWire.decodeControl)
+        let controls = try transport.controls.map { try CloudWire.decodeControl($0) }
         XCTAssertFalse(controls.contains { if case .backupSucceeded = $0 { return true }; return false })
         let local = try await game.load()
         XCTAssertEqual(local.quantity(of: 1), 3)
@@ -67,7 +82,7 @@ final class PhoneCloudCoordinatorTests: XCTestCase {
         let backend = try BackendClient(baseURL: URL(string: "https://api.example.test/")!, transport: http, store: sessionStore())
         let restarted = PhoneCloudCoordinator(backend: backend, transport: transport, receipts: store, directory: folder.appendingPathComponent("outbox"))
         await restarted.synchronizeAccount()
-        let controls = try transport.controls.map(CloudWire.decodeControl)
+        let controls = try transport.controls.map { try CloudWire.decodeControl($0) }
         XCTAssertTrue(controls.contains { if case .backupSucceeded = $0 { return true }; return false })
         let count = await http.count
         XCTAssertEqual(count, 1)

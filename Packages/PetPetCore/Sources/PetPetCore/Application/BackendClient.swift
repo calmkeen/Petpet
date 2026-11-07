@@ -102,6 +102,34 @@ public actor BackendClient {
         try await persist(nil, epoch: epoch)
     }
 
+    #if DEBUG
+    @discardableResult
+    public func signInForDevelopment() async throws -> BackendSession {
+        // No URLSession or production client is allowed to use this route.
+        guard baseURL == LocalDevelopmentBackend.baseURL, transport is LocalDevelopmentBackend else {
+            throw BackendError.configurationMissing
+        }
+        epoch += 1
+        let token = epoch
+        refreshTask?.cancel(); refreshTask = nil; refreshID = nil
+        cached = nil; loaded = true
+        try await persist(nil, epoch: token)
+        let response = try await send(path: "debug/login", method: "POST", data: nil)
+        try checkEpoch(token)
+        try requireSuccess(response)
+        let auth = try decodeAuth(response.data)
+        guard let id = auth.userID?.nonBlank, let access = auth.accessToken?.nonBlank,
+              let refresh = auth.refreshToken?.nonBlank else { throw BackendError.invalidResponse }
+        let session = BackendSession(accountID: id, serverOrigin: baseURL.absoluteString,
+                                     accessToken: access, refreshToken: refresh, email: nil,
+                                     name: auth.name, nickname: auth.nickname)
+        try await persist(session, epoch: token)
+        try checkEpoch(token)
+        cached = session
+        return session
+    }
+    #endif
+
     public func saveBackup(_ request: ServerBackupRequest, accountID: String) async throws {
         _ = try await authorized(path: "api/v1/backup", method: "POST",
                                  data: JSONEncoder().encode(request), accountID: accountID)
@@ -113,7 +141,10 @@ public actor BackendClient {
         let token = epoch
         async let petData = authorized(path: "api/v1/usermates/\(current.selectedMateID)", method: "GET", accountID: accountID)
         async let stepsData = authorized(path: "api/v1/stepcounts/me", method: "GET", accountID: accountID)
-        let (petResponse, stepsResponse) = try await (petData, stepsData)
+        let petResponse: Data
+        let stepsResponse: Data
+        do { (petResponse, stepsResponse) = try await (petData, stepsData) }
+        catch BackendError.http(404) { throw BackendError.noBackup }
         try checkEpoch(token)
         let pet = try JSONDecoder().decode(ServerPetResponse.self, from: petResponse)
         let steps = try JSONDecoder().decode(ServerStepsResponse.self, from: stepsResponse)

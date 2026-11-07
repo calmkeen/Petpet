@@ -67,31 +67,57 @@ public enum CloudFile: Codable, Sendable {
 
 public enum CloudWire {
     private struct Envelope<Value: Codable>: Codable {
-        var version = 1
+        var version: Int
+        var environment: CloudEnvironment?
         var value: Value
+        init(value: Value, environment: CloudEnvironment) {
+            self.value = value; self.environment = environment
+            version = environment == .development ? 2 : 1
+        }
     }
     public static let maximumFileBytes = 16 * 1_024 * 1_024
-    public static func encodeControl(_ value: CloudControl) throws -> Data {
-        let data = try JSONEncoder().encode(Envelope(value: value))
+    public static func encodeControl(_ value: CloudControl, environment: CloudEnvironment = .production) throws -> Data {
+        let data = try JSONEncoder().encode(Envelope(value: value, environment: environment))
         guard data.count <= 60_000 else { throw BackendError.transferTooLarge }
         return data
     }
-    public static func decodeControl(_ data: Data) throws -> CloudControl {
+    public static func decodeControl(_ data: Data, environment: CloudEnvironment = .production) throws -> CloudControl {
         guard data.count <= 60_000 else { throw BackendError.transferTooLarge }
         let value = try JSONDecoder().decode(Envelope<CloudControl>.self, from: data)
-        guard value.version == 1 else { throw BackendError.invalidResponse }
+        try validate(version: value.version, environment: value.environment, expected: environment)
         return value.value
     }
-    public static func encodeFile(_ value: CloudFile) throws -> Data {
-        let data = try JSONEncoder().encode(Envelope(value: value))
+    public static func encodeFile(_ value: CloudFile, environment: CloudEnvironment = .production) throws -> Data {
+        let data = try JSONEncoder().encode(Envelope(value: value, environment: environment))
         guard data.count <= maximumFileBytes else { throw BackendError.transferTooLarge }
         return data
     }
-    public static func decodeFile(_ data: Data) throws -> CloudFile {
+    public static func decodeFile(_ data: Data, environment: CloudEnvironment = .production) throws -> CloudFile {
         guard data.count <= maximumFileBytes else { throw BackendError.transferTooLarge }
         let value = try JSONDecoder().decode(Envelope<CloudFile>.self, from: data)
-        guard value.version == 1 else { throw BackendError.invalidResponse }
+        try validate(version: value.version, environment: value.environment, expected: environment)
         return value.value
+    }
+
+    public static func encodeChallenge(_ value: WatchRestoreChallenge, environment: CloudEnvironment) throws -> Data {
+        try JSONEncoder().encode(Envelope(value: value, environment: environment))
+    }
+
+    public static func decodeChallenge(_ data: Data, environment: CloudEnvironment) throws -> WatchRestoreChallenge {
+        guard data.count <= 60_000 else { throw BackendError.transferTooLarge }
+        if let value = try? JSONDecoder().decode(Envelope<WatchRestoreChallenge>.self, from: data) {
+            try validate(version: value.version, environment: value.environment, expected: environment)
+            return value.value
+        }
+        // Older production builds returned a bare challenge. Development must
+        // never accept it, since it could refer to the production game store.
+        guard environment == .production else { throw BackendError.environmentMismatch }
+        return try JSONDecoder().decode(WatchRestoreChallenge.self, from: data)
+    }
+
+    private static func validate(version: Int, environment: CloudEnvironment?, expected: CloudEnvironment) throws {
+        guard (environment ?? .production) == expected else { throw BackendError.environmentMismatch }
+        guard version == (expected == .development ? 2 : 1) else { throw BackendError.invalidResponse }
     }
 }
 
