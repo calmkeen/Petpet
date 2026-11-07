@@ -12,9 +12,9 @@ final class WatchSyncController: ObservableObject {
     private var scheduled: Task<Void, Never>?
 
     init(home: WatchHomeViewModel, pet: PetProgressViewModel,
-         history: any StepHistoryRepository, progress: any PetProgressRepository, outboxURL: URL) {
+         history: any StepHistoryRepository, progress: any PetProgressRepository, outboxURL: URL,
+         transport: WatchConnectivityTransport) {
         self.home = home
-        let transport = WatchConnectivityTransport()
         self.transport = transport
         let publisher = WatchSnapshotPublisher(
             history: history, progress: progress,

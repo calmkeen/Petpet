@@ -6,6 +6,7 @@ final class WatchHomeViewModel: ObservableObject {
     @Published private(set) var state: DailyStepState
     @Published private(set) var syncError: String?
     var onRecordsReady: (() -> Void)?
+    private(set) var isActive = false
     private let tracker: DailyStepTracker
 
     init(stepCounter: any StepCounting, repository: any StepHistoryRepository) {
@@ -30,6 +31,7 @@ final class WatchHomeViewModel: ObservableObject {
     }
 
     func start() async {
+        isActive = true
         await tracker.start()
         await tracker.finishHistoryRecovery()
         onRecordsReady?()
@@ -38,7 +40,18 @@ final class WatchHomeViewModel: ObservableObject {
     func setSyncError(_ message: String?) { syncError = message }
     func refresh() async { await tracker.refresh() }
     func stop() {
+        isActive = false
         tracker.stop()
         Task { [tracker] in await tracker.flush() }
+    }
+    func suspendForRestore() async {
+        tracker.stop()
+        await tracker.flush()
+    }
+    func resumeAfterRestore() async {
+        guard isActive else { return }
+        await tracker.start()
+        await tracker.finishHistoryRecovery()
+        onRecordsReady?()
     }
 }

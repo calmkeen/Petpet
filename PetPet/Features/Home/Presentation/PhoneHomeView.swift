@@ -4,6 +4,7 @@ import PetPetCore
 @MainActor
 struct PhoneHomeView: View {
     @ObservedObject var viewModel: PhoneHomeViewModel
+    @ObservedObject var accountViewModel: AccountViewModel
     @Environment(\.scenePhase) private var scenePhase
     private let green = Color(red: 0.12, green: 0.42, blue: 0.32)
 
@@ -22,6 +23,21 @@ struct PhoneHomeView: View {
                     Label(viewModel.connectionText,
                           systemImage: viewModel.state.connection.isReachable ? "checkmark.circle.fill" : "clock")
                         .font(.footnote).foregroundStyle(green)
+                    NavigationLink {
+                        AccountView(viewModel: accountViewModel)
+                    } label: {
+                        HStack {
+                            Label("계정 · 서버 백업", systemImage: "icloud")
+                            Spacer()
+                            Text(accountViewModel.session?.nickname ?? (accountViewModel.session == nil ? "로그인" : "연결됨"))
+                                .font(.caption)
+                            Image(systemName: "chevron.right").font(.caption)
+                        }
+                        .foregroundStyle(green).padding(16)
+                        .background(.background, in: RoundedRectangle(cornerRadius: 18))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("phone.openAccount")
                     stepsCard
                     petCard
                     if let snapshot = viewModel.snapshot {

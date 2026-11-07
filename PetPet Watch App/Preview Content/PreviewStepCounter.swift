@@ -22,4 +22,16 @@ actor PreviewStepHistoryRepository: StepHistoryRepository {
     func allRecords() -> [DailyStepRecord] { records.values.sorted { $0.date > $1.date } }
     func save(_ record: DailyStepRecord) { records[record.date] = record }
 }
+
+@MainActor
+final class PreviewCloudTransport: CloudTransport {
+    var connection = SnapshotConnection()
+    var onCloudControl: ((Data) -> Void)?
+    var onCloudFile: ((URL) -> Void)?
+    var onCloudChallenge: (() async throws -> Data)?
+    var onCloudTransferError: ((String?) -> Void)?
+    func enqueueCloudControl(_ data: Data) throws {}
+    func enqueueCloudFile(_ url: URL) throws {}
+    func requestCloudChallenge() async throws -> Data { throw BackendError.watchUnavailable }
+}
 #endif

@@ -41,6 +41,11 @@ final class PetProgressViewModel: ObservableObject {
 
     func retry() async { await perform(.visit) }
 
+    func reload() async {
+        do { progress = try await repository.load(); errorMessage = nil; message = nil }
+        catch { show(error) }
+    }
+
     func feed(_ food: FoodDefinition) async {
         let oldLevel = progress?.pet.level ?? 1
         await perform(.feed(foodID: food.id)) { change in

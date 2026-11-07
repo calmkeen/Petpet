@@ -4,6 +4,7 @@ import PetPetCore
 struct FoodInventoryView: View {
     @ObservedObject var viewModel: PetProgressViewModel
     @ObservedObject var stepViewModel: WatchHomeViewModel
+    @ObservedObject var cloudViewModel: WatchCloudController
 
     private var steps: DailyStepState { stepViewModel.state }
 
@@ -37,11 +38,18 @@ struct FoodInventoryView: View {
                     let pending = progress.pendingRewards(for: record)
                     Text("우유 \(pending.milk)개 · 사과 \(pending.apple)개")
                         .font(.caption).foregroundStyle(.green)
-                    Button("기록 저장·보상 받기") {
-                        Task { await viewModel.claim(for: record) }
+                    Button("서버 백업·보상 받기") {
+                        Task { await cloudViewModel.requestBackup() }
                     }
-                    .disabled(viewModel.isBusy || steps.isLoading || pending.isEmpty)
+                    .disabled(viewModel.isBusy || cloudViewModel.isBusy || steps.isLoading || cloudViewModel.account == nil)
                     .accessibilityIdentifier("watch.claimStepRewards")
+                    if cloudViewModel.account == nil {
+                        Text("아이폰에서 로그인하면 서버 백업 후 보상을 받아요.")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
+                    if let message = cloudViewModel.message {
+                        Text(message).font(.caption2).multilineTextAlignment(.center)
+                    }
                     if pending.isEmpty {
                         Text("다음 1,000걸음 보상을 향해 걸어요.")
                             .font(.caption2).foregroundStyle(.secondary)

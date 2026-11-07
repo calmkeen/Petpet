@@ -5,11 +5,12 @@ import PetPetCore
 struct WatchHomeView: View {
     @ObservedObject var viewModel: WatchHomeViewModel
     @ObservedObject var petViewModel: PetProgressViewModel
+    @ObservedObject var cloudViewModel: WatchCloudController
     @Environment(\.scenePhase) private var scenePhase
     @State private var selectedSection: WatchSection = .home
 
     private enum WatchSection: Hashable {
-        case home, statistics, food
+        case home, statistics, food, cloud
     }
 
     var body: some View {
@@ -18,8 +19,16 @@ struct WatchHomeView: View {
                 home.tag(WatchSection.home)
                 PetOverviewView(viewModel: petViewModel)
                     .tag(WatchSection.statistics)
-                FoodOverviewView(viewModel: petViewModel, stepViewModel: viewModel)
+                FoodOverviewView(viewModel: petViewModel, stepViewModel: viewModel, cloudViewModel: cloudViewModel)
                     .tag(WatchSection.food)
+                VStack(spacing: 12) {
+                    Label("계정과 백업", systemImage: "icloud").font(.headline)
+                    Text(cloudViewModel.account?.displayName ?? "아이폰에서 로그인해 주세요")
+                        .font(.caption).multilineTextAlignment(.center)
+                    NavigationLink("백업 관리") { WatchCloudView(viewModel: cloudViewModel) }
+                }
+                .padding(.horizontal, 18)
+                .tag(WatchSection.cloud)
             }
             // Keep pages short so the Crown always changes sections. Long
             // lists open on the navigation stack and receive Crown scrolling.
@@ -27,6 +36,8 @@ struct WatchHomeView: View {
         }
         // Keep tracking alive while browsing the pet and food pages.
         .task {
+            await cloudViewModel.start()
+            guard scenePhase == .active else { return }
             await petViewModel.start()
             await viewModel.start()
         }
@@ -119,9 +130,11 @@ struct WatchHomeView: View {
         fileURL: FileManager.default.temporaryDirectory
             .appendingPathComponent("PetPetPreview-\(UUID().uuidString).json")
     )
-    WatchHomeView(
-        viewModel: WatchHomeViewModel(stepCounter: PreviewStepCounter(), repository: history),
-        petViewModel: PetProgressViewModel(repository: progress, history: history)
-    )
+    let home = WatchHomeViewModel(stepCounter: PreviewStepCounter(), repository: history)
+    let pet = PetProgressViewModel(repository: progress, history: history)
+    WatchHomeView(viewModel: home, petViewModel: pet, cloudViewModel: WatchCloudController(
+        game: FileGameRepository(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)),
+        transport: PreviewCloudTransport(), home: home, pet: pet, directory: FileManager.default.temporaryDirectory
+    ))
 }
 #endif

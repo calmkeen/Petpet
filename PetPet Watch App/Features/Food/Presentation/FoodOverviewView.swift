@@ -4,6 +4,7 @@ import PetPetCore
 struct FoodOverviewView: View {
     @ObservedObject var viewModel: PetProgressViewModel
     @ObservedObject var stepViewModel: WatchHomeViewModel
+    @ObservedObject var cloudViewModel: WatchCloudController
 
     var body: some View {
         VStack(spacing: 8) {
@@ -23,7 +24,7 @@ struct FoodOverviewView: View {
                     .minimumScaleFactor(0.8).lineLimit(1)
             }
             NavigationLink {
-                FoodInventoryView(viewModel: viewModel, stepViewModel: stepViewModel)
+                FoodInventoryView(viewModel: viewModel, stepViewModel: stepViewModel, cloudViewModel: cloudViewModel)
             } label: {
                 Label("먹이·보상 관리", systemImage: "carrot.fill")
             }

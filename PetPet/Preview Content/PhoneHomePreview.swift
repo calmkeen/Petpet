@@ -11,6 +11,6 @@ import PetPetCore
     )
     PhoneHomeView(viewModel: PhoneHomeViewModel(initialState: PhoneSnapshotState(
         cached: CachedWatchSnapshot(snapshot: snapshot, receivedAt: Date(), peerID: "preview")
-    )))
+    )), accountViewModel: AccountViewModel())
 }
 #endif

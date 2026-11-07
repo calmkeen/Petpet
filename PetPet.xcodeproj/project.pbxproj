@@ -12,6 +12,8 @@
 		A1B2C3D4E5F6071829300002 /* PetPetCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829300005 /* PetPetCore */; };
 		A1B2C3D4E5F6071829300006 /* PetPetConnectivity in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829300008 /* PetPetConnectivity */; };
 		A1B2C3D4E5F6071829300007 /* PetPetConnectivity in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829300009 /* PetPetConnectivity */; };
+		A1B2C3D4E5F6071829300010 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829300011 /* GoogleSignIn */; };
+		A1B2C3D4E5F6071829300013 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829300014 /* GoogleSignInSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,6 +117,8 @@
 			files = (
 				A1B2C3D4E5F6071829300001 /* PetPetCore in Frameworks */,
 				A1B2C3D4E5F6071829300006 /* PetPetConnectivity in Frameworks */,
+				A1B2C3D4E5F6071829300010 /* GoogleSignIn in Frameworks */,
+				A1B2C3D4E5F6071829300013 /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,6 +212,8 @@
 			packageProductDependencies = (
 				A1B2C3D4E5F6071829300004 /* PetPetCore */,
 				A1B2C3D4E5F6071829300008 /* PetPetConnectivity */,
+				A1B2C3D4E5F6071829300011 /* GoogleSignIn */,
+				A1B2C3D4E5F6071829300014 /* GoogleSignInSwift */,
 			);
 			productName = PetPet;
 			productReference = 7557C4FB2E7E6A5C00B6970A /* PetPet.app */;
@@ -374,6 +380,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				A1B2C3D4E5F6071829300003 /* XCLocalSwiftPackageReference "Packages/PetPetCore" */,
+				A1B2C3D4E5F6071829300012 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7557C4FC2E7E6A5C00B6970A /* Products */;
@@ -699,6 +706,7 @@
 				DEVELOPMENT_TEAM = 7N2TRX73U6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PetPet-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = PetPet;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -731,6 +739,7 @@
 				DEVELOPMENT_TEAM = 7N2TRX73U6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "PetPet-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = PetPet;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -988,6 +997,17 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		A1B2C3D4E5F6071829300012 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = exactVersion;
+				version = 9.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		A1B2C3D4E5F6071829300004 /* PetPetCore */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1008,6 +1028,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A1B2C3D4E5F6071829300003 /* XCLocalSwiftPackageReference "Packages/PetPetCore" */;
 			productName = PetPetConnectivity;
+		};
+		A1B2C3D4E5F6071829300011 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D4E5F6071829300012 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		A1B2C3D4E5F6071829300014 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D4E5F6071829300012 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
