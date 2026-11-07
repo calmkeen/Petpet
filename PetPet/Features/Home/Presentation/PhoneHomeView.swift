@@ -52,6 +52,12 @@ struct PhoneHomeView: View {
                                 ForEach(FoodCatalog.all) { food in
                                     let quantity = snapshot.inventory.first { $0.foodID == food.id }?.quantity ?? 0
                                     VStack(spacing: 8) {
+                                        if food.id == 1 || food.id == 2 {
+                                            Image(food.id == 1 ? "stepmate_food_milk" : "stepmate_food_apple")
+                                                .resizable().scaledToFit().frame(width: 36, height: 36).accessibilityHidden(true)
+                                        } else {
+                                            Image(systemName: "fork.knife").frame(width: 36, height: 36).accessibilityHidden(true)
+                                        }
                                         Text(food.name).foregroundStyle(.secondary)
                                         Text("\(quantity)개").font(.title3.bold()).monospacedDigit()
                                     }
@@ -126,8 +132,7 @@ struct PhoneHomeView: View {
             Text("나의 펫").font(.headline)
             if let pet = viewModel.snapshot?.pet {
                 HStack(spacing: 20) {
-                    Image("pet_fox").resizable().scaledToFit().frame(width: 94, height: 110)
-                        .accessibilityHidden(true)
+                    PhonePetPortrait()
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Lv.\(pet.level)").font(.largeTitle.bold())
                             .accessibilityIdentifier("phone.petLevel")

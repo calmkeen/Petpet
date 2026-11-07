@@ -8,6 +8,8 @@ struct WatchHomeView: View {
     @ObservedObject var cloudViewModel: WatchCloudController
     @ObservedObject var streakViewModel: WatchStreakViewModel
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.isLuminanceReduced) private var luminanceReduced
+    @StateObject private var character = CharacterActivityViewModel()
     @State private var selectedSection: WatchSection = .home
 
     private enum WatchSection: Hashable {
@@ -36,6 +38,10 @@ struct WatchHomeView: View {
             // lists open on the navigation stack and receive Crown scrolling.
             .tabViewStyle(.verticalPage)
         }
+        .onReceive(viewModel.$state) { character.observe($0) }
+        .onChange(of: characterIsVisible, initial: true) { _, active in
+            character.setActive(active, steps: viewModel.state)
+        }
         // Keep tracking alive while browsing the pet and food pages.
         .task {
             await cloudViewModel.start()
@@ -63,65 +69,71 @@ struct WatchHomeView: View {
     }
 
     private var home: some View {
-        GeometryReader { geometry in
-            ZStack {
-                Image("background")
-                    .resizable().scaledToFill()
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .clipped()
-                VStack(spacing: 4) {
-                    Button {
-                        Task { await petViewModel.touch() }
-                    } label: {
-                        Image("snowfox_baby_sitting")
-                            .resizable().scaledToFit()
-                            .frame(height: min(90, geometry.size.height * 0.38))
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(petViewModel.isBusy || petViewModel.progress == nil)
-                    .accessibilityLabel("펫 쓰다듬기")
-                    .accessibilityIdentifier("watch.petTouch")
-                    if let progress = petViewModel.progress {
-                        Text("Lv.\(progress.pet.level) · \(progress.pet.mood.displayName)")
-                            .font(.caption2)
-                    }
-                    Text("오늘 \(viewModel.state.stepCount.formatted())걸음")
-                        .font(.headline).monospacedDigit()
-                        .accessibilityIdentifier("watch.stepCount")
-                    if viewModel.state.isLoading { ProgressView() }
-                    if let message = viewModel.errorMessage {
-                        Text(message).font(.caption2).multilineTextAlignment(.center)
-                    }
-                    HStack(spacing: 8) {
+        TimelineView(.periodic(from: Date(timeIntervalSince1970: floor(Date().timeIntervalSince1970 / 60) * 60), by: 60)) { context in
+            let period = PetDaylightPeriod(date: context.date)
+            GeometryReader { geometry in
+                ZStack {
+                    Image(period.backgroundImageName)
+                        .resizable().scaledToFill()
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                    VStack(spacing: 4) {
                         Button {
-                            withAnimation { selectedSection = .statistics }
+                            guard character.handleTouch() else { return }
+                            Task { await petViewModel.touch() }
                         } label: {
-                            Label("성장", systemImage: "chart.bar.fill")
+                            WatchPetSpriteView(state: character.state)
+                                .frame(height: min(90, geometry.size.height * 0.38))
                         }
-                        .accessibilityIdentifier("watch.openPetStatistics")
-                        Button {
-                            withAnimation { selectedSection = .food }
-                        } label: {
-                            Label("먹이", systemImage: "carrot.fill")
+                        .buttonStyle(.plain)
+                        .disabled(petViewModel.isBusy || petViewModel.progress == nil)
+                        .accessibilityLabel("펫 쓰다듬기")
+                        .accessibilityIdentifier("watch.petTouch")
+                        if let progress = petViewModel.progress {
+                            Text("Lv.\(progress.pet.level) · \(progress.pet.mood.displayName)")
+                                .font(.caption2)
                         }
-                        .accessibilityIdentifier("watch.openFoodInventory")
+                        Text("오늘 \(viewModel.state.stepCount.formatted())걸음")
+                            .font(.headline).monospacedDigit()
+                            .accessibilityIdentifier("watch.stepCount")
+                        if viewModel.state.isLoading { ProgressView() }
+                        if let message = viewModel.errorMessage {
+                            Text(message).font(.caption2).multilineTextAlignment(.center)
+                        }
+                        HStack(spacing: 8) {
+                            Button {
+                                withAnimation { selectedSection = .statistics }
+                            } label: {
+                                Label("성장", systemImage: "chart.bar.fill")
+                            }
+                            .accessibilityIdentifier("watch.openPetStatistics")
+                            Button {
+                                withAnimation { selectedSection = .food }
+                            } label: {
+                                Label("먹이", systemImage: "carrot.fill")
+                            }
+                            .accessibilityIdentifier("watch.openFoodInventory")
+                        }
+                        .font(.caption2)
+                        .buttonStyle(.bordered)
+                        .tint(.white.opacity(0.8))
+                        Text("크라운을 돌려 섹션 이동")
+                            .font(.system(size: 10))
                     }
-                    .font(.caption2)
-                    .buttonStyle(.bordered)
-                    .tint(.white.opacity(0.8))
-                    Text("크라운을 돌려 섹션 이동")
-                        .font(.system(size: 10))
+                    .foregroundStyle(period.usesLightText ? .white : .black)
+                    .padding(.horizontal, 12)
                 }
-                .foregroundStyle(.black)
-                .padding(.horizontal, 12)
             }
         }
         .ignoresSafeArea()
     }
 
+    private var characterIsVisible: Bool { selectedSection == .home && scenePhase == .active && !luminanceReduced }
+
     private func stop() {
         viewModel.stop()
         petViewModel.stop()
+        character.stop()
     }
 }
 

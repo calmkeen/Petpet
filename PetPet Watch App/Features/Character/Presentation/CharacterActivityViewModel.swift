@@ -2,86 +2,37 @@ import Combine
 import Foundation
 import PetPetCore
 
-/// Preserves the existing reaction draft. The static home sprite is not yet
-/// connected to these states; the pet interaction milestone will do that.
 @MainActor
 final class CharacterActivityViewModel: ObservableObject {
-    @Published private(set) var activity: CharacterActivity = .idle
-    private let detector: any MotionDetecting
-    private var isDetecting = false
-    private var isMoving = false
-    private var stopTimer: Timer?
-    private var idleTimer: Timer?
-    private var reactionTask: Task<Void, Never>?
+    @Published private(set) var state = PetAnimationState()
+    private var completion: Task<Void, Never>?
 
-    init(detector: any MotionDetecting) {
-        self.detector = detector
+    func setActive(_ value: Bool, steps: DailyStepState) {
+        state.setActive(value, at: Date())
+        state.observe(steps, at: Date())
+        scheduleCompletion()
     }
-
-    func start() {
-        guard !isDetecting else { return }
-        isDetecting = true
-        detector.start { [weak self] moving in
-            guard let self, self.isDetecting, moving != self.isMoving else { return }
-            self.isMoving = moving
-            self.reactionTask?.cancel()
-            if moving {
-                self.resetTimers()
-                self.activity = .running
-            } else {
-                self.startStopTimer()
-            }
-        }
+    func observe(_ steps: DailyStepState) {
+        let deadline = state.expiresAt
+        state.observe(steps, at: Date())
+        if deadline != state.expiresAt { scheduleCompletion() }
     }
-
-    func handleTouch() {
-        reactionTask?.cancel()
-        activity = .touching
-        resetActivity(after: 2_000_000_000)
+    func handleTouch() -> Bool {
+        guard state.touch(at: Date()) else { return false }
+        scheduleCompletion()
+        return true
     }
-
     func stop() {
-        isDetecting = false
-        isMoving = false
-        detector.stop()
-        resetTimers()
-        reactionTask?.cancel()
-        activity = .idle
+        state.setActive(false, at: Date())
+        completion?.cancel(); completion = nil
     }
-
-    private func startStopTimer() {
-        stopTimer?.invalidate()
-        stopTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                guard let self, self.isDetecting, !self.isMoving else { return }
-                self.activity = .idle
-                self.startIdleTimer()
-            }
+    private func scheduleCompletion() {
+        completion?.cancel(); completion = nil
+        guard let deadline = state.expiresAt else { return }
+        completion = Task { [weak self] in
+            do { try await Task.sleep(for: .seconds(max(0, deadline.timeIntervalSinceNow))) } catch { return }
+            guard let self, !Task.isCancelled, self.state.expiresAt == deadline else { return }
+            self.state.tick(at: max(Date(), deadline))
         }
-    }
-
-    private func startIdleTimer() {
-        idleTimer?.invalidate()
-        idleTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                guard let self, self.isDetecting, !self.isMoving else { return }
-                self.activity = .stopped
-                self.resetActivity(after: 1_000_000_000)
-            }
-        }
-    }
-
-    private func resetActivity(after nanoseconds: UInt64) {
-        reactionTask?.cancel()
-        reactionTask = Task { @MainActor [weak self] in
-            do { try await Task.sleep(nanoseconds: nanoseconds) } catch { return }
-            guard let self else { return }
-            self.activity = self.isMoving ? .running : .idle
-        }
-    }
-
-    private func resetTimers() {
-        stopTimer?.invalidate()
-        idleTimer?.invalidate()
     }
 }

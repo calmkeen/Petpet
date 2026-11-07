@@ -1,0 +1,166 @@
+{
+  "repository": "https://github.com/Chaeros/StepMate",
+  "commit": "4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3",
+  "files": [
+    {
+      "target": "PetPet Watch App",
+      "asset": "stepmate_fox_idle",
+      "source": "app/src/main/res/drawable/snowfox_baby_sitting.png",
+      "sha256": "d47b50ca1f01107616e0b118db48d1b368df4b9a53dcd537dffb0f9bbeaab5d8",
+      "gitBlob": "b1263c49950e5c6d1946b6555f222ed371c5b751",
+      "bytes": 1216958
+    },
+    {
+      "target": "PetPet Watch App",
+      "asset": "stepmate_fox_run_1",
+      "source": "app/src/main/res/drawable/snowfox_baby_run1.png",
+      "sha256": "228d77777f9242e97019204910bc808d0403e9be2fc2e96762ea075a792a8b0d",
+      "gitBlob": "5792b25223d31fa4805c29c8e5b1819c442bf3a6",
+      "bytes": 212207
+    },
+    {
+      "target": "PetPet Watch App",
+      "asset": "stepmate_fox_run_2",
+      "source": "app/src/main/res/drawable/snowfox_baby_run2.png",
+      "sha256": "890006cb761b2a46abb60dde7f23257ad99b26b6146fd80809dc7592d07be589",
+      "gitBlob": "17396b9cdd81d0e9170555401d5aa0bfa9b73489",
+      "bytes": 225020
+    },
+    {
+      "target": "PetPet Watch App",
+      "asset": "stepmate_fox_run_3",
+      "source": "app/src/main/res/drawable/snowfox_baby_run3.png",
+      "sha256": "6c9e190c5eefc2f84410b4e262fed2781dbd0067c05e9b0f12eb632b7c658112",
+      "gitBlob": "33baf4e8f3293ba403dfcdca91f2440ef99ad4cc",
+      "bytes": 202676
+    },
+    {
+      "target": "PetPet Watch App",
+      "asset": "stepmate_fox_run_4",
+      "source": "app/src/main/res/drawable/snowfox_baby_run4.png",
+      "sha256": "514a7e52c6d2286fa078f07899df590c28a1e523e95d8c3c4d688c645e120330",
+      "gitBlob": "e92193b42a7ad9af41fb05f7ccf3c6007890c452",
+      "bytes": 210724
+    },
+    {
+      "target": "PetPet Watch App",
+      "asset": "stepmate_fox_happy_1",
+      "source": "app/src/main/res/drawable/snowfox_baby_happy1.png",
+      "sha256": "cf791e266ecf5314a38a145153a39d7db3196688aeb9737404c8e4b4b0b3ca30",
+      "gitBlob": "16f3d1cb9ef97b5271c8c6d413a6a817f52fb38c",
+      "bytes": 698026
+    },
+    {
+      "target": "PetPet Watch App",
+      "asset": "stepmate_fox_happy_2",
+      "source": "app/src/main/res/drawable/snowfox_baby_happy2.png",
+      "sha256": "3d6f4ff06eeb6ed6743ab1081b5fe47791f8b40d79c6106f6afb315287dcb2bd",
+      "gitBlob": "2803356a97c80d34d371b99fdd21ac7ad8d582f6",
+      "bytes": 910974
+    },
+    {
+      "target": "PetPet Watch App",
+      "asset": "stepmate_background_dawn",
+      "source": "app/src/main/res/drawable/north_pole_background_dawn.png",
+      "sha256": "afa9b641d1c30e38605329fe6f4823d21246b7c960213e345c05043dc5ec38d3",
+      "gitBlob": "f194733c07f4dc4114ffe0c9e896e8bcf6ed86ec",
+      "bytes": 1284414
+    },
+    {
+      "target": "PetPet Watch App",
+      "asset": "stepmate_background_day",
+      "source": "app/src/main/res/drawable/north_pole_background_default.png",
+      "sha256": "6fc13b87fc727242fc8ebcce258bb9f7b950a75a943be4be1150063fa69d171a",
+      "gitBlob": "d2b40ce127f6d16ea2819c213754337089335ad8",
+      "bytes": 1842512
+    },
+    {
+      "target": "PetPet Watch App",
+      "asset": "stepmate_background_sunset",
+      "source": "app/src/main/res/drawable/north_pole_background_sunset.png",
+      "sha256": "9df2a9dd6ca566fa5f0c732ddd67deea2744a42bf2e2fa3ea96e8b6c3fce59b2",
+      "gitBlob": "7301408482298d7e88447c1da15d06198a230c58",
+      "bytes": 1500377
+    },
+    {
+      "target": "PetPet Watch App",
+      "asset": "stepmate_background_night",
+      "source": "app/src/main/res/drawable/north_pole_background_night.png",
+      "sha256": "5aab9aa9422e1ef46a4df4e321b8f1797c52b036bda24aea64005c14070a2fcf",
+      "gitBlob": "72c90257f6e92a136ecf02033cf680b0b7b2fc0c",
+      "bytes": 2052774
+    },
+    {
+      "target": "PetPet",
+      "asset": "stepmate_fox_idle",
+      "source": "app/src/main/res/drawable/snowfox_baby_sitting.png",
+      "sha256": "d47b50ca1f01107616e0b118db48d1b368df4b9a53dcd537dffb0f9bbeaab5d8",
+      "gitBlob": "b1263c49950e5c6d1946b6555f222ed371c5b751",
+      "bytes": 1216958
+    },
+    {
+      "target": "PetPet",
+      "asset": "stepmate_fox_happy_1",
+      "source": "app/src/main/res/drawable/snowfox_baby_happy1.png",
+      "sha256": "cf791e266ecf5314a38a145153a39d7db3196688aeb9737404c8e4b4b0b3ca30",
+      "gitBlob": "16f3d1cb9ef97b5271c8c6d413a6a817f52fb38c",
+      "bytes": 698026
+    },
+    {
+      "target": "PetPet",
+      "asset": "stepmate_fox_happy_2",
+      "source": "app/src/main/res/drawable/snowfox_baby_happy2.png",
+      "sha256": "3d6f4ff06eeb6ed6743ab1081b5fe47791f8b40d79c6106f6afb315287dcb2bd",
+      "gitBlob": "2803356a97c80d34d371b99fdd21ac7ad8d582f6",
+      "bytes": 910974
+    },
+    {
+      "target": "PetPet",
+      "asset": "stepmate_background_dawn",
+      "source": "app/src/main/res/drawable/north_pole_background_dawn.png",
+      "sha256": "afa9b641d1c30e38605329fe6f4823d21246b7c960213e345c05043dc5ec38d3",
+      "gitBlob": "f194733c07f4dc4114ffe0c9e896e8bcf6ed86ec",
+      "bytes": 1284414
+    },
+    {
+      "target": "PetPet",
+      "asset": "stepmate_background_day",
+      "source": "app/src/main/res/drawable/north_pole_background_default.png",
+      "sha256": "6fc13b87fc727242fc8ebcce258bb9f7b950a75a943be4be1150063fa69d171a",
+      "gitBlob": "d2b40ce127f6d16ea2819c213754337089335ad8",
+      "bytes": 1842512
+    },
+    {
+      "target": "PetPet",
+      "asset": "stepmate_background_sunset",
+      "source": "app/src/main/res/drawable/north_pole_background_sunset.png",
+      "sha256": "9df2a9dd6ca566fa5f0c732ddd67deea2744a42bf2e2fa3ea96e8b6c3fce59b2",
+      "gitBlob": "7301408482298d7e88447c1da15d06198a230c58",
+      "bytes": 1500377
+    },
+    {
+      "target": "PetPet",
+      "asset": "stepmate_background_night",
+      "source": "app/src/main/res/drawable/north_pole_background_night.png",
+      "sha256": "5aab9aa9422e1ef46a4df4e321b8f1797c52b036bda24aea64005c14070a2fcf",
+      "gitBlob": "72c90257f6e92a136ecf02033cf680b0b7b2fc0c",
+      "bytes": 2052774
+    },
+    {
+      "target": "PetPet",
+      "asset": "stepmate_food_milk",
+      "source": "app/src/main/res/drawable/milk_normal1.png",
+      "sha256": "1f440e8df1425aa130728b3718bf5eb81a2f494f5ac7ff4a8e4f7b6090735233",
+      "gitBlob": "a0eb09ec0a9b0968a70dde0b5080f092c6752f03",
+      "bytes": 195594
+    },
+    {
+      "target": "PetPet",
+      "asset": "stepmate_food_apple",
+      "source": "app/src/main/res/drawable/apple_normal1.png",
+      "sha256": "636a973be9ef4562cefa443874118c710c607ed03eb0cdab21d24ea635a3f995",
+      "gitBlob": "bf4f9a4dcea39cbdb9edfcf54de1129c9e9c8975",
+      "bytes": 19255
+    }
+  ]
+}
