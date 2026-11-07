@@ -18,7 +18,8 @@ models, repository contracts, and sensor-session logic live in the local
 - [Daily steps, persistence, and recovery](Docs/DailySteps.md)
 - [Feeding, growth, and step rewards](Docs/FeedingAndGrowth.md)
 - [iPhone and Apple Watch synchronization](Docs/WatchSynchronization.md)
-- [Google login, server backup, and restore setup](Docs/AccountAndBackup.md)
+- [Apple login, server backup, and restore setup](Docs/AccountAndBackup.md)
+- [Required backend changes for Apple login](Docs/AppleSignInServer.md)
 
 The watch app displays a pet and today's steps, restores calendar-day totals,
 and saves daily history locally. It refreshes system pedometer history when the
@@ -31,8 +32,9 @@ Rewards are granted after a successful server backup, matching Android.
 The iPhone receives the watch's daily steps, pet state, and food inventory through
 WatchConnectivity and keeps the latest valid snapshot for offline viewing.
 It shows connection status, last sync time, and a manual refresh action. Missing
-today's data is displayed as a dash. Google login, Keychain sessions, and the
-existing StepMate backup/restore API are implemented. Live account verification
-requires the iOS and Web OAuth Client IDs described in the setup guide.
+today's data is displayed as a dash. Native Sign in with Apple, Keychain sessions,
+and the StepMate backup/restore client are implemented. Live account verification
+requires the new Apple authentication endpoint and a developer team/profile that
+supports Sign in with Apple. The server handoff guide documents those changes.
 Games, streak UI, rankings, and voice remain subsequent milestones.
 

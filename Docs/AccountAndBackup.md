@@ -1,23 +1,24 @@
-# Google 로그인과 서버 백업·복원
+# Apple 로그인과 서버 백업·복원
 
 기준은 Android [StepMate `4e2b5e5`](https://github.com/Chaeros/StepMate/tree/4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3)와 서버 [StepMate_SpringBoot `bcdcefbb`](https://github.com/Chaeros/StepMate_SpringBoot/tree/bcdcefbb226951785e09a82c30ab473ef77e39da)다. 서버 코드는 읽기 전용으로 확인했으며 변경하지 않았다.
 
-## 설정이 필요한 이유
+## iOS 로그인 설정
 
-Google은 Android 앱과 iOS 앱을 별도의 OAuth 클라이언트로 등록한다. 같은 Google 계정과 백엔드를 사용하더라도 iOS Bundle ID와 로그인 복귀 URL을 등록해야 한다. Web Client ID는 서버가 검증할 ID 토큰의 audience이며 기존 Android와 서버가 사용하는 값을 재사용한다. Client ID는 앱 식별자이며 비밀번호나 Client Secret이 아니다.
+iOS는 Apple 기본 `SignInWithAppleButton`과 AuthenticationServices를 사용한다. Google SDK·iOS Google Client ID·Web Client ID·Google 복귀 URL scheme은 제거했다. Android의 기존 Google 인증 API 계약은 공용 클라이언트와 회귀 테스트에 남아 있지만 iOS 화면에서는 호출하지 않는다.
 
-Google Cloud의 기존 StepMate 프로젝트에서 다음을 준비한다.
+실제 로그인을 연결하려면 다음이 필요하다.
 
-1. OAuth 클라이언트 유형 **iOS**, Bundle ID **`com.calmkeen.PetPet`**로 클라이언트를 만든다. Google 콘솔이 추가 정보를 요청하면 기존 Apple 앱 설정에 맞게 입력한다.
-2. 기존 Android가 ID 토큰 요청에 사용하는 **Web application Client ID**와 서버의 허용 audience를 확인한다. 임의의 새 Web ID를 넣으면 서버가 토큰을 거부할 수 있다.
-3. 루트 `PetPet-Info.plist`의 `GIDClientID`에 iOS Client ID, `GIDServerClientID`에 Web Client ID를 넣는다.
-4. 같은 파일의 `CFBundleURLTypes → CFBundleURLSchemes`를 iOS Client ID의 역순 URL scheme으로 바꾼다. 예: `123-example.apps.googleusercontent.com` → `com.googleusercontent.apps.123-example`.
-5. `PetPetAPIBaseURL`이 같은 계정·데이터를 사용하는 서버인지 확인한다. 현재 기본값은 Android 문서의 `https://www.stepmatecp.com/`이며 운영 주소는 소유자 확인이 필요하다.
-6. 다시 빌드한 뒤 iPhone의 **계정 · 서버 백업**에서 Google 로그인을 진행한다. 워치에서는 로그인 화면을 띄우지 않는다.
+1. Apple Developer Program 팀의 앱 ID **`com.calmkeen.PetPet`**에 Sign in with Apple을 활성화하고 서명 프로파일을 갱신한다. 프로젝트의 `PetPet.entitlements`와 iPhone 타깃 Debug/Release에 capability를 연결했다. 무료 Personal Team은 이 기능을 지원하지 않는다. [Apple 지원 표](https://developer.apple.com/help/account/reference/supported-capabilities-ios/).
+2. 서버에 **`POST /api/v1/auth/apple`**과 Apple 증명 검증·공용 계정 조회를 추가한다. 이 경로는 이번에 정의한 계약이며 기존 서버에는 없다. [서버 변경 명세](AppleSignInServer.md)에 요청·응답과 수정 파일·이행 순서를 정리했다.
+3. 서버의 Apple Team ID·Key ID·`.p8` 키를 준비한다. 개인 키와 client secret은 서버에만 둔다. 앱은 Bundle ID를 사용하는 네이티브 인증이며 별도 Google OAuth 설정이 필요하지 않다.
+4. `PetPet-Info.plist`의 `PetPetAPIBaseURL`을 확인한다. 현재 기본값은 Android 문서의 `https://www.stepmatecp.com/`이며 운영 주소는 소유자 확인이 필요하다.
+5. 새 프로파일로 빌드한 iPhone의 **계정 · 서버 백업**에서 Apple로 로그인한다. 워치에는 계정 표시 정보만 전달한다.
 
-GoogleSignIn-iOS 9.0.0을 iPhone 타깃에만 연결했다. 설정이 비어 있거나 복귀 scheme이 일치하지 않으면 로그인 버튼을 비활성화한다. 저장소에는 실제 OAuth ID를 넣지 않았으며 Client Secret은 앱에 넣지 않는다.
+인증 요청마다 별도의 nonce·state를 만들고, SHA256 nonce와 state를 Apple 요청에 넣는다. 콜백의 state·유효 시간을 확인한 뒤 identityToken·authorizationCode·rawNonce를 서버에 한 번 교환한다. 서버가 검증하고 내부 userId와 PetPet 토큰 쌍을 반환해야 로그인으로 저장한다. Apple API가 404/405/501이면 서버 연결이 아직 준비되지 않았다고 안내한다.
 
-공식 안내: [iOS 프로젝트 등록과 URL scheme](https://developers.google.com/identity/sign-in/ios/start-integrating), [서버 인증용 ID 토큰](https://developers.google.com/identity/sign-in/ios/backend-auth).
+처음에만 오는 이름은 서버 교환이 완료될 때까지 앱 UserDefaults의 `PetPet.apple.pendingNames.v1`에 잠시 보관한다. token·code·nonce는 여기에 저장하지 않는다. Keychain에는 PetPet 세션과 Apple 제공자·사용자 식별자를 저장한다. 앱 실행·복귀와 Apple credential 철회 알림에서 기기 상태를 확인하며, 철회·계정 변경이 확인되면 해당 세션을 로그아웃하고 워치에도 알린다. 일시적인 상태 조회 오류만으로 세션을 지우지 않는다.
+
+공식 안내: [Apple 인증 흐름](https://developer.apple.com/documentation/signinwithapple/authenticating-users-with-sign-in-with-apple), [서버 검증과 기기 credential 상태](https://developer.apple.com/documentation/signinwithapple/verifying-a-user).
 
 ## 사용자 흐름
 
@@ -33,7 +34,7 @@ GoogleSignIn-iOS 9.0.0을 iPhone 타깃에만 연결했다. 설정이 비어 있
 
 | 동작 | 요청 |
 |---|---|
-| Google 로그인 | `POST /api/v1/google`, `{"idToken":"…"}` |
+| Apple 로그인 — 새 서버 계약 | `POST /api/v1/auth/apple`, identityToken·authorizationCode·rawNonce·userIdentifier·선택적 name |
 | 세션 갱신 | `POST /api/v1/auth/refresh`, `{"refreshToken":"…"}`. 404/405에서만 `/api/v1/refresh` 재시도 |
 | 백업 | `POST /api/v1/backup`, Bearer access token |
 | 펫 복원 | `GET /api/v1/usermates/1`, Bearer access token |
@@ -62,11 +63,13 @@ GoogleSignIn-iOS 9.0.0을 iPhone 타깃에만 연결했다. 설정이 비어 있
 
 ## 검증 범위
 
-공용 패키지 78개 테스트가 통과한다. 이번 단계는 ID 토큰 교환 계약, 동시 refresh, 만료·로그아웃·계정 전환 경쟁, 백업 JSON, 서버 계정 검증, 기존 파일 이관, 부분 복원, 저장 실패, 계정별 보관, 중복·역순 백업, 서버 실패 시 미지급, 자정 뒤 성공 확인, 재실행 후 성공 확인·복원 명령 재전송을 검증한다. HTTP는 주입한 테스트 서버 응답을 사용했다.
+공용 패키지 86개 테스트가 통과한다. Apple 교환 요청 형식·필수 응답·미구현 경로·state와 유효 시간·기존 Keychain 표현 호환·refresh 후 Apple 식별 유지·로그아웃 경합을 포함한다. 기존 동시 refresh, 백업·복원·이관·중복 보상·역순·중단 복구 테스트도 통과한다. HTTP는 주입한 모의 서버 응답을 사용했다.
 
-2026-11-07: iPhone·Watch 전체 Debug/Release 시뮬레이터 빌드와 실기기용 아키텍처 빌드를 통과했다. 시뮬레이터에서 iPhone 계정 화면의 미설정 안내·버튼 비활성화, 워치 Crown의 네 번째 계정·백업 섹션을 확인했다. 사용자가 승인한 워치 시뮬레이터의 피트니스 권한을 허용했으며 실제 워치 설정은 변경하지 않았다. 기존 시뮬레이터의 날짜별 걸음수·펫·먹이·지급 내역·터치 횟수가 통합 저장소에 보존되고 이전 파일이 그대로 남는 것을 비교했다. Keychain 동작을 확인하는 시뮬레이터 앱은 Xcode 기본 서명으로 빌드한다.
+2026-11-07 Apple 전환 검증: iPhone·Watch 전체 Debug/Release 시뮬레이터 빌드와 서명을 생략한 실기기용 아키텍처 컴파일이 통과했다. 기본 서명한 iPhone 시뮬레이터에서 Google 버튼이 사라지고 Apple 기본 버튼이 표시되는 것, 로그인 전 서버 백업·복원 버튼이 비활성화된 것을 확인했다. 기존 걸음수·펫·먹이 화면과 워치 연결도 유지됐다. 실제 Apple 인증 화면에서 계정을 인증하거나 운영 서버로 자격 증명을 전송하지 않았다.
 
-실제 Google 로그인, 운영 API 업로드와 서버 복원은 OAuth 설정 및 서버 주소를 확인한 뒤 별도로 검증해야 한다. 실제 계정 로그인이나 운영 데이터 복원을 이미 검증한 것으로 해석하지 않는다. 이번 변경은 실기기에 설치하지 않았다.
+앞선 백업 연동 단계에서는 워치 Crown의 네 번째 계정·백업 섹션과 저장소 이관을 확인했다. 사용자가 승인한 워치 시뮬레이터 피트니스 권한을 허용했으며 실제 워치 설정은 변경하지 않았다. 기존 시뮬레이터 걸음수·펫·먹이·지급 내역·터치 횟수와 보존된 이전 파일을 비교했다.
+
+현재 실기기 프로파일은 Sign In with Apple capability와 `com.apple.developer.applesignin` entitlement를 포함하지 않아 Apple 로그인 추가 후 서명 빌드는 실패한다. 이를 제거해서 설치한 것을 로그인 검증으로 취급하지 않는다. 서버 구현·Apple 개발자 팀/프로파일 설정 후 실제 Apple 계정 로그인과 운영 백업·복원을 별도로 확인해야 한다. 이번 변경은 실기기에 설치하지 않았다.
 
 ```sh
 swift test --package-path Packages/PetPetCore

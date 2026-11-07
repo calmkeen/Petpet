@@ -2,14 +2,14 @@
 
 ## 현재 완료 범위
 
-워치 홈, 하루 걸음수, 먹이·성장·스탯·호감도, iPhone 표시용 동기화를 구현했다. iPhone에는 Google 로그인·Keychain 세션과 기존 StepMate 서버의 백업·복원을 연결했으며, 워치는 서버 성공 확인 뒤 보상을 지급한다. 실제 OAuth 설정과 운영 API 검증은 남아 있다. [설정과 검증 범위](AccountAndBackup.md).
+워치 홈, 하루 걸음수, 먹이·성장·스탯·호감도, iPhone 표시용 동기화를 구현했다. iPhone에는 Apple 로그인·Keychain 세션과 StepMate 백업·복원 클라이언트를 연결했으며, 워치는 서버 성공 확인 뒤 보상을 지급한다. Apple 인증 서버 추가와 capability 프로파일 설정·실제 계정 검증이 남아 있다. [설정과 검증 범위](AccountAndBackup.md).
 
 ```text
 PetPet/                         iPhone 앱 타깃
   App/                          앱 시작점과 의존성 조립
   Features/Home/Presentation/    SwiftUI 화면과 ViewModel
-  Features/Account/Presentation/ Google 로그인·백업·복원 미리보기
-  Infrastructure/Account/       GoogleSignIn·Keychain 어댑터
+  Features/Account/Presentation/ Apple 로그인·백업·복원 미리보기
+  Infrastructure/Account/       AuthenticationServices·Keychain 어댑터
   Preview Content/              Debug 전용 미리보기
 PetPet Watch App/               watchOS 앱 타깃
   App/                          앱 시작점과 의존성 조립
@@ -79,7 +79,7 @@ flowchart LR
 1. 하루 걸음수 집계·날짜 변경·재실행 복구와 로컬 저장: 완료.
 2. Android와 같은 보상 수치, 먹이 소비, 경험치·레벨·스탯·호감도 규칙: 완료. 기분 표시·터치는 연결했으며, 움직임 애니메이션은 후속 작업이다.
 3. iPhone 보조 홈과 WatchConnectivity 읽기 전용 동기화: 완료. 기기별 센서 값을 단순 합산하지 않는다.
-4. Google 인증, Keychain 세션, 기존 서버의 백업·복원: 코드 구현 완료. OAuth 설정과 실제 계정 검증 필요. 스트릭·닉네임 수정 UI는 후속 작업이다.
+4. Apple 인증, Keychain 세션, 서버 백업·복원 클라이언트: 코드 구현 완료. 서버 Apple 인증과 개발자 팀 설정·실제 계정 검증 필요. 스트릭·닉네임 수정 UI는 후속 작업이다.
 5. 게임 2종, 랭킹, 음성·AI 대화.
 
 각 단계에서 실제 Android 코드의 규칙·API DTO를 확인한 뒤 이식한다. 워치 백그라운드 동작은 Wear OS의 센서 구독을 그대로 복제하지 않고 Apple 플랫폼에서 지원하는 수집 방식과 실행 수명에 맞춰 구현한다.

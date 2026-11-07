@@ -11,7 +11,7 @@
 | 펫 능력치·터치 | `feature_statistics`, 스탯 배분·50회 터치 호감도·공복/활동 상태 | 레벨·경험치·스탯 배분·호감도·기분과 영구 저장 구현 |
 | 먹이·보상 | `feature_userfoods`, `StepStreakViewModel.grantBackupRewards` | 먹이 소비·신규 우유 3개·1,000걸음당 우유·일일 사과·중복 방지 구현. 서버 백업 성공 확인 뒤 수령 |
 | 스트릭·닉네임 | `feature_stepstreak`와 서버 API | 후속 `Features/Streak` 및 기능별 Data |
-| 로그인·세션 | `feature_auth`, Google ID Token 교환·refresh·세션 만료 처리 | iPhone GoogleSignIn SDK·Keychain·공유 refresh·만료 처리 구현. 실제 OAuth 설정 대기 |
+| 로그인·세션 | `feature_auth`, Google ID Token 교환·refresh·세션 만료 처리 | iPhone은 Apple 기본 로그인·Keychain·공유 refresh·철회 처리 구현. Apple 인증 서버 추가와 capability 프로파일 설정 필요 |
 | 백업·복원 | `feature_backup`, Room 데이터와 메타데이터 | iPhone 경유 백업·미리보기 후 워치 복원·중복 보상 방지 구현. 운영 API 검증은 설정 후 진행 |
 | 지구를 지켜라 | `feature_game1`, 펫 스탯을 사용하는 슈팅·스테이지·랭킹 | 후속 게임 도메인 엔진과 watchOS 렌더러 |
 | 별계단 훈련 | `feature_game2`, 계단 게임·점수·랭킹 | 후속 게임 도메인 엔진과 watchOS 렌더러 |
@@ -23,7 +23,7 @@
 - 앱 이름·Xcode 타깃·Bundle ID는 PetPet의 기존 값을 사용한다. Android 패키지 이름을 Apple Bundle ID로 복사하지 않는다.
 - iOS 18 / watchOS 11 최소 버전을 유지한다. 구조 정비를 위해 사용자 기기나 Xcode 버전 업그레이드를 요구하지 않는다.
 - Android의 `Long` 식별자·능력치는 공용 모델에서 `Int64`로 다룬다. `PetStatistic` ID 1~6, `PetMood`의 HAPPY/SAD/HUNGRY 값은 원본 의미를 유지한다.
-- 서버와 공통 계정 사용은 기본 방향이다. 인증 audience·iOS OAuth 설정·서버 DTO·날짜 표현은 인증 이식 단계에서 맞춘다. Android 빌드 설정의 비밀 값이나 클라이언트 키를 소스에 복사하지 않는다.
+- iOS는 Apple, Android는 Google을 사용한다. 같은 내부 계정으로 연결하려면 서버가 두 제공자를 지원하고 명시적인 계정 연결 절차를 제공해야 한다. Apple 신규 로그인을 기존 Google 계정에 이메일로 자동 연결하지 않는다. [서버 변경 명세](AppleSignInServer.md). Apple 서버 키와 Android 비밀 값은 iOS 소스에 복사하지 않는다.
 - Google Credential Manager, Wearable Data Layer, Room, Samsung Health SDK, Android 음성 입력 UI는 Apple에서 직접 사용할 수 없다. 해당 기능은 Apple용 어댑터와 UI로 구현한다.
 - 실제 규칙은 README나 화면 이름보다 위 기준 커밋의 코드가 우선한다. 원본 버그까지 동등하게 재현하지 않으며, 의도된 규칙과 버그가 갈리는 경우 이 대응표에 결정과 차이를 남긴다.
 
