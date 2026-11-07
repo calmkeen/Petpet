@@ -9,6 +9,7 @@ public struct CloudAccount: Codable, Equatable, Sendable {
 public struct WatchBackupExport: Codable, Equatable, Sendable {
     public let operationID: UUID
     public let storeID: UUID
+    public let sequence: Int64
     public let accountID: String
     public let capturedAt: Date
     public let timeZoneIdentifier: String
@@ -27,9 +28,11 @@ public struct CloudBackupReceipt: Codable, Equatable, Sendable {
     public let storeID: UUID
     public let accountID: String
     public let completedAt: Date
+    public let sequence: Int64
     public init(export: WatchBackupExport, completedAt: Date) {
         operationID = export.operationID; storeID = export.storeID
         accountID = export.accountID; self.completedAt = completedAt
+        sequence = export.sequence
     }
 }
 

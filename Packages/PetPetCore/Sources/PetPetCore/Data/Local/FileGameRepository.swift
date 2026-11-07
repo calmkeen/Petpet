@@ -19,6 +19,7 @@ public actor FileGameRepository: StepHistoryRepository, PetProgressRepository {
         var appliedBackups: Set<UUID> = []
         var appliedRestores: Set<UUID> = []
         var restoreUndo: Game?
+        var exportSequence: Int64 = 0
     }
     private let directory: URL
     private let now: @Sendable () -> Date
@@ -36,6 +37,7 @@ public actor FileGameRepository: StepHistoryRepository, PetProgressRepository {
         return cached!.game.progress
     }
     public func perform(_ action: PetProgressAction) async throws -> PetProgressChange {
+        if case .claimRewards = action { throw BackendError.authenticationRequired }
         try await ensureLoaded()
         var next = cached!
         let reward = try PetProgressRules.apply(action, to: &next.game.progress, at: now(), calendar: calendar)
@@ -74,6 +76,8 @@ public actor FileGameRepository: StepHistoryRepository, PetProgressRepository {
         guard next.ownerID == nil || next.ownerID == accountID else { throw BackendError.accountMismatch }
         if let pending = next.pending[operationID.uuidString] { return pending }
         guard next.pending.count < 32 else { throw BackendError.operationExpired }
+        guard next.exportSequence < Int64.max else { throw BackendError.invalidResponse }
+        next.exportSequence += 1
         next.ownerID = accountID
         for (date, count) in dirtySteps { next.game.records[date] = max(next.game.records[date] ?? 0, count) }
         let capturedAt = now()
@@ -87,7 +91,7 @@ public actor FileGameRepository: StepHistoryRepository, PetProgressRepository {
         if !steps.contains(where: { $0.date == day }) {
             steps.append(DailyStepRecord(date: day, stepCount: next.game.records[day] ?? 0))
         }
-        let export = WatchBackupExport(operationID: operationID, storeID: next.storeID, accountID: accountID,
+        let export = WatchBackupExport(operationID: operationID, storeID: next.storeID, sequence: next.exportSequence, accountID: accountID,
                                        capturedAt: capturedAt, timeZoneIdentifier: calendar.timeZone.identifier,
                                        backupDay: day, pet: next.game.progress.pet, steps: steps.sorted { $0.date < $1.date })
         _ = try export.request()
@@ -102,7 +106,8 @@ public actor FileGameRepository: StepHistoryRepository, PetProgressRepository {
         var next = cached!
         guard receipt.storeID == next.storeID else { throw BackendError.accountMismatch }
         if next.appliedBackups.contains(receipt.operationID) { return next.game.progress }
-        guard let export = next.pending[receipt.operationID.uuidString], export.accountID == receipt.accountID else {
+        guard let export = next.pending[receipt.operationID.uuidString], export.accountID == receipt.accountID,
+              export.sequence == receipt.sequence else {
             throw BackendError.operationExpired
         }
         let active = next.ownerID == receipt.accountID
