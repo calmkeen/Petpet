@@ -20,6 +20,8 @@ struct AccountView: View {
                     Label(session.nickname ?? session.name ?? "내 계정", systemImage: "person.crop.circle.fill")
                         .font(.headline)
                     if let email = session.email { Text(email).font(.subheadline).foregroundStyle(.secondary) }
+                    NavigationLink("닉네임 변경") { PhoneNicknameView(editor: viewModel.makeNicknameEditor()) }
+                        .accessibilityIdentifier("phone.editNickname")
                     Button("로그아웃", role: .destructive) { Task { await viewModel.signOut() } }
                         .disabled(viewModel.isSigningIn)
                 } else {

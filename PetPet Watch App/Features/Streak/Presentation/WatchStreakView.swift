@@ -1,0 +1,115 @@
+import SwiftUI
+import PetPetCore
+
+struct WatchStreakOverview: View {
+    @ObservedObject var model: WatchStreakViewModel
+    @ObservedObject var cloud: WatchCloudController
+    var body: some View {
+        VStack(spacing: 8) {
+            Label("스트릭", systemImage: model.summary.currentDays >= 7 ? "flame.fill" : "calendar")
+                .font(.headline)
+            Text("연속 \(model.summary.currentDays)일").font(.system(size: 30, weight: .bold, design: .rounded))
+                .minimumScaleFactor(0.65).lineLimit(1).accessibilityIdentifier("watch.currentStreak")
+            Text("오늘부터 하루 1보 이상").font(.caption2).foregroundStyle(.secondary)
+            NavigationLink("월별 걸음 기록") { WatchStreakView(model: model, cloud: cloud) }
+                .accessibilityIdentifier("watch.openStreak")
+        }
+        .padding(.horizontal, 14)
+        .task { await model.appear() }
+        .onDisappear { model.disappear() }
+    }
+}
+
+struct WatchStreakView: View {
+    @ObservedObject var model: WatchStreakViewModel
+    @ObservedObject var cloud: WatchCloudController
+    @State private var selectingMonth = false
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
+    private let weekdays = ["일", "월", "화", "수", "목", "금", "토"]
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 12) {
+                Text("\(model.summary.currentDays >= 7 ? "🔥 " : "")연속 \(model.summary.currentDays)일")
+                    .font(.headline).accessibilityIdentifier("watch.streakDays")
+                HStack(spacing: 0) {
+                    Button { model.moveMonth(-1) } label: { Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44) }
+                        .buttonStyle(.plain).accessibilityLabel("이전 달").accessibilityIdentifier("watch.previousMonth")
+                    Button("\(String(model.month.year))년 \(model.month.month)월") { selectingMonth = true }
+                        .buttonStyle(.plain).font(.caption).lineLimit(1).minimumScaleFactor(0.6)
+                        .frame(maxWidth: .infinity, minHeight: 44).accessibilityIdentifier("watch.chooseMonth")
+                    Button { model.moveMonth(1) } label: { Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44) }
+                        .buttonStyle(.plain).accessibilityLabel("다음 달").accessibilityIdentifier("watch.nextMonth")
+                }
+                LazyVGrid(columns: columns, spacing: 4) {
+                    ForEach(weekdays.indices, id: \.self) { Text(weekdays[$0]).font(.system(size: 10)).foregroundStyle(.secondary) }
+                    ForEach(0..<model.month.leadingEmptyDays, id: \.self) { _ in Color.clear.frame(height: 18) }
+                    ForEach(1...model.month.dayCount, id: \.self) { day in
+                        let count = model.summary.counts[model.month.dateKey(day: day)] ?? 0
+                        RoundedRectangle(cornerRadius: 4).fill(StepIntensity(steps: count).watchColor)
+                            .frame(height: 18)
+                            .overlay {
+                                if day == model.selectedDay { RoundedRectangle(cornerRadius: 4).stroke(.yellow, lineWidth: 2) }
+                            }
+                    }
+                }
+                .accessibilityHidden(true) // date/count selection is available in the full-size picker below
+                HStack(spacing: 4) {
+                    Text("적음")
+                    ForEach(0..<5) { index in RoundedRectangle(cornerRadius: 2).fill(StepIntensity(rawValue: index)!.watchColor).frame(width: 12, height: 10) }
+                    Text("많음")
+                }.font(.system(size: 10)).foregroundStyle(.secondary)
+                Text("진한 파랑: 10,000걸음 이상").font(.caption2).foregroundStyle(.secondary)
+                Picker("날짜", selection: Binding(get: { model.selectedDay }, set: { model.selectDay($0) })) {
+                    ForEach(1...model.month.dayCount, id: \.self) { day in Text("\(day)일").tag(day) }
+                }
+                .pickerStyle(.navigationLink).accessibilityIdentifier("watch.streakDate")
+                Text("\(model.month.month)월 \(model.selectedDay)일\n\(model.selectedCount.formatted())걸음")
+                    .font(.headline).multilineTextAlignment(.center).monospacedDigit()
+                    .accessibilityIdentifier("watch.selectedDaySteps")
+                Text("오늘부터 매일 1보 이상 기록하면 이어져요.").font(.caption2).foregroundStyle(.secondary)
+                if let error = model.error {
+                    Text(error).font(.caption2).foregroundStyle(.orange)
+                    Button("다시 불러오기") { Task { await model.refresh() } }
+                }
+                Divider()
+                Button(cloud.isDevelopment ? "모의 백업·보상 받기" : "서버 백업·보상 받기") { Task { await cloud.requestBackup() } }
+                    .disabled(cloud.account == nil || cloud.isBusy)
+                if let date = cloud.lastBackupAt { Text("최근 백업 \(date.formatted(date: .abbreviated, time: .shortened))").font(.caption2).foregroundStyle(.secondary) }
+                if let message = cloud.message { Text(message).font(.caption2) }
+                Text("현재 닉네임\n\(cloud.account?.displayName ?? "미설정")").font(.caption).multilineTextAlignment(.center).lineLimit(3)
+                NavigationLink("닉네임 변경") { WatchNicknameView(editor: cloud.makeNicknameEditor()) }
+                    .disabled(cloud.account == nil).accessibilityIdentifier("watch.streakNickname")
+                if cloud.account == nil { Text("닉네임 변경·백업은 아이폰에서 로그인한 뒤 사용할 수 있어요.").font(.caption2).foregroundStyle(.secondary) }
+            }.padding(.horizontal, 10).padding(.bottom, 18)
+        }
+        .navigationTitle("스트릭")
+        .task { await model.appear() }
+        .onDisappear { model.disappear() }
+        .sheet(isPresented: $selectingMonth) {
+            NavigationStack {
+                Form {
+                    Picker("연도", selection: Binding(get: { model.month.year }, set: { year in
+                        if let month = StepMonth(year: year, month: model.month.month) { model.select(month) }
+                    })) { ForEach(Array(model.years), id: \.self) { Text(String($0)).tag($0) } }
+                    Picker("월", selection: Binding(get: { model.month.month }, set: { value in
+                        if let month = StepMonth(year: model.month.year, month: value) { model.select(month) }
+                    })) { ForEach(1...12, id: \.self) { Text("\($0)월").tag($0) } }
+                    Button("선택 완료") { selectingMonth = false }
+                }.navigationTitle("월 선택")
+            }
+        }
+    }
+}
+
+private extension StepIntensity {
+    var watchColor: Color {
+        switch self {
+        case .none: Color(red: 46/255, green: 46/255, blue: 46/255)
+        case .light: Color(red: 108/255, green: 108/255, blue: 108/255)
+        case .medium: Color(red: 187/255, green: 222/255, blue: 251/255)
+        case .strong: Color(red: 100/255, green: 181/255, blue: 246/255)
+        case .goal: Color(red: 33/255, green: 150/255, blue: 243/255)
+        }
+    }
+}

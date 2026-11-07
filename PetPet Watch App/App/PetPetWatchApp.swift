@@ -12,7 +12,7 @@ struct PetPetWatchApp: App {
 
     var body: some Scene {
         WindowGroup {
-            WatchHomeView(viewModel: model.home, petViewModel: model.pet, cloudViewModel: model.cloud)
+            WatchHomeView(viewModel: model.home, petViewModel: model.pet, cloudViewModel: model.cloud, streakViewModel: model.streak)
         }
         .backgroundTask(.watchConnectivity) { await model.finishBackgroundTransfer() }
     }

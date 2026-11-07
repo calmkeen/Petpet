@@ -49,6 +49,20 @@ final class NicknameFlowTests: XCTestCase {
         XCTAssertEqual(editor.state.status, .unavailable)
         XCTAssertEqual(editor.state.currentNickname, "현재이름")
     }
+    func testEditorChecksDifferentUnicodeRepresentationWithoutNormalizingInput() async {
+        let composed = "é친구"
+        let decomposed = "e\u{301}친구"
+        var checks: [String] = []
+        let editor = NicknameEditor(currentNickname: composed, debounce: .zero,
+            check: { checks.append($0); return true }, update: { $0 })
+        editor.setInput(decomposed)
+        await editor.finishCheck()
+        XCTAssertEqual(editor.state.status, .available)
+        XCTAssertEqual(checks.count, 1)
+        XCTAssertTrue(checks[0].utf8.elementsEqual(decomposed.utf8))
+        await editor.submit()
+        XCTAssertTrue(editor.state.currentNickname.utf8.elementsEqual(decomposed.utf8))
+    }
     #if DEBUG
     func testWatchRelayChecksAndChangesNicknameThroughPhoneWithoutCredentials() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)

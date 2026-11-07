@@ -14,14 +14,20 @@ final class AccountViewModel: ObservableObject {
     let configuration: AccountConfiguration
     private let backend: BackendClient?
     private let cloud: PhoneCloudCoordinator?
+    private let profile: PhoneProfileCoordinator?
     private let apple = AppleSignInProvider()
     private var started = false
 
-    init(backend: BackendClient? = nil, cloud: PhoneCloudCoordinator? = nil,
+    init(backend: BackendClient? = nil, cloud: PhoneCloudCoordinator? = nil, profile: PhoneProfileCoordinator? = nil,
          configuration: AccountConfiguration = AccountConfiguration()) {
-        self.backend = backend; self.cloud = cloud; self.configuration = configuration
+        self.backend = backend; self.cloud = cloud; self.profile = profile; self.configuration = configuration
         cloud?.onStateChange = { [weak self] in self?.cloudState = $0 }
         cloud?.onSessionChange = { [weak self] session in self?.session = session }
+        profile?.onProfileChange = { [weak self] in
+            guard let self else { return }
+            self.session = try? await self.backend?.session()
+            await self.cloud?.synchronizeAccount()
+        }
     }
 
     var isBusy: Bool { isSigningIn || isPreparingRestore || cloudState.phase != .idle }
@@ -41,6 +47,21 @@ final class AccountViewModel: ObservableObject {
     func connectionChanged() async {
         await start()
         await cloud?.synchronizeAccount()
+    }
+
+    func refreshProfile() async {
+        guard !isSigningIn, let id = session?.accountID else { return }
+        try? await profile?.refresh(accountID: id)
+    }
+    func makeNicknameEditor() -> NicknameEditor {
+        let id = session?.accountID
+        return NicknameEditor(currentNickname: session?.nickname ?? "미설정", check: { [weak self] value in
+            guard let self, let id, self.session?.accountID == id, let profile = self.profile else { throw BackendError.authenticationRequired }
+            return try await profile.check(value, accountID: id)
+        }, update: { [weak self] value in
+            guard let self, let id, self.session?.accountID == id, let profile = self.profile else { throw BackendError.authenticationRequired }
+            return try await profile.update(value, accountID: id)
+        })
     }
 
     #if DEBUG

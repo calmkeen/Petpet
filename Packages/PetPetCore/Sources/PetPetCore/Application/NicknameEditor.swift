@@ -37,7 +37,7 @@ public final class NicknameEditor {
         if value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { state.status = .idle; emit(); return }
         do { try NicknameRules.validate(value) }
         catch { state.status = error as? BackendError == .nicknameTooLong ? .tooLong : .tooShort; emit(); return }
-        if value == state.currentNickname { state.status = .unchanged; emit(); return }
+        if value.utf8.elementsEqual(state.currentNickname.utf8) { state.status = .unchanged; emit(); return }
         state.status = .checking; emit()
         let token = generation
         task = Task { [weak self] in

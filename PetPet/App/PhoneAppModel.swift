@@ -7,6 +7,7 @@ import PetPetConnectivity
 final class PhoneAppModel: ObservableObject {
     let home: PhoneHomeViewModel
     let account: AccountViewModel
+    let streak: PhoneStreakViewModel
     private let transport: WatchConnectivityTransport
 
     init() {
@@ -34,13 +35,15 @@ final class PhoneAppModel: ObservableObject {
                 receipts: FileCloudReceiptStore(fileURL: directory.appendingPathComponent("cloud-receipts-v1.json")),
                 directory: directory.appendingPathComponent("CloudOutbox", isDirectory: true), environment: configuration.environment)
         }
-        let account = AccountViewModel(backend: backend, cloud: cloud, configuration: configuration)
+        let profile = backend.map { PhoneProfileCoordinator(backend: $0, transport: transport, environment: configuration.environment) }
+        streak = PhoneStreakViewModel(backend: backend, cache: FileAccountStepCache(fileURL: directory.appendingPathComponent("server-streak-v1.json")))
+        let account = AccountViewModel(backend: backend, cloud: cloud, profile: profile, configuration: configuration)
         self.account = account
         let snapshotConnection = transport.onConnectionChange
         transport.onConnectionChange = { [weak account] connection in
             snapshotConnection?(connection)
             if connection.isActivated { Task { await account?.connectionChanged() } }
         }
-        Task { [home] in await home.start(); await account.start() }
+        Task { [home] in await home.start(); await account.start(); await account.refreshProfile() }
     }
 }

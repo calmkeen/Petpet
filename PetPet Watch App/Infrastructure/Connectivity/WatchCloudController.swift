@@ -15,6 +15,7 @@ final class WatchCloudController: ObservableObject {
     private let home: WatchHomeViewModel
     private let pet: PetProgressViewModel
     private let directory: URL
+    private let nicknameRelay: WatchNicknameRelay
     private var work: Task<Void, Never>?
     private var activeOperation: UUID?
 
@@ -22,8 +23,10 @@ final class WatchCloudController: ObservableObject {
          home: WatchHomeViewModel, pet: PetProgressViewModel, directory: URL, environment: CloudEnvironment = .production) {
         self.game = game; self.transport = transport
         self.home = home; self.pet = pet; self.directory = directory; self.environment = environment
+        nicknameRelay = WatchNicknameRelay(transport: transport, environment: environment)
         let cached = directory.appendingPathComponent("cloud-account-v1.json")
         if let data = try? Data(contentsOf: cached) { account = try? JSONDecoder().decode(CloudAccount?.self, from: data) }
+        nicknameRelay.setAccount(account)
         transport.onCloudControl = { [weak self] data in self?.enqueue { await self?.receiveControl(data) } }
         transport.onCloudFile = { [weak self] url in self?.enqueue { await self?.receiveFile(url) } }
         transport.onCloudChallenge = { [weak game] in
@@ -35,6 +38,22 @@ final class WatchCloudController: ObservableObject {
 
     func start() async { lastBackupAt = try? await game.lastBackupAt() }
     func finishWork() async { await work?.value }
+
+    func makeNicknameEditor() -> NicknameEditor {
+        let id = account?.id
+        return NicknameEditor(currentNickname: account?.displayName ?? "미설정", check: { [weak self] value in
+            guard let self, let id, self.account?.id == id else { throw BackendError.authenticationRequired }
+            return try await self.nicknameRelay.check(value)
+        }, update: { [weak self] value in
+            guard let self, let id, self.account?.id == id else { throw BackendError.authenticationRequired }
+            let name = try await self.nicknameRelay.update(value)
+            guard self.account?.id == id else { throw BackendError.sessionChanged }
+            let updated = CloudAccount(id: id, displayName: name)
+            try JSONEncoder().encode(updated).write(to: self.directory.appendingPathComponent("cloud-account-v1.json"), options: .atomic)
+            self.account = updated; self.nicknameRelay.setAccount(updated)
+            return name
+        })
+    }
 
     func requestBackup() async {
         guard !isBusy else { return }
@@ -72,6 +91,7 @@ final class WatchCloudController: ObservableObject {
             switch try CloudWire.decodeControl(data, environment: environment) {
             case let .account(account):
                 self.account = account
+                nicknameRelay.setAccount(account)
                 if !isBusy { message = nil }
                 try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
                 try JSONEncoder().encode(account).write(to: directory.appendingPathComponent("cloud-account-v1.json"), options: .atomic)

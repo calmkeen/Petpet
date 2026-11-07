@@ -5,6 +5,7 @@ import PetPetCore
 struct PhoneHomeView: View {
     @ObservedObject var viewModel: PhoneHomeViewModel
     @ObservedObject var accountViewModel: AccountViewModel
+    @ObservedObject var streakViewModel: PhoneStreakViewModel
     @Environment(\.scenePhase) private var scenePhase
     private let green = Color(red: 0.12, green: 0.42, blue: 0.32)
 
@@ -42,6 +43,7 @@ struct PhoneHomeView: View {
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("phone.openAccount")
                     stepsCard
+                    PhoneStreakSection(model: streakViewModel, accountID: accountViewModel.session?.accountID)
                     petCard
                     if let snapshot = viewModel.snapshot {
                         card {
@@ -86,11 +88,14 @@ struct PhoneHomeView: View {
             .toolbar(.hidden, for: .navigationBar)
             .refreshable { await viewModel.refresh() }
         }
-        .task { await viewModel.start() }
+        .task { await viewModel.start(); await streakViewModel.refresh(accountID: accountViewModel.session?.accountID) }
+        .onChange(of: accountViewModel.session?.accountID) { _, id in Task { await streakViewModel.refresh(accountID: id, force: true) } }
+        .onChange(of: accountViewModel.cloudState.lastBackupAt) { _, _ in Task { await streakViewModel.refresh(accountID: accountViewModel.session?.accountID, force: true) } }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 viewModel.refreshDate()
                 Task { await viewModel.refresh() }
+                Task { await streakViewModel.refresh(accountID: accountViewModel.session?.accountID) }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in viewModel.refreshDate() }

@@ -12,6 +12,8 @@ struct WatchCloudView: View {
                 }
                 if let account = viewModel.account {
                     Text(account.displayName).font(.caption).lineLimit(2)
+                    NavigationLink("닉네임 변경") { WatchNicknameView(editor: viewModel.makeNicknameEditor()) }
+                        .accessibilityIdentifier("watch.editNickname")
                     Button(viewModel.isDevelopment ? "모의 백업·보상 받기" : "서버 백업·보상 받기") { Task { await viewModel.requestBackup() } }
                         .disabled(viewModel.isBusy)
                         .accessibilityIdentifier("watch.serverBackup")

@@ -21,9 +21,9 @@ struct PetPetApp: App {
 
     var body: some Scene {
         WindowGroup {
-            PhoneHomeView(viewModel: model.home, accountViewModel: model.account)
+            PhoneHomeView(viewModel: model.home, accountViewModel: model.account, streakViewModel: model.streak)
                 .onChange(of: scenePhase) { _, phase in
-                    if phase == .active { Task { await model.account.checkAppleCredential() } }
+                    if phase == .active { Task { await model.account.checkAppleCredential(); await model.account.refreshProfile() } }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: ASAuthorizationAppleIDProvider.credentialRevokedNotification)) { _ in
                     Task { await model.account.checkAppleCredential() }

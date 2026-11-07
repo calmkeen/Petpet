@@ -6,11 +6,12 @@ struct WatchHomeView: View {
     @ObservedObject var viewModel: WatchHomeViewModel
     @ObservedObject var petViewModel: PetProgressViewModel
     @ObservedObject var cloudViewModel: WatchCloudController
+    @ObservedObject var streakViewModel: WatchStreakViewModel
     @Environment(\.scenePhase) private var scenePhase
     @State private var selectedSection: WatchSection = .home
 
     private enum WatchSection: Hashable {
-        case home, statistics, food, cloud
+        case home, statistics, food, streak, cloud
     }
 
     var body: some View {
@@ -21,6 +22,7 @@ struct WatchHomeView: View {
                     .tag(WatchSection.statistics)
                 FoodOverviewView(viewModel: petViewModel, stepViewModel: viewModel, cloudViewModel: cloudViewModel)
                     .tag(WatchSection.food)
+                WatchStreakOverview(model: streakViewModel, cloud: cloudViewModel).tag(WatchSection.streak)
                 VStack(spacing: 12) {
                     Label("계정과 백업", systemImage: "icloud").font(.headline)
                     Text(cloudViewModel.account?.displayName ?? "아이폰에서 로그인해 주세요")
@@ -135,6 +137,6 @@ struct WatchHomeView: View {
     WatchHomeView(viewModel: home, petViewModel: pet, cloudViewModel: WatchCloudController(
         game: FileGameRepository(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)),
         transport: PreviewCloudTransport(), home: home, pet: pet, directory: FileManager.default.temporaryDirectory
-    ))
+    ), streakViewModel: WatchStreakViewModel(history: history, home: home))
 }
 #endif
