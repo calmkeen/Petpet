@@ -6,10 +6,24 @@ struct WatchHomeView: View {
     @ObservedObject var viewModel: WatchHomeViewModel
     @ObservedObject var petViewModel: PetProgressViewModel
     @Environment(\.scenePhase) private var scenePhase
+    @State private var selectedSection: WatchSection = .home
+
+    private enum WatchSection: Hashable {
+        case home, statistics, food
+    }
 
     var body: some View {
         NavigationStack {
-            home
+            TabView(selection: $selectedSection) {
+                home.tag(WatchSection.home)
+                PetOverviewView(viewModel: petViewModel)
+                    .tag(WatchSection.statistics)
+                FoodOverviewView(viewModel: petViewModel, stepViewModel: viewModel)
+                    .tag(WatchSection.food)
+            }
+            // Keep pages short so the Crown always changes sections. Long
+            // lists open on the navigation stack and receive Crown scrolling.
+            .tabViewStyle(.verticalPage)
         }
         // Keep tracking alive while browsing the pet and food pages.
         .task {
@@ -66,14 +80,14 @@ struct WatchHomeView: View {
                         Text(message).font(.caption2).multilineTextAlignment(.center)
                     }
                     HStack(spacing: 8) {
-                        NavigationLink {
-                            PetStatisticsView(viewModel: petViewModel)
+                        Button {
+                            withAnimation { selectedSection = .statistics }
                         } label: {
                             Label("성장", systemImage: "chart.bar.fill")
                         }
                         .accessibilityIdentifier("watch.openPetStatistics")
-                        NavigationLink {
-                            FoodInventoryView(viewModel: petViewModel, stepViewModel: viewModel)
+                        Button {
+                            withAnimation { selectedSection = .food }
                         } label: {
                             Label("먹이", systemImage: "carrot.fill")
                         }
@@ -82,13 +96,14 @@ struct WatchHomeView: View {
                     .font(.caption2)
                     .buttonStyle(.bordered)
                     .tint(.white.opacity(0.8))
+                    Text("크라운을 돌려 섹션 이동")
+                        .font(.system(size: 10))
                 }
                 .foregroundStyle(.black)
                 .padding(.horizontal, 12)
             }
         }
         .ignoresSafeArea()
-        .toolbar(.hidden, for: .navigationBar)
     }
 
     private func stop() {

@@ -23,6 +23,8 @@ and saves daily history locally. It refreshes system pedometer history when the
 app resumes and rolls over at local midnight. CoreMotion provides approximately
 seven days of historical recovery; older saved records are retained. Feeding,
 leveling, stat allocation, affection, and daily step rewards persist locally.
+The Digital Crown switches between home, growth, and food overview pages;
+opening a management screen lets the Crown scroll its detailed list.
 Rewards are claimed after a successful local save; Android's server-backup trigger
 will be connected when authentication and backend integration are implemented.
 Synchronization, backend services, games, and voice remain subsequent milestones.
