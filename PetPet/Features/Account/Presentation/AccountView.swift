@@ -1,9 +1,10 @@
 import SwiftUI
-import GoogleSignInSwift
+import AuthenticationServices
 import PetPetCore
 
 struct AccountView: View {
     @ObservedObject var viewModel: AccountViewModel
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         List {
@@ -15,9 +16,13 @@ struct AccountView: View {
                     Button("로그아웃", role: .destructive) { Task { await viewModel.signOut() } }
                         .disabled(viewModel.isSigningIn)
                 } else {
-                    GoogleSignInButton { Task { await viewModel.signIn() } }
+                    SignInWithAppleButton(.signIn, onRequest: viewModel.beginSignIn) { result in
+                        Task { await viewModel.completeSignIn(result) }
+                    }
+                        .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+                        .frame(height: 50)
                         .disabled(!viewModel.canSignIn || viewModel.isSigningIn)
-                        .accessibilityIdentifier("phone.googleSignIn")
+                        .accessibilityIdentifier("phone.appleSignIn")
                     if !viewModel.canSignIn {
                         Text("계정 연결 설정이 아직 완료되지 않았어요.")
                             .font(.footnote).foregroundStyle(.secondary)

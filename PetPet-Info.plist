@@ -4,16 +4,5 @@
 <dict>
     <key>PetPetAPIBaseURL</key>
     <string>https://www.stepmatecp.com/</string>
-    <key>GIDClientID</key>
-    <string></string>
-    <key>GIDServerClientID</key>
-    <string></string>
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleURLSchemes</key>
-            <array><string>petpet-google-unconfigured</string></array>
-        </dict>
-    </array>
 </dict>
 </plist>

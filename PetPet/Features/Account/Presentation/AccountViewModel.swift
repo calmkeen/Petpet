@@ -1,4 +1,5 @@
 import Combine
+import AuthenticationServices
 import Foundation
 import PetPetCore
 
@@ -13,13 +14,12 @@ final class AccountViewModel: ObservableObject {
     let configuration: AccountConfiguration
     private let backend: BackendClient?
     private let cloud: PhoneCloudCoordinator?
-    private let google: GoogleSignInProvider
+    private let apple = AppleSignInProvider()
     private var started = false
 
     init(backend: BackendClient? = nil, cloud: PhoneCloudCoordinator? = nil,
          configuration: AccountConfiguration = AccountConfiguration()) {
         self.backend = backend; self.cloud = cloud; self.configuration = configuration
-        google = GoogleSignInProvider(configuration: configuration)
         cloud?.onStateChange = { [weak self] in self?.cloudState = $0 }
         cloud?.onSessionChange = { [weak self] session in self?.session = session }
     }
@@ -33,6 +33,7 @@ final class AccountViewModel: ObservableObject {
         started = true
         do {
             session = try await backend?.session()
+            await checkAppleCredential()
             await cloud?.synchronizeAccount()
         } catch { started = false; message = BackendError.storage.localizedDescription }
     }
@@ -42,23 +43,51 @@ final class AccountViewModel: ObservableObject {
         await cloud?.synchronizeAccount()
     }
 
-    func signIn() async {
-        guard let backend, canSignIn, !isSigningIn else { message = BackendError.configurationMissing.localizedDescription; return }
+    func beginSignIn(_ request: ASAuthorizationAppleIDRequest) {
+        guard canSignIn, !isSigningIn else { return }
         isSigningIn = true; message = nil
+        do { try apple.configure(request) }
+        catch { isSigningIn = false; message = error.localizedDescription }
+    }
+
+    func completeSignIn(_ result: Result<ASAuthorization, Error>) async {
         defer { isSigningIn = false }
         do {
-            let identity = try await google.signIn()
+            let identity = try apple.identity(from: result)
+            guard let backend, canSignIn else { throw BackendError.configurationMissing }
             session = try await backend.signIn(identity)
+            apple.confirmProfile(for: identity.userIdentifier)
             preview = nil
             await cloud?.synchronizeAccount()
         } catch is CancellationError { }
-        catch { message = (error as? BackendError ?? .network).localizedDescription }
+        catch {
+            session = try? await backend?.session()
+            await cloud?.synchronizeAccount()
+            message = error.localizedDescription
+        }
+    }
+
+    func checkAppleCredential() async {
+        guard !isSigningIn, let session, session.identityProvider == .apple,
+              let subject = session.providerSubject else { return }
+        do {
+            let authorized = try await apple.credentialIsAuthorized(for: subject)
+            // A late credential check must not clear a newly signed-in account.
+            guard !isSigningIn, self.session == session else { return }
+            if !authorized {
+                try await backend?.signOut()
+                self.session = nil; preview = nil
+                await cloud?.synchronizeAccount()
+                message = "Apple 계정 연결이 해제되었어요. 다시 로그인해 주세요."
+            }
+        } catch {
+            // An unsuccessful state query is not proof of revocation.
+        }
     }
 
     func signOut() async {
         do {
             try await backend?.signOut()
-            google.signOut()
             session = nil; preview = nil; message = nil
             await cloud?.synchronizeAccount()
         } catch { message = BackendError.storage.localizedDescription }

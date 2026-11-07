@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
-import GoogleSignIn
+import AuthenticationServices
 
 @main
 @MainActor
 struct PetPetApp: App {
     @StateObject private var model: PhoneAppModel
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         let model = PhoneAppModel()
@@ -21,7 +22,12 @@ struct PetPetApp: App {
     var body: some Scene {
         WindowGroup {
             PhoneHomeView(viewModel: model.home, accountViewModel: model.account)
-                .onOpenURL { GIDSignIn.sharedInstance.handle($0) }
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active { Task { await model.account.checkAppleCredential() } }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: ASAuthorizationAppleIDProvider.credentialRevokedNotification)) { _ in
+                    Task { await model.account.checkAppleCredential() }
+                }
         }
     }
 }

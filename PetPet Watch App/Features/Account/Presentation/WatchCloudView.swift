@@ -13,7 +13,7 @@ struct WatchCloudView: View {
                         .disabled(viewModel.isBusy)
                         .accessibilityIdentifier("watch.serverBackup")
                 } else {
-                    Text("아이폰의 PetPet에서 Google로 로그인해 주세요.")
+                    Text("아이폰의 PetPet에서 Apple로 로그인해 주세요.")
                         .font(.caption).multilineTextAlignment(.center)
                 }
                 if viewModel.isBusy { ProgressView() }
