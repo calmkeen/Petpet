@@ -21,6 +21,7 @@ models, repository contracts, and sensor-session logic live in the local
 - [Android artwork and pet frame animations](Docs/AndroidMedia.md)
 - [Smooth greeting animation and GIF preview](Docs/SmoothPetAnimation.md)
 - [Native running and greeting playback with simulator verification](Docs/NativePetAnimations.md)
+- [Watch games, leaderboards, and voice/AI chat](Docs/GamesAndChat.md)
 - [iPhone and Apple Watch synchronization](Docs/WatchSynchronization.md)
 - [Apple login, server backup, and restore setup](Docs/AccountAndBackup.md)
 - [Required backend changes for Apple login](Docs/AppleSignInServer.md)
@@ -36,8 +37,12 @@ reference. The watch preloads textures and plays SpriteKit actions; the phone
 uses native UIKit greeting playback. Debug includes a visual-only watch preview.
 Both apps use its dawn/day/sunset/night artwork, and the phone's pet portrait
 provides a visual greeting. Animation pauses when offscreen or inactive.
-The Digital Crown switches between home, growth, food, streak, and account overview pages;
+The Digital Crown switches between home, growth, food, streak, games, chat, and account overview pages;
 opening a management screen lets the Crown scroll its detailed list.
+The watch includes shooting and star-stair games, persistent personal records,
+and phone-relayed leaderboards. Questions use system voice or keyboard input;
+AI replies stream through the iPhone. Debug provides mock rankings and clearly
+labeled mock AI replies without external requests.
 Release rewards are granted after a successful server backup, matching Android.
 Debug uses a persistent mock backend on the iPhone and an isolated watch game copy.
 The iPhone receives the watch's daily steps, pet state, and food inventory through
