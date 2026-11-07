@@ -21,12 +21,27 @@ final class PetAppearanceTests: XCTestCase {
         let running = PetSpriteAnimation(.running)
         XCTAssertEqual([0.0,0.2,0.4,0.6,0.8].map { running.imageName(elapsed: $0) },
                        [1,2,3,4,1].map { "stepmate_fox_run_\($0)" })
-        let happy = PetSpriteAnimation(.touching)
-        XCTAssertEqual([0.0,0.3,0.6,20.0].map { happy.imageName(elapsed: $0) },
-                       [1,2,1,1].map { "stepmate_fox_happy_\($0)" })
         XCTAssertEqual(running.imageName(elapsed: -10), "stepmate_fox_run_1")
         XCTAssertEqual(running.imageName(elapsed: .infinity), "stepmate_fox_run_1")
         XCTAssertFalse(PetSpriteAnimation(.idle).isAnimated)
+    }
+    func testGreetingUsesTwelveOrderedFramesAndMatchingIdleEndpoints() {
+        let happy = PetSpriteAnimation(.touching)
+        XCTAssertEqual(happy.frameInterval, 0.1)
+        XCTAssertEqual(PetSpriteAnimation.greetingDuration, 1.2)
+        let expected = (0..<12).map { String(format: "stepmate_fox_greeting_v2_%02d", $0) }
+        XCTAssertEqual((0..<12).map { happy.imageName(elapsed: Double($0) * 0.1) }, expected)
+        XCTAssertEqual(happy.imageName(elapsed: -1), expected[0])
+        XCTAssertEqual(happy.imageName(elapsed: 20), expected[11])
+        XCTAssertEqual(PetSpriteAnimation(.idle).imageName(elapsed: 0), expected[0])
+        XCTAssertEqual(happy.posterImageName, expected[5])
+        var state = PetAnimationState()
+        state.setActive(true, at: now)
+        XCTAssertTrue(state.touch(at: now))
+        state.tick(at: now.addingTimeInterval(1.1))
+        XCTAssertEqual(state.activity, .touching)
+        state.tick(at: now.addingTimeInterval(1.2))
+        XCTAssertEqual(state.activity, .idle)
     }
     func testRestoredTotalsLoadingAndNewDayDoNotPretendToBeLiveSteps() {
         var state = PetAnimationState()
@@ -68,9 +83,9 @@ final class PetAppearanceTests: XCTestCase {
         XCTAssertFalse(state.touch(at: now.addingTimeInterval(2.4)))
         state.observe(steps(3), at: now.addingTimeInterval(2.5))
         XCTAssertEqual(state.activity, .touching)
-        state.tick(at: now.addingTimeInterval(3))
+        state.tick(at: now.addingTimeInterval(3.3))
         XCTAssertEqual(state.activity, .idle)
-        XCTAssertTrue(state.touch(at: now.addingTimeInterval(3)))
+        XCTAssertTrue(state.touch(at: now.addingTimeInterval(3.3)))
     }
     func testOffscreenAndForegroundBaselineDoNotReplayOldActivity() {
         var state = PetAnimationState()

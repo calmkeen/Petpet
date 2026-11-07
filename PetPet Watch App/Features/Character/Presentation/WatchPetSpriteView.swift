@@ -11,7 +11,7 @@ struct WatchPetSpriteView: View {
         let animation = PetSpriteAnimation(state.activity)
         let paused = !state.isActive || !animation.isAnimated || reduceMotion || luminanceReduced || scenePhase != .active
         TimelineView(.animation(minimumInterval: animation.frameInterval, paused: paused)) { context in
-            Image(animation.imageName(elapsed: paused ? 0 : context.date.timeIntervalSince(state.startedAt)))
+            Image(paused ? animation.posterImageName : animation.imageName(elapsed: context.date.timeIntervalSince(state.startedAt)))
                 .resizable().scaledToFit()
         }
         .accessibilityHidden(true)

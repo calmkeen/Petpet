@@ -9,6 +9,7 @@ struct WatchHomeView: View {
     @ObservedObject var streakViewModel: WatchStreakViewModel
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.isLuminanceReduced) private var luminanceReduced
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @StateObject private var character = CharacterActivityViewModel()
     @State private var selectedSection: WatchSection = .home
 
@@ -41,6 +42,9 @@ struct WatchHomeView: View {
         .onReceive(viewModel.$state) { character.observe($0) }
         .onChange(of: characterIsVisible, initial: true) { _, active in
             character.setActive(active, steps: viewModel.state)
+        }
+        .onChange(of: [reduceMotion, luminanceReduced, scenePhase == .active, selectedSection == .home], initial: true) { _, flags in
+            AnimationDiagnostics.record(reduceMotion: flags[0], luminanceReduced: flags[1], sceneActive: flags[2], homeVisible: flags[3])
         }
         // Keep tracking alive while browsing the pet and food pages.
         .task {

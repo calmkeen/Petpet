@@ -22,12 +22,16 @@ public enum PetDaylightPeriod: CaseIterable, Sendable {
     public var usesLightText: Bool { self == .night }
 }
 
-/// The original Android PNG sequence, rendered without a GIF decoder.
+/// Fixed-canvas greeting frames keep the same character pose between updates.
 public struct PetSpriteAnimation: Sendable {
+    public static let greetingFrameCount = 12
+    public static let greetingFrameInterval: TimeInterval = 0.1
+    public static let greetingDuration: TimeInterval = 1.2
     public let activity: CharacterActivity
     public init(_ activity: CharacterActivity) { self.activity = activity }
-    public var frameInterval: TimeInterval { activity == .touching ? 0.3 : 0.2 }
+    public var frameInterval: TimeInterval { activity == .touching ? Self.greetingFrameInterval : 0.2 }
     public var isAnimated: Bool { activity == .running || activity == .touching }
+    public var posterImageName: String { imageName(elapsed: activity == .touching ? 0.5 : 0) }
     public func imageName(elapsed: TimeInterval) -> String {
         let elapsed = elapsed.isFinite ? max(0, elapsed) : 0
         switch activity {
@@ -35,9 +39,9 @@ public struct PetSpriteAnimation: Sendable {
             let frame = Int((elapsed.truncatingRemainder(dividingBy: 0.8) / 0.2 + 1e-9).rounded(.down))
             return "stepmate_fox_run_\(min(frame, 3) + 1)"
         case .touching:
-            let frame = min(Int(min(elapsed / 0.3, 2).rounded(.down)), 2)
-            return ["stepmate_fox_happy_1", "stepmate_fox_happy_2", "stepmate_fox_happy_1"][frame]
-        case .idle, .stopped: return "stepmate_fox_idle"
+            let frame = min(Int(min(elapsed / Self.greetingFrameInterval + 1e-9, Double(Self.greetingFrameCount - 1)).rounded(.down)), Self.greetingFrameCount - 1)
+            return String(format: "stepmate_fox_greeting_v2_%02d", frame)
+        case .idle, .stopped: return "stepmate_fox_greeting_v2_00"
         }
     }
 }
@@ -81,7 +85,7 @@ public struct PetAnimationState: Equatable, Sendable {
     public mutating func touch(at date: Date) -> Bool {
         tick(at: date)
         guard isActive, activity != .running, activity != .touching else { return false }
-        activity = .touching; startedAt = date; expiresAt = date.addingTimeInterval(0.9)
+        activity = .touching; startedAt = date; expiresAt = date.addingTimeInterval(PetSpriteAnimation.greetingDuration)
         return true
     }
     public mutating func tick(at date: Date) {

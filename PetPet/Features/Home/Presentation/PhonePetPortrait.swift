@@ -13,9 +13,9 @@ struct PhonePetPortrait: View {
             Button { if greeting == nil { greeting = Date() } } label: {
                 ZStack {
                     Image(period.backgroundImageName).resizable().scaledToFill()
-                    TimelineView(.animation(minimumInterval: 0.3, paused: greeting == nil || reduceMotion || scenePhase != .active)) { frame in
+                    TimelineView(.animation(minimumInterval: PetSpriteAnimation.greetingFrameInterval, paused: greeting == nil || reduceMotion || scenePhase != .active)) { frame in
                         let animation = PetSpriteAnimation(greeting == nil ? .idle : .touching)
-                        Image(animation.imageName(elapsed: reduceMotion ? 0 : frame.date.timeIntervalSince(greeting ?? frame.date)))
+                        Image(reduceMotion ? animation.posterImageName : animation.imageName(elapsed: frame.date.timeIntervalSince(greeting ?? frame.date)))
                             .resizable().scaledToFit().padding(12)
                     }
                 }
@@ -27,7 +27,7 @@ struct PhonePetPortrait: View {
         }
         .task(id: greeting) {
             guard greeting != nil else { return }
-            do { try await Task.sleep(for: .milliseconds(900)) } catch { return }
+            do { try await Task.sleep(for: .seconds(PetSpriteAnimation.greetingDuration)) } catch { return }
             greeting = nil
         }
         .onChange(of: scenePhase) { _, phase in if phase != .active { greeting = nil } }
