@@ -75,7 +75,7 @@ flowchart LR
 - 워치 걸음수는 기기의 현재 시간대에서 자정부터의 합계다. 저장된 오늘 기록을 먼저 표시한 뒤 CoreMotion 구간 조회·실시간 누적값으로 보정한다. 자정 타이머와 날짜/시간대 변경 알림, 앱 복귀 시 새 날짜를 확인한다.
 - 날짜별 기록은 펫·먹이와 함께 Application Support/PetPet/game-state-v1.json에 저장한다. 기존 날짜별 파일과 펫 파일을 최초 이관하고 원본은 보존한다. actor에서 직렬화하고 원자적으로 교체한다.
 - CoreMotion이 제공하는 최근 약 7일 범위에서 오늘과 이전의 완전한 날짜 구간을 복구한다. 앱이 장기간 실행되지 않아 센서 보관 범위를 벗어난 미저장 기록은 복구할 수 없다. 자세한 정책은 [하루 걸음수](DailySteps.md)를 따른다.
-- 워치의 펫·시간대 배경은 Android 원본 PNG를 사용한다. `PetAnimationState`·`PetSpriteAnimation`이 기존 걸음수 변화와 터치로 재생 상태·프레임을 정하며, SwiftUI 타임라인은 홈 표시 중에만 움직인다. 별도 가속도계 구독은 시작하지 않는다. [에셋과 검증](AndroidMedia.md).
+- 워치의 시간대 배경은 Android 원본을, 달리기·인사는 이를 참조한 16프레임 에셋을 사용한다. `PetAnimationState`·`PetSpriteAnimation`이 재생 규칙을, `PetPlaybackRequest`가 재시작 여부를 정한다. 워치는 SpriteKit 텍스처 사전 로드와 동작을, 아이폰은 UIKit 애니메이션을 사용한다. 별도 가속도계 구독은 시작하지 않는다. [네이티브 재생과 검증](NativePetAnimations.md).
 - iPhone은 실제 수신한 오늘 걸음수·펫 상태·보유 먹이와 마지막 동기화 시각을 표시한다. 최초 수신 전과 오늘 날짜의 기록이 없을 때는 `—`를 표시한다. 미리보기 데이터는 `Preview Content`에만 둔다. [동기화 정책](WatchSynchronization.md).
 - `PetProfile`, `PetMood`, `FoodDefinition`, `FoodInventoryItem`, `PetStatistic`, `UserProfile`, `DailyStepRecord`는 Android의 실제 모델을 참고한 공용 타입이다. 이들의 Codable 표현을 서버 요청 DTO로 바로 사용하지 않는다. 날짜 포맷과 JSON 키는 각 API 계약에 맞는 별도 DTO에서 변환한다.
 - `FileGameRepository`는 펫·먹이·걸음수·날짜별 지급 내역·복원을 하나의 트랜잭션으로 저장한다. 보상은 `PhoneCloudCoordinator`가 서버 성공을 기록하고 워치에 보낸 확인 메시지로만 지급한다. 이전 로컬 지급 헬퍼는 기존 파일 구현의 테스트·이관 참고용이며 실제 앱 화면에서 호출하지 않는다. [상세 규칙](FeedingAndGrowth.md).

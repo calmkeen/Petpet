@@ -20,6 +20,7 @@ models, repository contracts, and sensor-session logic live in the local
 - [Streak calendars and nickname editing](Docs/StreakAndNickname.md)
 - [Android artwork and pet frame animations](Docs/AndroidMedia.md)
 - [Smooth greeting animation and GIF preview](Docs/SmoothPetAnimation.md)
+- [Native running and greeting playback with simulator verification](Docs/NativePetAnimations.md)
 - [iPhone and Apple Watch synchronization](Docs/WatchSynchronization.md)
 - [Apple login, server backup, and restore setup](Docs/AccountAndBackup.md)
 - [Required backend changes for Apple login](Docs/AppleSignInServer.md)
@@ -30,8 +31,9 @@ and saves daily history locally. It refreshes system pedometer history when the
 app resumes and rolls over at local midnight. CoreMotion provides approximately
 seven days of historical recovery; older saved records are retained. Feeding,
 leveling, stat allocation, affection, and daily step rewards persist locally.
-Android's original PNG frames animate running on the watch. Greeting reactions
-use 12 aligned frames generated from the original character reference.
+Running and greeting use 16 aligned frames generated from the original character
+reference. The watch preloads textures and plays SpriteKit actions; the phone
+uses native UIKit greeting playback. Debug includes a visual-only watch preview.
 Both apps use its dawn/day/sunset/night artwork, and the phone's pet portrait
 provides a visual greeting. Animation pauses when offscreen or inactive.
 The Digital Crown switches between home, growth, food, streak, and account overview pages;

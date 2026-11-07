@@ -1,0 +1,44 @@
+{
+  "simulator": "Apple Watch Series 11 46mm / watchOS 26.5",
+  "date": "2026-11-08",
+  "samples": {
+    "running": {
+      "renderTicks": 24,
+      "spriteWidth": 88.38095092773438,
+      "mode": "running",
+      "spriteHeight": 116,
+      "renderer": "SpriteKit",
+      "sceneWidth": 176,
+      "textureFrameCount": 16,
+      "maxFrameGapMS": 33.33333367481828,
+      "sampleSeconds": 0.7666666666045785,
+      "sceneHeight": 116,
+      "targetFPS": 30,
+      "nativeUpdateFPS": 30.000000002429537,
+      "texturesReady": true
+    },
+    "touching": {
+      "renderTicks": 24,
+      "spriteWidth": 88.38095092773438,
+      "mode": "touching",
+      "spriteHeight": 116,
+      "renderer": "SpriteKit",
+      "sceneWidth": 176,
+      "textureFrameCount": 16,
+      "maxFrameGapMS": 33.33333367481828,
+      "sampleSeconds": 0.7666666666045785,
+      "sceneHeight": 116,
+      "targetFPS": 30,
+      "nativeUpdateFPS": 30.000000002429537,
+      "texturesReady": true
+    }
+  },
+  "flags": {
+    "luminanceReduced": false,
+    "sceneActive": true,
+    "homeVisible": true,
+    "reduceMotion": false
+  },
+  "scope": "Simulator-only; SpriteKit update cadence, not physical-screen presented FPS.",
+  "physicalDevicesUsed": false
+}
