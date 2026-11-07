@@ -105,6 +105,29 @@ final class BackendClientTests: XCTestCase {
         XCTAssertThrowsError(try BackendClient(baseURL: URL(string: "http://api.example.test")!, transport: http, store: store))
     }
 
+    func testAccountSwitchDoesNotAuthorizeOldAccountWorkDuringSignIn() async throws {
+        let gate = BackendGate()
+        let store = TestSessionStore(session: saved())
+        let http = TestBackendHTTP { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/google")
+            await gate.pause()
+            return response(200, #"{"userId":"8","accessToken":"account-B","refreshToken":"refresh-B"}"#)
+        }
+        let client = try BackendClient(baseURL: base, transport: http, store: store)
+        _ = try await client.session()
+        let login = Task {
+            try await client.signIn(GoogleIdentity(subject: "B", idToken: "google-B", email: nil, name: nil))
+        }
+        await gate.waitUntilPaused()
+        do { try await client.saveBackup(request(), accountID: "7"); XCTFail() }
+        catch { XCTAssertEqual(error as? BackendError, .authenticationRequired) }
+        await gate.release()
+        let session = try await login.value
+        XCTAssertEqual(session.accountID, "8")
+        let calls = await http.requests
+        XCTAssertEqual(calls.count, 1)
+    }
+
     func testBackupRequestMatchesAndroidFieldsAndLocalDateTime() throws {
         let data = try JSONEncoder().encode(request())
         let body = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])

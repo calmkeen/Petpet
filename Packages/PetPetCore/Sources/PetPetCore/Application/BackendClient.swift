@@ -13,6 +13,7 @@ public actor BackendClient {
     private var loaded = false
     private var epoch = 0
     private var refreshTask: Task<BackendSession, Error>?
+    private var refreshID: UUID?
     private var storageTail: Task<Void, Error>?
 
     public init(baseURL: URL, transport: any BackendHTTPTransport = URLSessionBackendTransport(),
@@ -40,7 +41,9 @@ public actor BackendClient {
         guard !identity.subject.isEmpty, !identity.idToken.isEmpty else { throw BackendError.invalidResponse }
         epoch += 1
         let token = epoch
-        refreshTask?.cancel(); refreshTask = nil
+        refreshTask?.cancel(); refreshTask = nil; refreshID = nil
+        cached = nil; loaded = true
+        try await persist(nil, epoch: token)
         let response = try await send(path: "api/v1/google", body: ["idToken": identity.idToken])
         try checkEpoch(token)
         try requireSuccess(response)
@@ -61,7 +64,7 @@ public actor BackendClient {
 
     public func signOut() async throws {
         epoch += 1
-        refreshTask?.cancel(); refreshTask = nil
+        refreshTask?.cancel(); refreshTask = nil; refreshID = nil
         cached = nil; loaded = true
         try await persist(nil, epoch: epoch)
     }
@@ -129,6 +132,8 @@ public actor BackendClient {
         guard let refreshToken = current.refreshToken?.nonBlank else {
             try await signOut(); throw BackendError.authenticationRequired
         }
+        let identifier = UUID()
+        refreshID = identifier
         let task = Task { [transport, baseURL] in
             var request = URLRequest(url: baseURL.appendingPathComponent("api/v1/auth/refresh"))
             request.httpMethod = "POST"
@@ -160,11 +165,11 @@ public actor BackendClient {
         do {
             let result = try await task.value
             try checkEpoch(token)
-            refreshTask = nil
+            if refreshID == identifier { refreshTask = nil; refreshID = nil }
             return result
         } catch {
             if token == epoch {
-                refreshTask = nil
+                if refreshID == identifier { refreshTask = nil; refreshID = nil }
                 if error as? BackendError == .authenticationRequired { try await signOut() }
             }
             throw error

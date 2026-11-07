@@ -53,7 +53,7 @@ public actor FilePetProgressRepository: PetProgressRepository {
         cached = progress
     }
 
-    private static func validate(_ progress: PetProgress) throws {
+    static func validate(_ progress: PetProgress) throws {
         let pet = progress.pet
         let quantitiesValid = progress.inventory.allSatisfy {
             $0.id == $0.foodID && FoodCatalog.food(id: $0.foodID) != nil && $0.quantity > 0
