@@ -25,13 +25,12 @@ CoreMotion은 시작 날짜부터의 누적 데이터를 제공하고, 앱이 �
 
 ## 저장 형식과 경계
 
-- 구현: `PetPetCore/Data/Local/FileStepHistoryRepository`.
-- 위치: 워치 앱의 `Application Support/PetPet/step-history-v1.json`.
-- 형식: `{ "version": 1, "records": { "2026-11-07": 1234 } }`.
+- 현재 구현: `PetPetCore/Data/Local/FileGameRepository`가 걸음수와 펫의 공용 저장소 계약을 구현한다.
+- 위치: 워치 앱의 `Application Support/PetPet/game-state-v1.json` 내부 날짜별 records.
+- 이전 `FileStepHistoryRepository`의 `step-history-v1.json`은 `{ "version": 1, "records": { "2026-11-07": 1234 } }` 형식이다. 최초 실행 때 새 통합 저장소로 이관하고 이전 파일은 보존한다. [이관과 복원](AccountAndBackup.md).
 - 하나의 actor 인스턴스가 읽기·쓰기를 직렬화한다. 같은 날짜의 낮은 값/늦은 쓰기는 높은 기록을 덮어쓰지 않는다. 파일은 `.atomic`으로 교체한다.
 - 쓰기 실패 시 변경분을 메모리에 유지해 다음 저장에서 전체 기록을 다시 쓴다. 읽을 수 없는 JSON이나 알 수 없는 스키마 버전은 오류로 처리하고 기존 파일을 덮어쓰지 않는다.
-- `record(for:)`는 날짜별 조회, `allRecords()`는 최신 날짜부터의 전체 조회를 제공한다. 서버 DTO·인증·보상·식사 횟수는 이 파일에 섞지 않는다.
-- 첫 구조 정비 단계에는 영구 걸음 기록이 없었으므로 이전 데이터 마이그레이션은 필요하지 않다.
+- `record(for:)`는 날짜별 조회, `allRecords()`는 최신 날짜부터의 전체 조회를 제공한다. 서버 JSON은 별도 DTO로 변환하며 인증 토큰은 이 파일에 넣지 않는다.
 
 ## 검증 시나리오
 

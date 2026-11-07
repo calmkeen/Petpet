@@ -18,19 +18,21 @@ models, repository contracts, and sensor-session logic live in the local
 - [Daily steps, persistence, and recovery](Docs/DailySteps.md)
 - [Feeding, growth, and step rewards](Docs/FeedingAndGrowth.md)
 - [iPhone and Apple Watch synchronization](Docs/WatchSynchronization.md)
+- [Google login, server backup, and restore setup](Docs/AccountAndBackup.md)
 
 The watch app displays a pet and today's steps, restores calendar-day totals,
 and saves daily history locally. It refreshes system pedometer history when the
 app resumes and rolls over at local midnight. CoreMotion provides approximately
 seven days of historical recovery; older saved records are retained. Feeding,
 leveling, stat allocation, affection, and daily step rewards persist locally.
-The Digital Crown switches between home, growth, and food overview pages;
+The Digital Crown switches between home, growth, food, and account overview pages;
 opening a management screen lets the Crown scroll its detailed list.
-Rewards are claimed after a successful local save; Android's server-backup trigger
-will be connected when authentication and backend integration are implemented.
+Rewards are granted after a successful server backup, matching Android.
 The iPhone receives the watch's daily steps, pet state, and food inventory through
 WatchConnectivity and keeps the latest valid snapshot for offline viewing.
 It shows connection status, last sync time, and a manual refresh action. Missing
-today's data is displayed as a dash. Backend services, games, and voice remain
-subsequent milestones.
+today's data is displayed as a dash. Google login, Keychain sessions, and the
+existing StepMate backup/restore API are implemented. Live account verification
+requires the iOS and Web OAuth Client IDs described in the setup guide.
+Games, streak UI, rankings, and voice remain subsequent milestones.
 

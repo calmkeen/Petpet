@@ -9,14 +9,14 @@
 | 워치 홈·걸음수 | `feature_stepcounter`, 자정 리셋·센서 재시작 복구·일일 기록 | 오늘 자정 기준 집계·저장 복원·자정/시간대 전환·최근 기록 복구 구현 |
 | 펫 이미지·움직임 | `MateMovingImage`, 시간대별 배경 | 고정 이미지 유지. 반응 초안과 Motion 어댑터 분리 |
 | 펫 능력치·터치 | `feature_statistics`, 스탯 배분·50회 터치 호감도·공복/활동 상태 | 레벨·경험치·스탯 배분·호감도·기분과 영구 저장 구현 |
-| 먹이·보상 | `feature_userfoods`, `StepStreakViewModel.grantBackupRewards` | 먹이 소비·신규 우유 3개·1,000걸음당 우유·일일 사과·중복 방지 구현. 현재 로컬 저장 뒤 수령 |
+| 먹이·보상 | `feature_userfoods`, `StepStreakViewModel.grantBackupRewards` | 먹이 소비·신규 우유 3개·1,000걸음당 우유·일일 사과·중복 방지 구현. 서버 백업 성공 확인 뒤 수령 |
 | 스트릭·닉네임 | `feature_stepstreak`와 서버 API | 후속 `Features/Streak` 및 기능별 Data |
-| 로그인·세션 | `feature_auth`, Google ID Token 교환·refresh·세션 만료 처리 | 후속 `Features/Auth`, Keychain·인증 API 어댑터 |
-| 백업·복원 | `feature_backup`, Room 데이터와 메타데이터 | 걸음수·펫·먹이·보상 내역 로컬 저장 구현. 서버 백업·복원은 미구현 |
+| 로그인·세션 | `feature_auth`, Google ID Token 교환·refresh·세션 만료 처리 | iPhone GoogleSignIn SDK·Keychain·공유 refresh·만료 처리 구현. 실제 OAuth 설정 대기 |
+| 백업·복원 | `feature_backup`, Room 데이터와 메타데이터 | iPhone 경유 백업·미리보기 후 워치 복원·중복 보상 방지 구현. 운영 API 검증은 설정 후 진행 |
 | 지구를 지켜라 | `feature_game1`, 펫 스탯을 사용하는 슈팅·스테이지·랭킹 | 후속 게임 도메인 엔진과 watchOS 렌더러 |
 | 별계단 훈련 | `feature_game2`, 계단 게임·점수·랭킹 | 후속 게임 도메인 엔진과 watchOS 렌더러 |
 | 음성·AI 대화 | `feature_voice`, 음성 입력과 스트리밍 클라이언트 | 후속 음성 권한·녹음/인식·스트리밍 어댑터 |
-| 폰 보조 앱 | `mobile`, 로그인·홈·스트릭·워치 설치/연동 | WatchConnectivity로 걸음수·펫·먹이 수신·캐시·재연결·수동 갱신 구현. 로그인·서버 스트릭은 후속 |
+| 폰 보조 앱 | `mobile`, 로그인·홈·스트릭·워치 설치/연동 | 걸음수·펫·먹이 수신·캐시·수동 갱신, 계정·서버 백업·복원 화면 구현. 스트릭 UI는 후속 |
 
 ## 호환 기준
 
@@ -35,4 +35,4 @@ Android의 부팅 이후 센서 원시 누적값·offset 보정은 Apple에 복�
 
 ## 먹이·성장과 보상의 차이
 
-게임 수치와 지급량은 Android와 동일하다. Android는 서버 백업 성공 뒤 지급하며, Apple 앱은 서버 연결 전까지 명시적인 로컬 저장·수령 버튼을 사용한다. 펫·먹이·지급 내역은 하나의 원자적 파일 저장으로 처리하여 Android의 개별 저장 사이 중단으로 인한 중복 지급·먹이 유실을 방지한다. 공복과 미접속이 동시에 성립하면 HUNGRY를 우선한다. 자세한 원본 경로와 규칙·결정은 [먹이·성장·보상](FeedingAndGrowth.md)을 따른다.
+게임 수치와 지급량, 서버 백업 성공 뒤 지급하는 시점은 Android와 동일하다. Apple은 iPhone이 서버 요청을 수행하고 워치에 성공 확인을 보내므로 전달이 지연될 수 있다. 자정 뒤에 도착해도 원래 백업한 날짜의 기록에만 지급한다. 펫·먹이·지급 내역은 하나의 원자적 파일 저장으로 처리한다. 공복과 미접속이 동시에 성립하면 HUNGRY를 우선한다. 자세한 규칙은 [먹이·성장·보상](FeedingAndGrowth.md), 서버 계약과 설정·검증 범위는 [계정·백업·복원](AccountAndBackup.md)을 따른다.
