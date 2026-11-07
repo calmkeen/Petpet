@@ -24,25 +24,42 @@ public enum PetDaylightPeriod: CaseIterable, Sendable {
 
 /// Fixed-canvas greeting frames keep the same character pose between updates.
 public struct PetSpriteAnimation: Sendable {
-    public static let greetingFrameCount = 12
-    public static let greetingFrameInterval: TimeInterval = 0.1
-    public static let greetingDuration: TimeInterval = 1.2
+    public static let greetingFrameCount = 16
+    public static let greetingFrameInterval: TimeInterval = 1.0 / 15
+    public static let greetingDuration: TimeInterval = 16.0 / 15
     public let activity: CharacterActivity
     public init(_ activity: CharacterActivity) { self.activity = activity }
-    public var frameInterval: TimeInterval { activity == .touching ? Self.greetingFrameInterval : 0.2 }
+    public var frameInterval: TimeInterval { Self.greetingFrameInterval }
+    public var frameNames: [String] {
+        let mode = activity == .running ? "running" : "greeting"
+        let count = isAnimated ? 16 : 1
+        return (0..<count).map { String(format: "stepmate_fox_\(mode)_v3_%02d", $0) }
+    }
+    public var cycleDuration: TimeInterval { Double(frameNames.count) * frameInterval }
     public var isAnimated: Bool { activity == .running || activity == .touching }
-    public var posterImageName: String { imageName(elapsed: activity == .touching ? 0.5 : 0) }
+    public var posterImageName: String { frameNames[activity == .touching ? 8 : 0] }
     public func imageName(elapsed: TimeInterval) -> String {
         let elapsed = elapsed.isFinite ? max(0, elapsed) : 0
         switch activity {
         case .running:
-            let frame = Int((elapsed.truncatingRemainder(dividingBy: 0.8) / 0.2 + 1e-9).rounded(.down))
-            return "stepmate_fox_run_\(min(frame, 3) + 1)"
+            let frame = Int((elapsed.truncatingRemainder(dividingBy: cycleDuration) / frameInterval + 1e-9).rounded(.down))
+            return frameNames[min(frame, 15)]
         case .touching:
             let frame = min(Int(min(elapsed / Self.greetingFrameInterval + 1e-9, Double(Self.greetingFrameCount - 1)).rounded(.down)), Self.greetingFrameCount - 1)
-            return String(format: "stepmate_fox_greeting_v2_%02d", frame)
-        case .idle, .stopped: return "stepmate_fox_greeting_v2_00"
+            return frameNames[frame]
+        case .idle, .stopped: return frameNames[0]
         }
+    }
+}
+
+/// A step update may extend expiry without restarting an already playing clip.
+public struct PetPlaybackRequest: Equatable, Sendable {
+    public let activity: CharacterActivity
+    public let startedAt: Date
+    public let isPlaying: Bool
+    public init(state: PetAnimationState, suppressed: Bool) {
+        activity = state.activity; startedAt = state.startedAt
+        isPlaying = state.isActive && PetSpriteAnimation(state.activity).isAnimated && !suppressed
     }
 }
 
@@ -54,6 +71,16 @@ public struct PetAnimationState: Equatable, Sendable {
     public private(set) var isActive = false
     private var baseline: DailyStepRecord?
     public init() {}
+
+    #if DEBUG
+    /// Visual-only preview. It never reads or mutates the game repository.
+    public static func preview(_ activity: CharacterActivity, at date: Date = Date()) -> Self {
+        var state = Self()
+        state.isActive = true; state.activity = activity; state.startedAt = date
+        state.expiresAt = activity == .touching ? date.addingTimeInterval(PetSpriteAnimation.greetingDuration) : nil
+        return state
+    }
+    #endif
 
     public mutating func setActive(_ value: Bool, at date: Date) {
         guard value != isActive else { return }

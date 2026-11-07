@@ -19,29 +19,56 @@ final class PetAppearanceTests: XCTestCase {
     }
     func testOriginalFrameOrderTimingAndClockRollback() {
         let running = PetSpriteAnimation(.running)
-        XCTAssertEqual([0.0,0.2,0.4,0.6,0.8].map { running.imageName(elapsed: $0) },
-                       [1,2,3,4,1].map { "stepmate_fox_run_\($0)" })
-        XCTAssertEqual(running.imageName(elapsed: -10), "stepmate_fox_run_1")
-        XCTAssertEqual(running.imageName(elapsed: .infinity), "stepmate_fox_run_1")
+        XCTAssertEqual([0.0,1.0/15,2.0/15,15.0/15,16.0/15].map { running.imageName(elapsed: $0) },
+                       [0,1,2,15,0].map { String(format: "stepmate_fox_running_v3_%02d", $0) })
+        XCTAssertEqual(running.imageName(elapsed: -10), "stepmate_fox_running_v3_00")
+        XCTAssertEqual(running.imageName(elapsed: .infinity), "stepmate_fox_running_v3_00")
         XCTAssertFalse(PetSpriteAnimation(.idle).isAnimated)
     }
-    func testGreetingUsesTwelveOrderedFramesAndMatchingIdleEndpoints() {
+    func testGreetingUsesSixteenOrderedFramesAndMatchingIdleEndpoints() {
         let happy = PetSpriteAnimation(.touching)
-        XCTAssertEqual(happy.frameInterval, 0.1)
-        XCTAssertEqual(PetSpriteAnimation.greetingDuration, 1.2)
-        let expected = (0..<12).map { String(format: "stepmate_fox_greeting_v2_%02d", $0) }
-        XCTAssertEqual((0..<12).map { happy.imageName(elapsed: Double($0) * 0.1) }, expected)
+        XCTAssertEqual(happy.frameInterval, 1.0 / 15)
+        XCTAssertEqual(PetSpriteAnimation.greetingDuration, 16.0 / 15)
+        let expected = (0..<16).map { String(format: "stepmate_fox_greeting_v3_%02d", $0) }
+        XCTAssertEqual((0..<16).map { happy.imageName(elapsed: Double($0) / 15) }, expected)
         XCTAssertEqual(happy.imageName(elapsed: -1), expected[0])
-        XCTAssertEqual(happy.imageName(elapsed: 20), expected[11])
+        XCTAssertEqual(happy.imageName(elapsed: 20), expected[15])
         XCTAssertEqual(PetSpriteAnimation(.idle).imageName(elapsed: 0), expected[0])
-        XCTAssertEqual(happy.posterImageName, expected[5])
+        XCTAssertEqual(happy.posterImageName, expected[8])
         var state = PetAnimationState()
         state.setActive(true, at: now)
         XCTAssertTrue(state.touch(at: now))
-        state.tick(at: now.addingTimeInterval(1.1))
+        state.tick(at: now.addingTimeInterval(1.0))
         XCTAssertEqual(state.activity, .touching)
-        state.tick(at: now.addingTimeInterval(1.2))
+        state.tick(at: now.addingTimeInterval(16.0 / 15))
         XCTAssertEqual(state.activity, .idle)
+    }
+    func testExtendingRunningExpiryDoesNotRestartNativePlayback() {
+        var state = PetAnimationState()
+        state.setActive(true, at: now)
+        state.observe(steps(10), at: now)
+        state.observe(steps(11), at: now)
+        let first = PetPlaybackRequest(state: state, suppressed: false)
+        let oldDeadline = state.expiresAt
+        state.observe(steps(12), at: now.addingTimeInterval(0.5))
+        XCTAssertNotEqual(oldDeadline, state.expiresAt)
+        XCTAssertEqual(first, PetPlaybackRequest(state: state, suppressed: false))
+        XCTAssertFalse(PetPlaybackRequest(state: state, suppressed: true).isPlaying)
+    }
+    func testNewGestureStartsANewClipAndPreviewHasNoGameStorageDependency() {
+        var state = PetAnimationState()
+        state.setActive(true, at: now)
+        state.touch(at: now)
+        let first = PetPlaybackRequest(state: state, suppressed: false)
+        state.tick(at: now.addingTimeInterval(2))
+        state.touch(at: now.addingTimeInterval(2))
+        XCTAssertNotEqual(first, PetPlaybackRequest(state: state, suppressed: false))
+        #if DEBUG
+        let preview = PetAnimationState.preview(.running, at: now)
+        XCTAssertEqual(preview.activity, .running)
+        XCTAssertTrue(PetPlaybackRequest(state: preview, suppressed: false).isPlaying)
+        XCTAssertNil(preview.expiresAt)
+        #endif
     }
     func testRestoredTotalsLoadingAndNewDayDoNotPretendToBeLiveSteps() {
         var state = PetAnimationState()

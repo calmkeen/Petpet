@@ -2,6 +2,18 @@ import Foundation
 
 @MainActor
 enum AnimationDiagnostics {
+    static func recordRenderer(_ metrics: [String: Any]) {
+        #if DEBUG
+        guard let data = try? JSONSerialization.data(withJSONObject: metrics) else { return }
+        let file = URL.applicationSupportDirectory.appendingPathComponent("PetPet/Development/animation-renderer-debug.json")
+        Task.detached(priority: .utility) {
+            do {
+                try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+                try data.write(to: file, options: .atomic)
+            } catch { }
+        }
+        #endif
+    }
     static func record(reduceMotion: Bool, luminanceReduced: Bool, sceneActive: Bool, homeVisible: Bool) {
         #if DEBUG
         let flags = ["reduceMotion": reduceMotion, "luminanceReduced": luminanceReduced,

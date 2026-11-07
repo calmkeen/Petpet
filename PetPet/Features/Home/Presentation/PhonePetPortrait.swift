@@ -13,11 +13,8 @@ struct PhonePetPortrait: View {
             Button { if greeting == nil { greeting = Date() } } label: {
                 ZStack {
                     Image(period.backgroundImageName).resizable().scaledToFill()
-                    TimelineView(.animation(minimumInterval: PetSpriteAnimation.greetingFrameInterval, paused: greeting == nil || reduceMotion || scenePhase != .active)) { frame in
-                        let animation = PetSpriteAnimation(greeting == nil ? .idle : .touching)
-                        Image(reduceMotion ? animation.posterImageName : animation.imageName(elapsed: frame.date.timeIntervalSince(greeting ?? frame.date)))
-                            .resizable().scaledToFit().padding(12)
-                    }
+                    NativePhonePetSprite(greeting: greeting, suppressed: reduceMotion || scenePhase != .active)
+                        .padding(12).allowsHitTesting(false)
                 }
                 .frame(width: 104, height: 126).clipped()
                 .clipShape(RoundedRectangle(cornerRadius: 18))

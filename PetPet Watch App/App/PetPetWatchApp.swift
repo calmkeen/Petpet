@@ -4,6 +4,9 @@ import SwiftUI
 @MainActor
 struct PetPetWatchApp: App {
     @StateObject private var model: WatchAppModel
+    #if DEBUG
+    @State private var previewing = ProcessInfo.processInfo.arguments.contains("--pet-animation-preview")
+    #endif
 
     init() {
         let model = WatchAppModel()
@@ -12,7 +15,17 @@ struct PetPetWatchApp: App {
 
     var body: some Scene {
         WindowGroup {
+            #if DEBUG
+            if previewing {
+                NavigationStack {
+                    WatchAnimationPreview().toolbar { Button("홈") { previewing = false } }
+                }
+            } else {
+                WatchHomeView(viewModel: model.home, petViewModel: model.pet, cloudViewModel: model.cloud, streakViewModel: model.streak)
+            }
+            #else
             WatchHomeView(viewModel: model.home, petViewModel: model.pet, cloudViewModel: model.cloud, streakViewModel: model.streak)
+            #endif
         }
         .backgroundTask(.watchConnectivity) { await model.finishBackgroundTransfer() }
     }

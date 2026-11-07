@@ -31,6 +31,10 @@ struct WatchCloudView: View {
                 }
                 Text("서버 복원은 아이폰에서 기록을 확인한 뒤 진행해요.")
                     .font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                #if DEBUG
+                NavigationLink("캐릭터 동작 테스트") { WatchAnimationPreview() }
+                    .accessibilityIdentifier("watch.previewCharacter")
+                #endif
             }
             .padding(.horizontal, 14).padding(.vertical, 20)
         }

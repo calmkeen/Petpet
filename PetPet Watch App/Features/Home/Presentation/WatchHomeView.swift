@@ -86,10 +86,12 @@ struct WatchHomeView: View {
                             guard character.handleTouch() else { return }
                             Task { await petViewModel.touch() }
                         } label: {
-                            WatchPetSpriteView(state: character.state)
+                            WatchPetSpriteView(state: character.state, backgroundImageName: period.backgroundImageName,
+                                               backgroundCanvas: geometry.size, backgroundCoordinateSpace: "pet.home")
                                 .frame(height: min(90, geometry.size.height * 0.38))
                         }
                         .buttonStyle(.plain)
+                        .contentShape(Rectangle())
                         .disabled(petViewModel.isBusy || petViewModel.progress == nil)
                         .accessibilityLabel("펫 쓰다듬기")
                         .accessibilityIdentifier("watch.petTouch")
@@ -126,7 +128,7 @@ struct WatchHomeView: View {
                     }
                     .foregroundStyle(period.usesLightText ? .white : .black)
                     .padding(.horizontal, 12)
-                }
+                }.coordinateSpace(name: "pet.home")
             }
         }
         .ignoresSafeArea()
