@@ -14,11 +14,11 @@ public protocol BackendHTTPTransport: Sendable {
 }
 
 public struct URLSessionBackendTransport: BackendHTTPTransport {
-    private let session: URLSession
+    let session: URLSession
     public init() {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForRequest = 30
-        configuration.timeoutIntervalForResource = 60
+        configuration.timeoutIntervalForResource = 120
         configuration.httpCookieStorage = nil
         configuration.urlCache = nil
         session = URLSession(configuration: configuration, delegate: NoBackendRedirects(), delegateQueue: nil)

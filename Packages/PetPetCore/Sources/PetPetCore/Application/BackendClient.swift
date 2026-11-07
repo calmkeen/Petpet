@@ -233,6 +233,65 @@ public actor BackendClient {
         return try ServerRestoreState(accountID: accountID, pet: profile, steps: records)
     }
 
+    public func ranking(_ game: MiniGame, submitting score: GameScore? = nil, accountID: String) async throws -> GameRanking {
+        let path = "api/v1/\(game.serverPath)/rank/"
+        let token = epoch
+        var position: Int?
+        if let score {
+            guard score.game == game else { throw BackendError.invalidResponse }
+            try score.validate()
+            let body = try JSONEncoder().encode(score.requestBody)
+            _ = try await authorized(path: path + "score", method: "POST", data: body, accountID: accountID)
+            let data = try await authorized(path: path + "position", method: "POST", data: body, accountID: accountID)
+            struct Position: Decodable { let rank: Int; let userId: Int64 }
+            guard let value = try? JSONDecoder().decode(Position.self, from: data), value.rank > 0,
+                  Int64(accountID).map({ $0 == value.userId }) ?? true else { throw BackendError.invalidResponse }
+            position = value.rank
+        }
+        let data = try await authorized(path: path + "top10", method: "GET", accountID: accountID)
+        struct Row: Decodable { let rank: Int?; let userId: Int64?; let userName: String?; let score: Int?; let maxStep: Int?; let maxCombo: Int? }
+        struct Rows: Decodable { let ranks: [Row] }
+        guard let rows = try? JSONDecoder().decode(Rows.self, from: data), rows.ranks.count <= 10 else { throw BackendError.invalidResponse }
+        let entries = try rows.ranks.enumerated().map { index, row -> GameRankEntry in
+            let score = (game == .shooting ? row.score : row.maxStep) ?? 0
+            guard score >= 0, (row.maxCombo ?? 0) >= 0, (row.rank ?? index + 1) > 0 else { throw BackendError.invalidResponse }
+            return GameRankEntry(rank: row.rank ?? index + 1, userID: row.userId, name: String((row.userName ?? "이름 없음").prefix(255)), score: score, maxCombo: row.maxCombo ?? 0)
+        }
+        try checkEpoch(token)
+        return GameRanking(game: game, position: position, entries: entries)
+    }
+
+    public func streamChat(question: String, accountID: String,
+                           onEvent: @escaping @Sendable (ChatStreamEvent) async throws -> Void) async throws {
+        try ChatProgress.validate(question: question)
+        guard let current = try await session(), current.accountID == accountID else { throw BackendError.authenticationRequired }
+        guard let streaming = transport as? any BackendChatTransport else { throw BackendError.configurationMissing }
+        let token = epoch
+        var access = current.accessToken
+        for attempt in 0...1 {
+            var request = URLRequest(url: baseURL.appendingPathComponent("api/v1/ai/chat/stream"))
+            request.httpMethod = "POST"; request.timeoutInterval = 120
+            request.httpBody = try JSONEncoder().encode(["question": question])
+            request.setValue("Bearer \(access)", forHTTPHeaderField: "Authorization")
+            request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
+            do {
+                try await streaming.stream(request) { event in
+                    try await self.checkEpoch(token)
+                    try Task.checkCancellation()
+                    try await onEvent(event)
+                }
+                try checkEpoch(token)
+                return
+            } catch let BackendError.http(code) where code == 401 || code == 403 {
+                try checkEpoch(token)
+                guard attempt == 0 else { try await signOut(); throw BackendError.authenticationRequired }
+                access = try await refresh(rejectedToken: access, epoch: token).accessToken
+            }
+        }
+    }
+
     private func authorized(path: String, method: String, data: Data? = nil, accountID: String,
                             query: [URLQueryItem] = []) async throws -> Data {
         guard let current = try await session(), current.accountID == accountID else { throw BackendError.authenticationRequired }

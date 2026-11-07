@@ -5,7 +5,7 @@ import FoundationNetworking
 #endif
 
 /// An in-process HTTP substitute. It has no network client or production fallback.
-public actor LocalDevelopmentBackend: BackendHTTPTransport {
+public actor LocalDevelopmentBackend: BackendHTTPTransport, BackendChatTransport {
     public static let baseURL = URL(string: "https://debug.petpet.invalid/")!
     public static let accountID: Int64 = 900_000_001
     public static let reservedNicknames: Set<String> = ["사용중닉네임", "StepMate"]
@@ -16,6 +16,7 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport {
         var pet: ServerBackupRequest?
         var records: [String: Int] = [:]
         var nickname: String?
+        var gameScores: [String: GameScore]?
     }
     private let fileURL: URL
     private var cached: Archive?
@@ -40,9 +41,12 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport {
             guard let token = cached!.accessToken,
                   request.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)" else { return response(401) }
         }
+        if url.path.contains("/rank/") { return try gameRank(request) }
         switch (request.httpMethod ?? "GET", url.path) {
         case ("GET", "/api/v1/users/me"):
             return try json(["nickname": currentNickname])
+        case ("POST", "/api/v1/ai/chat/stream"):
+            return response(200)
         case ("GET", "/api/v1/users/nickname/check"):
             let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
             guard items.count == 1, items.first?.name == "nickname", let nickname = items.first?.value else { return response(400) }
@@ -84,6 +88,64 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport {
                 .map { ["date": $0.key, "stepCount": $0.value] as [String: Any] }])
         default: return response(404)
         }
+    }
+
+    public func stream(_ request: URLRequest, onEvent: @escaping @Sendable (ChatStreamEvent) async throws -> Void) async throws {
+        let result = try await send(request)
+        guard result.statusCode == 200 else { throw BackendError.http(result.statusCode) }
+        guard request.url?.path == "/api/v1/ai/chat/stream",
+              let body = try? JSONDecoder().decode([String: String].self, from: request.httpBody ?? Data()),
+              let question = body["question"] else { throw BackendError.invalidResponse }
+        try ChatProgress.validate(question: question)
+        try await onEvent(ChatStreamEvent(name: "metadata", data: "{}"))
+        try await onEvent(ChatStreamEvent(name: "context", data: "{}"))
+        let answer = "[개발용 모의 응답] ‘\(question)’ 질문을 받았어요. 함께 산책하고 펫에게 먹이를 주며 즐거운 하루를 보내요! 실제 AI 서버에 전송하지 않았어요."
+        for word in answer.split(separator: " ", omittingEmptySubsequences: false) {
+            try Task.checkCancellation()
+            guard request.value(forHTTPHeaderField: "Authorization") == cached?.accessToken.map({ "Bearer \($0)" }) else { throw BackendError.sessionChanged }
+            try await Task.sleep(for: .milliseconds(35))
+            let data = try JSONEncoder().encode(["token": String(word) + " "])
+            try await onEvent(ChatStreamEvent(name: "token", data: String(decoding: data, as: UTF8.self)))
+        }
+        try await onEvent(ChatStreamEvent(name: "done", data: "{}"))
+    }
+
+    private func gameRank(_ request: URLRequest) throws -> BackendHTTPResponse {
+        guard let path = request.url?.path,
+              let game = MiniGame.allCases.first(where: { path.hasPrefix("/api/v1/\($0.serverPath)/rank/") }) else { return response(404) }
+        let operation = path.split(separator: "/").last
+        var submitted: GameScore?
+        if request.httpMethod == "POST" {
+            guard let body = try? JSONDecoder().decode([String: Int].self, from: request.httpBody ?? Data()),
+                  let score = body[game == .shooting ? "score" : "maxStep"] else { return response(400) }
+            let value = GameScore(game: game, score: score, maxCombo: body["maxCombo"] ?? 0)
+            do { try value.validate() } catch { return response(400) }
+            submitted = value
+        }
+        if operation == "score", let score = submitted {
+            var next = cached!
+            var scores = next.gameScores ?? [:]
+            let old = scores[game.rawValue]
+            let improves = old == nil || score.score > old!.score || (game == .starStair && score.score == old!.score && score.maxCombo > old!.maxCombo)
+            if improves { scores[game.rawValue] = score; next.gameScores = scores; try write(next) }
+            return try json(["userId": Self.accountID, "updated": improves])
+        }
+        var entries: [(Int64, String, Int, Int)] = [(900_000_101,"연습여우",30,20),(900_000_102,"산책친구",15,10),(900_000_103,"초보펫",5,3)]
+        if let best = cached?.gameScores?[game.rawValue] { entries.append((Self.accountID,currentNickname,best.score,best.maxCombo)) }
+        entries.sort { $0.2 == $1.2 ? ($0.3 == $1.3 ? $0.0 < $1.0 : $0.3 > $1.3) : $0.2 > $1.2 }
+        if operation == "top10", request.httpMethod == "GET" {
+            return try json(["ranks": entries.map { row -> [String: Any] in
+                let rank = 1 + entries.filter { $0.2 > row.2 || (game == .starStair && $0.2 == row.2 && $0.3 > row.3) }.count
+                var item: [String: Any] = ["rank":rank,"userId":row.0,"userName":row.1]
+                if game == .shooting { item["score"] = row.2 } else { item["maxStep"] = row.2; item["maxCombo"] = row.3 }
+                return item
+            }])
+        }
+        if operation == "position", let score = submitted {
+            let rank = 1 + entries.filter { $0.0 != Self.accountID && ($0.2 > score.score || (game == .starStair && $0.2 == score.score && $0.3 > score.maxCombo)) }.count
+            return try json(["userId":Self.accountID,"rank":rank])
+        }
+        return response(404)
     }
 
     private func issueSession() throws -> BackendHTTPResponse {
