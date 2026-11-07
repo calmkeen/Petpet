@@ -1,0 +1,138 @@
+{
+  "repository": "https://github.com/Chaeros/StepMate",
+  "commit": "4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3",
+  "files": [
+    {
+      "path": "app/src/main/res/drawable/meteorite_1.png",
+      "gitBlobSHA": "03ff7de696909c3021c5da2da80faf2f8c7dcaa1"
+    },
+    {
+      "path": "app/src/main/res/drawable/meteorite_2.png",
+      "gitBlobSHA": "cf672b33d1b096c0fec8bd056323c735f9cb21a5"
+    },
+    {
+      "path": "app/src/main/res/drawable/meteorite_3.png",
+      "gitBlobSHA": "0c2c79ef825cf7ea5872675afc7613b70722137c"
+    },
+    {
+      "path": "app/src/main/res/drawable/meteorite_boss_round1.png",
+      "gitBlobSHA": "eb59cc028ab322a620bc4415aedadba245caa652"
+    },
+    {
+      "path": "app/src/main/res/drawable/meteorite_boss_round1_2.png",
+      "gitBlobSHA": "412fe4299eee9bab3c623cabc1e631d9ee0bc9a8"
+    },
+    {
+      "path": "app/src/main/res/drawable/shooting_item_attack.png",
+      "gitBlobSHA": "d82466e2f71d1b632d93a29ceedef20812990182"
+    },
+    {
+      "path": "app/src/main/res/drawable/shooting_item_boom.png",
+      "gitBlobSHA": "fb5f3f7ab48cabe7dedc3e3ddead5bea474ff635"
+    },
+    {
+      "path": "app/src/main/res/drawable/shooting_item_hp.png",
+      "gitBlobSHA": "17fe5bc09621132027a446a0a79b956c647e26fd"
+    },
+    {
+      "path": "app/src/main/res/drawable/shooting_item_speed.png",
+      "gitBlobSHA": "aba9e8397a730fcbc59928cd5d514200a6516e7f"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootinggame_background.png",
+      "gitBlobSHA": "ec4fb419ddc23a0bc0fd67840db6129fc93cef06"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootinggame_icon.png",
+      "gitBlobSHA": "80616869da5b6534a9025d9c477908c7e8fa0145"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootinggame_satelite_1.png",
+      "gitBlobSHA": "8f97b16a728c0eae1aaa174a2442b9defb336f08"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootinggame_satelite_2.png",
+      "gitBlobSHA": "2ef6b4849b7b928a0e2e6ee7fd3977e0668c6814"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootinggame_satelite_3.png",
+      "gitBlobSHA": "dfa142a8912b55b010cc5a894e5385aab640ecfe"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootinggame_stage3_alien.png",
+      "gitBlobSHA": "783a4e9ad6851a3218615648a54c58eebf8ddcc1"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootinggame_stage3_boss_1.png",
+      "gitBlobSHA": "52828f8daff2ed0a5ebaab99d6bbfe88b88f10a1"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootinggame_stage3_boss_2.png",
+      "gitBlobSHA": "1bdde2bc218868700cf5a171e4c608258da57c4f"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootinggame_stage3_boss_3.png",
+      "gitBlobSHA": "877136c23030fc1050bd8eec7183671d7f2dee83"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootingstar_1.png",
+      "gitBlobSHA": "b4f04cf9c668386418d769eab6f099b5a1146b3a"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootingstar_2.png",
+      "gitBlobSHA": "689d2a4c2e40cdee93379af7e7dc0c6741cb6927"
+    },
+    {
+      "path": "app/src/main/res/drawable/shootingstar_3.png",
+      "gitBlobSHA": "6d31a3257765e161fa408c47fc23b223326c8282"
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_run_back1.png",
+      "gitBlobSHA": "7bd41394ba9c1d146bd09256a6ca5e2a61bcf60e"
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_run_back2.png",
+      "gitBlobSHA": "75a593d07535c95363cc99b59931bec899580d86"
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_run_back3.png",
+      "gitBlobSHA": "cc3349204a92d03b38b414fb404a33ca0b031135"
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_run_back4.png",
+      "gitBlobSHA": "491edd20d7954371d9c968951be0f8252ae09507"
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_run_back5.png",
+      "gitBlobSHA": "5021d05c76bef12de748e6a0876ab7fb4050fd6f"
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_run_back6.png",
+      "gitBlobSHA": "705828259b4588558513ddd7a2c0a95f2a2f31e6"
+    },
+    {
+      "path": "app/src/main/res/drawable/space_trash_1.png",
+      "gitBlobSHA": "f29dbf83f22dcd170b0cae5b92b04d42a986b890"
+    },
+    {
+      "path": "app/src/main/res/drawable/space_trash_2.png",
+      "gitBlobSHA": "42854caaf2b210d3c640eee3512f325735e6791a"
+    },
+    {
+      "path": "app/src/main/res/drawable/space_trash_3.png",
+      "gitBlobSHA": "0ed47bb9684281d22b65d66821b47f2b8e12829e"
+    },
+    {
+      "path": "app/src/main/res/drawable/starstairgame_background1.png",
+      "gitBlobSHA": "66f0c5d031c6420ad6bf82a2adaae1ef4bfe1377"
+    },
+    {
+      "path": "app/src/main/res/drawable/starstairgame_icon_color.png",
+      "gitBlobSHA": "49a4002bcf89e00414a9e09a05e81abddd83f692"
+    },
+    {
+      "path": "app/src/main/res/drawable/startstair_purple.png",
+      "gitBlobSHA": "2d031f571d922d43f585fb168e7858ca741c5076"
+    }
+  ]
+}

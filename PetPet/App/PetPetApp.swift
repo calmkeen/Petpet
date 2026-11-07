@@ -21,7 +21,7 @@ struct PetPetApp: App {
 
     var body: some Scene {
         WindowGroup {
-            PhoneHomeView(viewModel: model.home, accountViewModel: model.account, streakViewModel: model.streak)
+            PhoneHomeView(viewModel: model.home, accountViewModel: model.account, streakViewModel: model.streak, extras:model.extras)
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active { Task { await model.account.checkAppleCredential(); await model.account.refreshProfile() } }
                 }

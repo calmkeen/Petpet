@@ -8,7 +8,10 @@ final class PhoneAppModel: ObservableObject {
     let home: PhoneHomeViewModel
     let account: AccountViewModel
     let streak: PhoneStreakViewModel
+    let extras: PhoneExtrasModel
     private let transport: WatchConnectivityTransport
+    private let features: PhoneFeatureCoordinator?
+    private var accountSubscription: AnyCancellable?
 
     init() {
         let configuration = AccountConfiguration()
@@ -35,6 +38,8 @@ final class PhoneAppModel: ObservableObject {
                 receipts: FileCloudReceiptStore(fileURL: directory.appendingPathComponent("cloud-receipts-v1.json")),
                 directory: directory.appendingPathComponent("CloudOutbox", isDirectory: true), environment: configuration.environment)
         }
+        features = backend.map { PhoneFeatureCoordinator(backend: $0, transport: transport, environment: configuration.environment) }
+        extras = PhoneExtrasModel(backend:backend)
         let profile = backend.map { PhoneProfileCoordinator(backend: $0, transport: transport, environment: configuration.environment) }
         streak = PhoneStreakViewModel(backend: backend, cache: FileAccountStepCache(fileURL: directory.appendingPathComponent("server-streak-v1.json")))
         let account = AccountViewModel(backend: backend, cloud: cloud, profile: profile, configuration: configuration)
@@ -43,6 +48,12 @@ final class PhoneAppModel: ObservableObject {
         transport.onConnectionChange = { [weak account] connection in
             snapshotConnection?(connection)
             if connection.isActivated { Task { await account?.connectionChanged() } }
+        }
+        let extras = self.extras
+        let features = self.features
+        accountSubscription = account.$session.map { $0?.accountID }.removeDuplicates().sink { [weak extras, weak features] id in
+            features?.accountChanged()
+            extras?.setAccount(id)
         }
         Task { [home] in await home.start(); await account.start(); await account.refreshProfile() }
     }

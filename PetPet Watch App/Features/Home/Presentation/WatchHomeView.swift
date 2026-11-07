@@ -7,6 +7,7 @@ struct WatchHomeView: View {
     @ObservedObject var petViewModel: PetProgressViewModel
     @ObservedObject var cloudViewModel: WatchCloudController
     @ObservedObject var streakViewModel: WatchStreakViewModel
+    var games: WatchGameServices?
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.isLuminanceReduced) private var luminanceReduced
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -14,7 +15,7 @@ struct WatchHomeView: View {
     @State private var selectedSection: WatchSection = .home
 
     private enum WatchSection: Hashable {
-        case home, statistics, food, streak, cloud
+        case home, statistics, food, streak, games, chat, cloud
     }
 
     var body: some View {
@@ -26,6 +27,10 @@ struct WatchHomeView: View {
                 FoodOverviewView(viewModel: petViewModel, stepViewModel: viewModel, cloudViewModel: cloudViewModel)
                     .tag(WatchSection.food)
                 WatchStreakOverview(model: streakViewModel, cloud: cloudViewModel).tag(WatchSection.streak)
+                if let games {
+                    WatchGameOverview(services:games,pet:petViewModel).tag(WatchSection.games)
+                    WatchChatOverview(services:games).tag(WatchSection.chat)
+                }
                 VStack(spacing: 12) {
                     Label("계정과 백업", systemImage: "icloud").font(.headline)
                     Text(cloudViewModel.account?.displayName ?? "아이폰에서 로그인해 주세요")

@@ -6,6 +6,7 @@ struct PhoneHomeView: View {
     @ObservedObject var viewModel: PhoneHomeViewModel
     @ObservedObject var accountViewModel: AccountViewModel
     @ObservedObject var streakViewModel: PhoneStreakViewModel
+    var extras: PhoneExtrasModel?
     @Environment(\.scenePhase) private var scenePhase
     private let green = Color(red: 0.12, green: 0.42, blue: 0.32)
 
@@ -42,6 +43,12 @@ struct PhoneHomeView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("phone.openAccount")
+                    if let extras {
+                        NavigationLink { PhoneExtrasView(model:extras,development:accountViewModel.configuration.isDevelopment) } label: {
+                            Label("게임 랭킹 · AI 대화",systemImage:"gamecontroller.fill").frame(maxWidth:.infinity,alignment:.leading).padding(16)
+                                .background(.background,in:RoundedRectangle(cornerRadius:18))
+                        }.buttonStyle(.plain).accessibilityIdentifier("phone.openExtras")
+                    }
                     stepsCard
                     PhoneStreakSection(model: streakViewModel, accountID: accountViewModel.session?.accountID)
                     petCard

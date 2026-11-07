@@ -21,10 +21,10 @@ struct PetPetWatchApp: App {
                     WatchAnimationPreview().toolbar { Button("홈") { previewing = false } }
                 }
             } else {
-                WatchHomeView(viewModel: model.home, petViewModel: model.pet, cloudViewModel: model.cloud, streakViewModel: model.streak)
+                WatchHomeView(viewModel: model.home, petViewModel: model.pet, cloudViewModel: model.cloud, streakViewModel: model.streak, games:model.games)
             }
             #else
-            WatchHomeView(viewModel: model.home, petViewModel: model.pet, cloudViewModel: model.cloud, streakViewModel: model.streak)
+            WatchHomeView(viewModel: model.home, petViewModel: model.pet, cloudViewModel: model.cloud, streakViewModel: model.streak, games:model.games)
             #endif
         }
         .backgroundTask(.watchConnectivity) { await model.finishBackgroundTransfer() }

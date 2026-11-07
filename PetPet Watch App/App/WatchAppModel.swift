@@ -9,6 +9,7 @@ final class WatchAppModel: ObservableObject {
     let pet: PetProgressViewModel
     let cloud: WatchCloudController
     let streak: WatchStreakViewModel
+    let games: WatchGameServices
     private let sync: WatchSyncController
     private let transport: WatchConnectivityTransport
 
@@ -28,6 +29,7 @@ final class WatchAppModel: ObservableObject {
         self.home = home; self.pet = pet
         streak = WatchStreakViewModel(history: game, home: home)
         cloud = WatchCloudController(game: game, transport: transport, home: home, pet: pet, directory: directory, environment: environment)
+        games = WatchGameServices(client: WatchFeatureClient(transport:transport,environment:environment), records:FileMiniGameRecords(fileURL:directory.appendingPathComponent("minigame-records-v1.json")),cloud:cloud)
         sync = WatchSyncController(home: home, pet: pet, history: game, progress: game,
                                    outboxURL: directory.appendingPathComponent("watch-sync-outbox-v1.json"), transport: transport)
     }
