@@ -20,6 +20,7 @@ models, repository contracts, and sensor-session logic live in the local
 - [iPhone and Apple Watch synchronization](Docs/WatchSynchronization.md)
 - [Apple login, server backup, and restore setup](Docs/AccountAndBackup.md)
 - [Required backend changes for Apple login](Docs/AppleSignInServer.md)
+- [Free Personal Team testing with Debug login and mock backups](Docs/DebugTesting.md)
 
 The watch app displays a pet and today's steps, restores calendar-day totals,
 and saves daily history locally. It refreshes system pedometer history when the
@@ -28,7 +29,8 @@ seven days of historical recovery; older saved records are retained. Feeding,
 leveling, stat allocation, affection, and daily step rewards persist locally.
 The Digital Crown switches between home, growth, food, and account overview pages;
 opening a management screen lets the Crown scroll its detailed list.
-Rewards are granted after a successful server backup, matching Android.
+Release rewards are granted after a successful server backup, matching Android.
+Debug uses a persistent mock backend on the iPhone and an isolated watch game copy.
 The iPhone receives the watch's daily steps, pet state, and food inventory through
 WatchConnectivity and keeps the latest valid snapshot for offline viewing.
 It shows connection status, last sync time, and a manual refresh action. Missing
@@ -37,4 +39,9 @@ and the StepMate backup/restore client are implemented. Live account verificatio
 requires the new Apple authentication endpoint and a developer team/profile that
 supports Sign in with Apple. The server handoff guide documents those changes.
 Games, streak UI, rankings, and voice remain subsequent milestones.
+
+The default Debug build runs on a free Personal Team with a development login
+button and no Sign in with Apple entitlement. It supports real watch sensors and
+phone/watch sync, plus local mock backup, rewards, and restore. Production account
+and game files are preserved. Release retains native Apple authentication.
 

@@ -2,6 +2,8 @@
 
 iOS 클라이언트는 Apple 로그인으로 전환했다. **아래 Apple API는 iOS가 구현한 새 계약이며 현재 서버에 배포된 API라는 뜻이 아니다.** 서버 저장소는 변경하지 않았다.
 
+이 문서는 실제 Apple 인증을 사용하는 **Release** 서버 계약이다. 기본 Debug의 모의 로그인·로컬 백업에는 서버 변경이 필요하지 않다. [무료 개발 모드](DebugTesting.md).
+
 확인한 서버 기준: [StepMate_SpringBoot `bcdcefbb`](https://github.com/Chaeros/StepMate_SpringBoot/tree/bcdcefbb226951785e09a82c30ab473ef77e39da). 실제 수정 전 최신 브랜치와 비교한다. Android의 기존 Google 로그인·계정·백업은 유지한다.
 
 ## 1. 추가할 API

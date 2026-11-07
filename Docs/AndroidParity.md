@@ -11,8 +11,8 @@
 | 펫 능력치·터치 | `feature_statistics`, 스탯 배분·50회 터치 호감도·공복/활동 상태 | 레벨·경험치·스탯 배분·호감도·기분과 영구 저장 구현 |
 | 먹이·보상 | `feature_userfoods`, `StepStreakViewModel.grantBackupRewards` | 먹이 소비·신규 우유 3개·1,000걸음당 우유·일일 사과·중복 방지 구현. 서버 백업 성공 확인 뒤 수령 |
 | 스트릭·닉네임 | `feature_stepstreak`와 서버 API | 후속 `Features/Streak` 및 기능별 Data |
-| 로그인·세션 | `feature_auth`, Google ID Token 교환·refresh·세션 만료 처리 | iPhone은 Apple 기본 로그인·Keychain·공유 refresh·철회 처리 구현. Apple 인증 서버 추가와 capability 프로파일 설정 필요 |
-| 백업·복원 | `feature_backup`, Room 데이터와 메타데이터 | iPhone 경유 백업·미리보기 후 워치 복원·중복 보상 방지 구현. 운영 API 검증은 설정 후 진행 |
+| 로그인·세션 | `feature_auth`, Google ID Token 교환·refresh·세션 만료 처리 | Release는 Apple 기본 로그인·Keychain·공유 refresh·철회 처리. Debug는 무료 계정용 모의 로그인과 분리 저장소 구현 |
+| 백업·복원 | `feature_backup`, Room 데이터와 메타데이터 | iPhone 경유 백업·미리보기 후 복원·중복 보상 방지 구현. Debug 모의 백업·복원은 시뮬레이터 검증 완료, 운영 API 검증은 서버 설정 후 진행 |
 | 지구를 지켜라 | `feature_game1`, 펫 스탯을 사용하는 슈팅·스테이지·랭킹 | 후속 게임 도메인 엔진과 watchOS 렌더러 |
 | 별계단 훈련 | `feature_game2`, 계단 게임·점수·랭킹 | 후속 게임 도메인 엔진과 watchOS 렌더러 |
 | 음성·AI 대화 | `feature_voice`, 음성 입력과 스트리밍 클라이언트 | 후속 음성 권한·녹음/인식·스트리밍 어댑터 |

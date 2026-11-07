@@ -2,6 +2,8 @@
 
 기준은 Android [StepMate `4e2b5e5`](https://github.com/Chaeros/StepMate/tree/4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3)와 서버 [StepMate_SpringBoot `bcdcefbb`](https://github.com/Chaeros/StepMate_SpringBoot/tree/bcdcefbb226951785e09a82c30ab473ef77e39da)다. 서버 코드는 읽기 전용으로 확인했으며 변경하지 않았다.
 
+**기본 Debug 구성은 무료 계정용 모의 로그인·아이폰 내부 백업 모드다.** Apple 로그인 권한을 요청하지 않고 기존 데이터를 복사한 개발용 저장소를 사용한다. [개발용 실행·검증 안내](DebugTesting.md). 아래 실제 Apple 인증·운영 서버 설정은 Release 구성을 대상으로 한다.
+
 ## iOS 로그인 설정
 
 iOS는 Apple 기본 `SignInWithAppleButton`과 AuthenticationServices를 사용한다. Google SDK·iOS Google Client ID·Web Client ID·Google 복귀 URL scheme은 제거했다. Android의 기존 Google 인증 API 계약은 공용 클라이언트와 회귀 테스트에 남아 있지만 iOS 화면에서는 호출하지 않는다.
@@ -63,13 +65,13 @@ iOS는 Apple 기본 `SignInWithAppleButton`과 AuthenticationServices를 사용�
 
 ## 검증 범위
 
-공용 패키지 86개 테스트가 통과한다. Apple 교환 요청 형식·필수 응답·미구현 경로·state와 유효 시간·기존 Keychain 표현 호환·refresh 후 Apple 식별 유지·로그아웃 경합을 포함한다. 기존 동시 refresh, 백업·복원·이관·중복 보상·역순·중단 복구 테스트도 통과한다. HTTP는 주입한 모의 서버 응답을 사용했다.
+공용 패키지 98개 테스트가 통과한다. Apple 교환 요청 형식·필수 응답·미구현 경로·state와 유효 시간·기존 Keychain 표현 호환·refresh 후 Apple 식별 유지·로그아웃 경합을 포함한다. 기존 동시 refresh, 백업·복원·이관·중복 보상·역순·중단 복구 및 Debug 모의 백엔드·데이터 분리 테스트도 통과한다. HTTP는 주입한 모의 응답을 사용했다.
 
 2026-11-07 Apple 전환 검증: iPhone·Watch 전체 Debug/Release 시뮬레이터 빌드와 서명을 생략한 실기기용 아키텍처 컴파일이 통과했다. 기본 서명한 iPhone 시뮬레이터에서 Google 버튼이 사라지고 Apple 기본 버튼이 표시되는 것, 로그인 전 서버 백업·복원 버튼이 비활성화된 것을 확인했다. 기존 걸음수·펫·먹이 화면과 워치 연결도 유지됐다. 실제 Apple 인증 화면에서 계정을 인증하거나 운영 서버로 자격 증명을 전송하지 않았다.
 
 앞선 백업 연동 단계에서는 워치 Crown의 네 번째 계정·백업 섹션과 저장소 이관을 확인했다. 사용자가 승인한 워치 시뮬레이터 피트니스 권한을 허용했으며 실제 워치 설정은 변경하지 않았다. 기존 시뮬레이터 걸음수·펫·먹이·지급 내역·터치 횟수와 보존된 이전 파일을 비교했다.
 
-현재 실기기 프로파일은 Sign In with Apple capability와 `com.apple.developer.applesignin` entitlement를 포함하지 않아 Apple 로그인 추가 후 서명 빌드는 실패한다. 이를 제거해서 설치한 것을 로그인 검증으로 취급하지 않는다. 서버 구현·Apple 개발자 팀/프로파일 설정 후 실제 Apple 계정 로그인과 운영 백업·복원을 별도로 확인해야 한다. 이번 변경은 실기기에 설치하지 않았다.
+현재 실기기 프로파일은 Sign In with Apple capability를 포함하지 않아 **실제 Apple 인증을 사용하는 Release 서명**에는 새 프로파일이 필요하다. Debug는 entitlement를 제외하고 모의 로그인으로 별도 서명·설치했으며, 실제 Apple 인증을 검증한 것으로 취급하지 않는다. 서버 구현·Apple 개발자 팀/프로파일 설정 후 운영 백업·복원을 별도로 확인해야 한다. 최신 실기기 결과는 [Debug 테스트 기록](DebugTesting.md)을 따른다.
 
 ```sh
 swift test --package-path Packages/PetPetCore
