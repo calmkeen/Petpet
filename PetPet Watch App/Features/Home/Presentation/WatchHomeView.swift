@@ -1,62 +1,30 @@
-//
-//  WatchHomeView.swift
-//  PetPet Watch App
-//
-//  Created by calmkeen on 9/20/25.
-//
-
 import SwiftUI
 import PetPetCore
 
 @MainActor
 struct WatchHomeView: View {
     @ObservedObject var viewModel: WatchHomeViewModel
+    @ObservedObject var petViewModel: PetProgressViewModel
     @Environment(\.scenePhase) private var scenePhase
-    
+
     var body: some View {
-        GeometryReader { geometry in
-            ZStack{
-                Image("background")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .clipped()
-                VStack {
-                    Text(Date(), style: .time)
-                        .foregroundColor(.black)
-                    Image("snowfox_baby_sitting")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                    Text("오늘 \(viewModel.state.stepCount.formatted())걸음")
-                        .foregroundColor(.black)
-                        .accessibilityIdentifier("watch.stepCount")
-                    if viewModel.state.isLoading {
-                        ProgressView()
-                    }
-                    if let message = viewModel.errorMessage {
-                        Text(message)
-                            .font(.caption2)
-                            .foregroundColor(.black)
-                            .multilineTextAlignment(.center)
-                    }
-                }
-                .padding()
-            }
+        NavigationStack {
+            home
         }
-        .ignoresSafeArea(.all)
-        .navigationBarHidden(true)
-        .background(TransparentVideoOverlay())
+        // Keep tracking alive while browsing the pet and food pages.
         .task {
+            await petViewModel.start()
             await viewModel.start()
         }
-        .onDisappear {
-            viewModel.stop()
-        }
+        .onDisappear { stop() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
-                Task { await viewModel.start() }
+                Task {
+                    await petViewModel.start()
+                    await viewModel.start()
+                }
             } else if phase == .background {
-                viewModel.stop()
+                stop()
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
@@ -67,12 +35,78 @@ struct WatchHomeView: View {
         }
     }
 
+    private var home: some View {
+        GeometryReader { geometry in
+            ZStack {
+                Image("background")
+                    .resizable().scaledToFill()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                VStack(spacing: 4) {
+                    Button {
+                        Task { await petViewModel.touch() }
+                    } label: {
+                        Image("snowfox_baby_sitting")
+                            .resizable().scaledToFit()
+                            .frame(height: min(90, geometry.size.height * 0.38))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(petViewModel.isBusy || petViewModel.progress == nil)
+                    .accessibilityLabel("펫 쓰다듬기")
+                    .accessibilityIdentifier("watch.petTouch")
+                    if let progress = petViewModel.progress {
+                        Text("Lv.\(progress.pet.level) · \(progress.pet.mood.displayName)")
+                            .font(.caption2)
+                    }
+                    Text("오늘 \(viewModel.state.stepCount.formatted())걸음")
+                        .font(.headline).monospacedDigit()
+                        .accessibilityIdentifier("watch.stepCount")
+                    if viewModel.state.isLoading { ProgressView() }
+                    if let message = viewModel.errorMessage {
+                        Text(message).font(.caption2).multilineTextAlignment(.center)
+                    }
+                    HStack(spacing: 8) {
+                        NavigationLink {
+                            PetStatisticsView(viewModel: petViewModel)
+                        } label: {
+                            Label("성장", systemImage: "chart.bar.fill")
+                        }
+                        .accessibilityIdentifier("watch.openPetStatistics")
+                        NavigationLink {
+                            FoodInventoryView(viewModel: petViewModel, steps: viewModel.state)
+                        } label: {
+                            Label("먹이", systemImage: "carrot.fill")
+                        }
+                        .accessibilityIdentifier("watch.openFoodInventory")
+                    }
+                    .font(.caption2)
+                    .buttonStyle(.bordered)
+                    .tint(.white.opacity(0.8))
+                }
+                .foregroundStyle(.black)
+                .padding(.horizontal, 12)
+            }
+        }
+        .ignoresSafeArea()
+        .toolbar(.hidden, for: .navigationBar)
+    }
+
+    private func stop() {
+        viewModel.stop()
+        petViewModel.stop()
+    }
 }
 
 #if DEBUG
 #Preview {
-    WatchHomeView(viewModel: WatchHomeViewModel(
-        stepCounter: PreviewStepCounter(), repository: PreviewStepHistoryRepository()
-    ))
+    let history = PreviewStepHistoryRepository()
+    let progress = FilePetProgressRepository(
+        fileURL: FileManager.default.temporaryDirectory
+            .appendingPathComponent("PetPetPreview-\(UUID().uuidString).json")
+    )
+    WatchHomeView(
+        viewModel: WatchHomeViewModel(stepCounter: PreviewStepCounter(), repository: history),
+        petViewModel: PetProgressViewModel(repository: progress, history: history)
+    )
 }
 #endif

@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7557C5222E7E6A5F00B6970A /* PetPet Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 7557C5212E7E6A5F00B6970A /* PetPet Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A1B2C3D4E5F6071829300001 /* PetPetCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829300004 /* PetPetCore */; };
 		A1B2C3D4E5F6071829300002 /* PetPetCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829300005 /* PetPetCore */; };
-		7557C5222E7E6A5F00B6970A /* PetPet Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 7557C5212E7E6A5F00B6970A /* PetPet Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -978,7 +978,7 @@
 /* Begin XCLocalSwiftPackageReference section */
 		A1B2C3D4E5F6071829300003 /* XCLocalSwiftPackageReference "Packages/PetPetCore" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "Packages/PetPetCore";
+			relativePath = Packages/PetPetCore;
 		};
 /* End XCLocalSwiftPackageReference section */
 

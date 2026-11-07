@@ -2,7 +2,7 @@
 
 ## 현재 완료 범위
 
-워치 홈, 하루 걸음수 집계, 날짜별 로컬 저장까지 구현했다. iPhone은 Android의 폰 앱처럼 로그인·조회·동기화 보조 역할을 맡는 방향으로 둔다. 서버는 기존 StepMate API 재사용을 기본 방향으로 하되 아직 연결하지 않는다.
+워치 홈, 하루 걸음수 집계·저장, 먹이 소비·성장·스탯·호감도와 걸음수 보상을 구현했다. iPhone은 Android의 폰 앱처럼 로그인·조회·동기화 보조 역할을 맡는 방향으로 둔다. 서버는 기존 StepMate API 재사용을 기본 방향으로 하되 아직 연결하지 않는다.
 
 ```text
 PetPet/                         iPhone 앱 타깃
@@ -12,6 +12,8 @@ PetPet/                         iPhone 앱 타깃
 PetPet Watch App/               watchOS 앱 타깃
   App/                          앱 시작점과 의존성 조립
   Features/Home/Presentation/    워치 홈과 화면 상태
+  Features/Pet/Presentation/     성장·스탯 화면과 펫 상태
+  Features/Food/Presentation/    먹이 목록·소비·보상 수령 화면
   Features/Character/Presentation/ 캐릭터 반응 초안
   Infrastructure/Motion/        CoreMotion 어댑터
   Preview Content/              센서를 사용하지 않는 미리보기
@@ -30,6 +32,11 @@ flowchart LR
   UI --> Session[PetPetCore: DailyStepTracker]
   Session --> Port[Domain: StepCounting]
   Session --> Store[Domain: StepHistoryRepository]
+  UI --> Progress[Domain: PetProgressRepository]
+  UI --> Claim[Application: ClaimStepRewards]
+  Claim --> Store
+  Claim --> Progress
+  PetFile[Data: FilePetProgressRepository] -. 구현 .-> Progress
   File[Data: FileStepHistoryRepository] -. 구현 .-> Store
   Motion[Infrastructure: CoreMotionStepCounter] -. 구현 .-> Port
   App --> Motion
@@ -51,13 +58,14 @@ flowchart LR
 - 워치의 정지 캐릭터, 배경, 시각 표시는 유지한다. 기존 움직임·터치 반응 초안은 별도 ViewModel/센서 어댑터로 분리했으며 홈 애니메이션에는 아직 연결하지 않았다.
 - iPhone의 임의 숫자 표시는 제거했다. 실제 기록을 받기 전에는 `—`를 표시한다. 미리보기 데이터는 `Preview Content`에만 둔다.
 - `PetProfile`, `PetMood`, `FoodDefinition`, `FoodInventoryItem`, `PetStatistic`, `UserProfile`, `DailyStepRecord`는 Android의 실제 모델을 참고한 공용 타입이다. 이들의 Codable 표현을 서버 요청 DTO로 바로 사용하지 않는다. 날짜 포맷과 JSON 키는 각 API 계약에 맞는 별도 DTO에서 변환한다.
-- `StepHistoryRepository`는 실제 파일 저장과 날짜별/전체 기록 조회를 구현했다. `PetRepository`의 펫 저장, WatchConnectivity 동기화, 인증·백업·랭킹·음성 API는 후속 단계다.
+- `FilePetProgressRepository`는 펫·먹이·날짜별 보상 내역을 하나의 트랜잭션으로 저장한다. 먹이와 펫을 개별 `PetRepository.save`로 나눠 저장하지 않는다. `ClaimStepRewards`는 오늘 기록 저장 성공 후 저장된 최댓값으로 보상을 요청한다. [상세 규칙](FeedingAndGrowth.md).
+- `StepHistoryRepository`는 실제 파일 저장과 날짜별/전체 기록 조회를 구현했다. WatchConnectivity 동기화, 인증·백업·랭킹·음성 API는 후속 단계다.
 - 빈 `GestureEvent`와 사용되지 않던 사용자·캐릭터 모델 초안은 정리했다. 캐릭터 기분과 애니메이션 상태는 각각 `PetMood`와 `CharacterActivity`로 구분한다.
 
 ## 기능을 추가하는 순서
 
 1. 하루 걸음수 집계·날짜 변경·재실행 복구와 로컬 저장: 완료.
-2. Android와 같은 보상, 먹이 소비, 경험치·레벨·스탯·호감도 규칙과 캐릭터 반응.
+2. Android와 같은 보상 수치, 먹이 소비, 경험치·레벨·스탯·호감도 규칙: 완료. 기분 표시·터치는 연결했으며, 움직임 애니메이션은 후속 작업이다.
 3. iPhone 보조 홈과 WatchConnectivity 동기화. 기기별 센서 값을 단순 합산하지 않는다.
 4. Google 인증, Keychain 세션, 기존 서버의 백업·복원·스트릭·닉네임 API.
 5. 게임 2종, 랭킹, 음성·AI 대화.

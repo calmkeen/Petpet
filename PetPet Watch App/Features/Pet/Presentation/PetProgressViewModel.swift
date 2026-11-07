@@ -1,0 +1,103 @@
+import Combine
+import Foundation
+import PetPetCore
+
+@MainActor
+final class PetProgressViewModel: ObservableObject {
+    @Published private(set) var progress: PetProgress?
+    @Published private(set) var isBusy = false
+    @Published private(set) var message: String?
+    @Published private(set) var errorMessage: String?
+
+    private let repository: any PetProgressRepository
+    private let claimRewards: ClaimStepRewards
+    private var isActive = false
+    private var moodTask: Task<Void, Never>?
+
+    init(repository: any PetProgressRepository, history: any StepHistoryRepository) {
+        self.repository = repository
+        claimRewards = ClaimStepRewards(history: history, progress: repository)
+    }
+
+    func start() async {
+        guard !isActive else { return }
+        isActive = true
+        await perform(.visit)
+        guard isActive else { return }
+        moodTask = Task { [weak self] in
+            while !Task.isCancelled {
+                do { try await Task.sleep(for: .seconds(600)) } catch { return }
+                guard let self else { return }
+                await self.perform(.refreshMood)
+            }
+        }
+    }
+
+    func stop() {
+        isActive = false
+        moodTask?.cancel()
+        moodTask = nil
+    }
+
+    func retry() async { await perform(.visit) }
+
+    func feed(_ food: FoodDefinition) async {
+        let oldLevel = progress?.pet.level ?? 1
+        await perform(.feed(foodID: food.id)) { change in
+            let levelUp = change.progress.pet.level > oldLevel
+                ? " · Lv.\(change.progress.pet.level)!" : ""
+            return "\(food.name) 냠냠! 경험치 +\(food.improvement)\(levelUp)"
+        }
+    }
+
+    func allocate(_ statistic: TrainableStatistic) async {
+        await perform(.allocate(statistic)) { _ in "능력치가 1 올랐어요." }
+    }
+
+    func touch() async {
+        let oldAffection = progress?.pet.affection
+        await perform(.touch) { change in
+            change.progress.pet.affection != oldAffection ? "호감도 +1!" : nil
+        }
+    }
+
+    func claim(for record: DailyStepRecord) async {
+        guard !isBusy else { return }
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let change = try await claimRewards(for: record)
+            progress = change.progress
+            errorMessage = nil
+            if let reward = change.reward {
+                message = reward.isEmpty ? "오늘 받을 보상을 모두 받았어요."
+                    : "우유 +\(reward.milk) · 사과 +\(reward.apple)"
+            }
+        } catch { show(error) }
+    }
+
+    private func perform(
+        _ action: PetProgressAction,
+        feedback: ((PetProgressChange) -> String?)? = nil
+    ) async {
+        guard !isBusy else { return }
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let change = try await repository.perform(action)
+            progress = change.progress
+            errorMessage = nil
+            if let feedback { message = feedback(change) }
+        } catch { show(error) }
+    }
+
+    private func show(_ error: Error) {
+        message = nil
+        switch error as? PetProgressError {
+        case .noFood: errorMessage = "이 먹이를 모두 먹었어요."
+        case .noStatPoints: errorMessage = "레벨을 올리면 포인트를 받아요."
+        case .outdatedDay: errorMessage = "날짜가 바뀌었어요. 오늘 걸음 수를 확인한 뒤 다시 받아 주세요."
+        default: errorMessage = "펫 기록을 불러오거나 저장하지 못했어요. 다시 시도해 주세요."
+        }
+    }
+}
