@@ -1,0 +1,107 @@
+import Foundation
+
+public struct PhoneSnapshotState: Equatable, Sendable {
+    public var cached: CachedWatchSnapshot?
+    public var connection = SnapshotConnection()
+    public var isRefreshing = false
+    public var hasStorageError = false
+    public var hasTransferError = false
+    public init(cached: CachedWatchSnapshot? = nil) { self.cached = cached }
+}
+
+@MainActor
+public final class PhoneSnapshotReceiver {
+    public private(set) var state = PhoneSnapshotState()
+    public var onStateChange: ((PhoneSnapshotState) -> Void)?
+    private let repository: any PhoneSnapshotRepository
+    private let transport: any SnapshotTransport
+    private let now: () -> Date
+    private var started = false
+    private var receiveTask: Task<Void, Never>?
+
+    public init(repository: any PhoneSnapshotRepository, transport: any SnapshotTransport,
+                now: @escaping () -> Date = { Date() }) {
+        self.repository = repository
+        self.transport = transport
+        self.now = now
+        transport.onSnapshot = { [weak self] data, peer in self?.receive(data, from: peer) }
+        transport.onConnectionChange = { [weak self] connection in self?.connectionChanged(connection) }
+    }
+
+    public func start() async {
+        guard !started else { return }
+        started = true
+        do { state.cached = try await repository.load() }
+        catch { state.hasStorageError = true }
+        emit()
+        transport.activate()
+    }
+
+    public func refresh() async {
+        guard !state.isRefreshing else { return }
+        // Re-read the system's last context too, allowing a failed cache write
+        // to recover even when the watch is no longer directly reachable.
+        transport.activate()
+        guard state.connection.isActivated, state.connection.isReachable,
+              let peer = state.connection.peerID else {
+            state.hasTransferError = true
+            emit()
+            return
+        }
+        state.isRefreshing = true
+        state.hasTransferError = false
+        emit()
+        defer { state.isRefreshing = false; emit() }
+        do {
+            let data = try await transport.requestLatest()
+            guard peer == state.connection.peerID else { return }
+            receive(data, from: peer)
+            await finishReceiving()
+        } catch {
+            state.hasTransferError = true
+        }
+    }
+
+    public func finishReceiving() async { await receiveTask?.value }
+
+    private func receive(_ data: Data, from peer: String) {
+        guard state.connection.isActivated, state.connection.peerID == peer else { return }
+        let snapshot: WatchSnapshot
+        do { snapshot = try WatchSnapshotCodec.decode(data) }
+        catch { state.hasTransferError = true; emit(); return }
+        let previous = receiveTask
+        let receivedAt = now()
+        receiveTask = Task { [weak self, repository] in
+            await previous?.value
+            guard let self, self.state.connection.peerID == peer else { return }
+            do {
+                let saved = try await repository.accept(snapshot, from: peer, at: receivedAt)
+                guard self.state.connection.peerID == peer else { return }
+                self.state.cached = saved
+                self.state.hasStorageError = false
+                self.state.hasTransferError = false
+            } catch { self.state.hasStorageError = true }
+            self.emit()
+        }
+    }
+
+    private func connectionChanged(_ connection: SnapshotConnection) {
+        let wasReachable = state.connection.isReachable
+        let oldPeer = state.connection.peerID
+        state.connection = connection
+        if connection.isActivated {
+            if !connection.isPaired {
+                state.cached = nil
+            } else if let peer = connection.peerID, state.cached?.peerID != peer {
+                state.cached = nil
+            }
+        }
+        emit()
+        if connection.isActivated, connection.isReachable,
+           !wasReachable || oldPeer != connection.peerID {
+            Task { [weak self] in await self?.refresh() }
+        }
+    }
+
+    private func emit() { onStateChange?(state) }
+}
