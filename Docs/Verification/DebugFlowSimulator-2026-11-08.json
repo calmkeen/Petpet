@@ -1,0 +1,408 @@
+{
+  "verifiedAt": "2026-11-08T10:59:28.142022+00:00",
+  "scope": "Debug local mock account and actual WatchConnectivity on paired iPhone SE 3 iOS 18.0 / Apple Watch SE 2 40mm watchOS 11.0 simulators",
+  "fixtures": "Only two step records were seeded on the fresh watch after initial UI validation; all pet, food, account, backup and restore changes came through app actions.",
+  "tests": {
+    "core": 179,
+    "watchControllers": 2,
+    "nativeJourneyUI": 9,
+    "releaseSimulatorBuild": "passed"
+  },
+  "phases": [
+    {
+      "phase": 0,
+      "test": "test00NewWatchCanPlayWithoutLogin",
+      "verifiedAt": "2026-11-08T10:40:21.202144+00:00",
+      "pet": {
+        "attack": 50,
+        "mood": "HAPPY",
+        "health": 8,
+        "affection": 0,
+        "id": 1,
+        "defense": 0,
+        "statPoints": 0,
+        "experience": 0,
+        "level": 1,
+        "lastFedAt": 815827201.379532
+      },
+      "inventory": [
+        {
+          "quantity": 3,
+          "id": 1,
+          "foodID": 1
+        }
+      ],
+      "steps": {},
+      "appliedBackups": 0,
+      "appliedRestores": 0,
+      "watchHasAccount": false,
+      "passed": true
+    },
+    {
+      "phase": 1,
+      "test": "test01LoginAndEmptyRestore",
+      "verifiedAt": "2026-11-08T10:50:09.248182+00:00",
+      "pet": {
+        "affection": 0,
+        "level": 1,
+        "health": 8,
+        "id": 1,
+        "defense": 0,
+        "mood": "HAPPY",
+        "statPoints": 0,
+        "attack": 50,
+        "experience": 0,
+        "lastFedAt": 815827201.379532
+      },
+      "inventory": [
+        {
+          "quantity": 3,
+          "id": 1,
+          "foodID": 1
+        }
+      ],
+      "steps": {
+        "2026-11-07": 2000,
+        "2026-11-08": 4321
+      },
+      "appliedBackups": 0,
+      "appliedRestores": 0,
+      "watchHasAccount": true,
+      "passed": true
+    },
+    {
+      "phase": 2,
+      "test": "test02FeedGrowAndAllocate",
+      "verifiedAt": "2026-11-08T10:51:07.948900+00:00",
+      "pet": {
+        "id": 1,
+        "experience": 0,
+        "attack": 50,
+        "defense": 0,
+        "lastFedAt": 815827836.35988,
+        "level": 2,
+        "health": 9,
+        "mood": "HAPPY",
+        "statPoints": 1,
+        "affection": 0
+      },
+      "inventory": [
+        {
+          "id": 1,
+          "foodID": 1,
+          "quantity": 1
+        }
+      ],
+      "steps": {
+        "2026-11-07": 2000,
+        "2026-11-08": 4321
+      },
+      "appliedBackups": 0,
+      "appliedRestores": 0,
+      "watchHasAccount": true,
+      "passed": true
+    },
+    {
+      "phase": 3,
+      "test": "test03SyncedGrowthBackupTwiceAndCancelRestore",
+      "verifiedAt": "2026-11-08T10:52:22.365049+00:00",
+      "pet": {
+        "id": 1,
+        "health": 9,
+        "attack": 50,
+        "mood": "HAPPY",
+        "lastFedAt": 815827836.35988,
+        "statPoints": 1,
+        "level": 2,
+        "experience": 0,
+        "defense": 0,
+        "affection": 0
+      },
+      "inventory": [
+        {
+          "quantity": 5,
+          "id": 1,
+          "foodID": 1
+        },
+        {
+          "id": 2,
+          "foodID": 2,
+          "quantity": 1
+        }
+      ],
+      "steps": {
+        "2026-11-07": 2000,
+        "2026-11-08": 4321
+      },
+      "appliedBackups": 2,
+      "appliedRestores": 0,
+      "watchHasAccount": true,
+      "passed": true
+    },
+    {
+      "phase": 4,
+      "test": "test04SpendAfterBackup",
+      "verifiedAt": "2026-11-08T10:53:00.091644+00:00",
+      "pet": {
+        "mood": "HAPPY",
+        "lastFedAt": 815827965.050454,
+        "statPoints": 0,
+        "level": 2,
+        "experience": 1,
+        "affection": 0,
+        "defense": 0,
+        "attack": 51,
+        "id": 1,
+        "health": 9
+      },
+      "inventory": [
+        {
+          "id": 1,
+          "quantity": 4,
+          "foodID": 1
+        },
+        {
+          "foodID": 2,
+          "id": 2,
+          "quantity": 1
+        }
+      ],
+      "steps": {
+        "2026-11-08": 4321,
+        "2026-11-07": 2000
+      },
+      "appliedBackups": 2,
+      "appliedRestores": 0,
+      "watchHasAccount": true,
+      "passed": true
+    },
+    {
+      "phase": 5,
+      "test": "test05ReconnectRestoreOlderPetAndLogout",
+      "verifiedAt": "2026-11-08T10:53:50.578469+00:00",
+      "pet": {
+        "experience": 0,
+        "affection": 0,
+        "lastFedAt": 815827836.3599999,
+        "defense": 0,
+        "level": 2,
+        "statPoints": 0,
+        "id": 1,
+        "health": 9,
+        "attack": 50,
+        "mood": "HAPPY"
+      },
+      "inventory": [
+        {
+          "quantity": 4,
+          "id": 1,
+          "foodID": 1
+        },
+        {
+          "quantity": 1,
+          "id": 2,
+          "foodID": 2
+        }
+      ],
+      "steps": {
+        "2026-11-07": 2000,
+        "2026-11-08": 4321
+      },
+      "appliedBackups": 2,
+      "appliedRestores": 1,
+      "watchHasAccount": false,
+      "passed": true
+    },
+    {
+      "phase": 6,
+      "test": "test06LoggedOutWatchKeepsLocalPlay",
+      "verifiedAt": "2026-11-08T10:55:09.048919+00:00",
+      "pet": {
+        "health": 9,
+        "mood": "HAPPY",
+        "lastFedAt": 815828099.21862,
+        "experience": 1,
+        "defense": 0,
+        "id": 1,
+        "statPoints": 0,
+        "level": 2,
+        "affection": 0,
+        "attack": 50
+      },
+      "inventory": [
+        {
+          "foodID": 1,
+          "quantity": 3,
+          "id": 1
+        },
+        {
+          "quantity": 1,
+          "foodID": 2,
+          "id": 2
+        }
+      ],
+      "steps": {
+        "2026-11-08": 4321,
+        "2026-11-07": 2000
+      },
+      "appliedBackups": 2,
+      "appliedRestores": 1,
+      "watchHasAccount": false,
+      "passed": true
+    },
+    {
+      "phase": 7,
+      "test": "test07ReloginKeepsBackupAndLocalProgress",
+      "verifiedAt": "2026-11-08T10:55:50.703900+00:00",
+      "pet": {
+        "health": 9,
+        "lastFedAt": 815828099.21862,
+        "id": 1,
+        "affection": 0,
+        "attack": 50,
+        "statPoints": 0,
+        "defense": 0,
+        "level": 2,
+        "mood": "HAPPY",
+        "experience": 1
+      },
+      "inventory": [
+        {
+          "quantity": 3,
+          "foodID": 1,
+          "id": 1
+        },
+        {
+          "foodID": 2,
+          "id": 2,
+          "quantity": 1
+        }
+      ],
+      "steps": {
+        "2026-11-07": 2000,
+        "2026-11-08": 4321
+      },
+      "appliedBackups": 2,
+      "appliedRestores": 1,
+      "watchHasAccount": true,
+      "passed": true
+    },
+    {
+      "phase": 8,
+      "test": "test08WatchRequestsBackupAfterRelogin",
+      "verifiedAt": "2026-11-08T10:56:32.461566+00:00",
+      "pet": {
+        "level": 2,
+        "experience": 1,
+        "affection": 0,
+        "id": 1,
+        "health": 9,
+        "defense": 0,
+        "mood": "HAPPY",
+        "attack": 50,
+        "statPoints": 0,
+        "lastFedAt": 815828099.21862
+      },
+      "inventory": [
+        {
+          "foodID": 1,
+          "id": 1,
+          "quantity": 3
+        },
+        {
+          "quantity": 1,
+          "foodID": 2,
+          "id": 2
+        }
+      ],
+      "steps": {
+        "2026-11-07": 2000,
+        "2026-11-08": 4321
+      },
+      "appliedBackups": 3,
+      "appliedRestores": 1,
+      "watchHasAccount": true,
+      "passed": true
+    }
+  ],
+  "acceptedResults": [
+    {
+      "phase": 0,
+      "result": "phase-00-193931.xcresult",
+      "passedTests": 1,
+      "failedTests": 0,
+      "resultStatus": "Passed"
+    },
+    {
+      "phase": 1,
+      "result": "phase-01-194935.xcresult",
+      "passedTests": 1,
+      "failedTests": 0,
+      "resultStatus": "Passed"
+    },
+    {
+      "phase": 2,
+      "result": "phase-02-195009.xcresult",
+      "passedTests": 1,
+      "failedTests": 0,
+      "resultStatus": "Passed"
+    },
+    {
+      "phase": 3,
+      "result": "phase-03-195108.xcresult",
+      "passedTests": 1,
+      "failedTests": 0,
+      "resultStatus": "Passed"
+    },
+    {
+      "phase": 4,
+      "result": "phase-04-195222.xcresult",
+      "passedTests": 1,
+      "failedTests": 0,
+      "resultStatus": "Passed"
+    },
+    {
+      "phase": 5,
+      "result": "phase-05-195300.xcresult",
+      "passedTests": 1,
+      "failedTests": 0,
+      "resultStatus": "Passed"
+    },
+    {
+      "phase": 6,
+      "result": "phase-06-195350.xcresult",
+      "passedTests": 1,
+      "failedTests": 0,
+      "resultStatus": "Passed"
+    },
+    {
+      "phase": 7,
+      "result": "phase-07-195509.xcresult",
+      "passedTests": 1,
+      "failedTests": 0,
+      "resultStatus": "Passed"
+    },
+    {
+      "phase": 8,
+      "result": "phase-08-195551.xcresult",
+      "passedTests": 1,
+      "failedTests": 0,
+      "resultStatus": "Passed"
+    }
+  ],
+  "finalChecks": {
+    "phonePetEqualsWatch": true,
+    "phoneFoodEqualsWatch": true,
+    "phoneStepsEqualWatch": true,
+    "serverStepsEqualWatch": true,
+    "serverPetStatsEqualWatch": true,
+    "accountRestoredOnWatch": true,
+    "allBackupsAcknowledged": true,
+    "noPendingBackups": true,
+    "noPendingRestores": true,
+    "developmentSnapshotTagged": true
+  },
+  "appliedBackups": 3,
+  "appliedRestores": 1,
+  "pendingBackupReceipts": 0
+}
