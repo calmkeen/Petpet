@@ -2,6 +2,21 @@ import XCTest
 @testable import PetPetCore
 
 final class DailyStepTrackerTests: XCTestCase {
+    @MainActor func testRefreshRestartsLiveStreamAfterTransientFailure() async {
+        let counter = FakeDailyStepCounter(count:20)
+        let tracker = makeTracker(counter,MemoryStepHistory(),TestStepClock())
+        await tracker.start()
+        counter.send(.failure(.updateFailed))
+        XCTAssertFalse(tracker.state.isTracking)
+        counter.count = 30
+        await tracker.refresh()
+        XCTAssertEqual(counter.starts.count,2)
+        XCTAssertTrue(tracker.state.isTracking); XCTAssertNil(tracker.state.error)
+        counter.send(.success(999),subscription:0)
+        XCTAssertEqual(tracker.state.stepCount,30)
+        counter.send(.success(31)); XCTAssertEqual(tracker.state.stepCount,31)
+        tracker.stop(); await tracker.flush()
+    }
     @MainActor
     func testStartsAtLocalMidnightAndIgnoresDuplicateStarts() async {
         let clock = TestStepClock()

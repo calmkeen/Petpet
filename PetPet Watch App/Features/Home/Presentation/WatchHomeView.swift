@@ -109,7 +109,12 @@ struct WatchHomeView: View {
                             .accessibilityIdentifier("watch.stepCount")
                         if viewModel.state.isLoading { ProgressView() }
                         if let message = viewModel.errorMessage {
-                            Text(message).font(.caption2).multilineTextAlignment(.center)
+                            Button {
+                                Task { await viewModel.refresh() }
+                            } label: {
+                                Label(message,systemImage:"arrow.clockwise").font(.caption2).lineLimit(2).minimumScaleFactor(0.75)
+                            }.buttonStyle(.plain).accessibilityLabel(message + " 다시 시도")
+                                .accessibilityIdentifier("watch.retrySteps")
                         }
                         HStack(spacing: 8) {
                             Button {

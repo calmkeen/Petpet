@@ -53,7 +53,7 @@ public final class DailyStepTracker {
     public func refresh() async {
         guard isRunning else { return }
         let day = StepDay(containing: now(), calendar: calendar())
-        if day != activeDay {
+        if day != activeDay || !hasSubscription {
             await activate(day)
         } else if !state.isLoading {
             await queryToday(day, generation: generation)
