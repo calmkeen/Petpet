@@ -43,7 +43,9 @@ Debug는 최초 실행 때 기존 워치의 **현재 펫·먹이·걸음수·지
 
 ## 검증
 
-공용 패키지 테스트 **158개**가 통과했다. 개발 모드 관련 테스트는 운영 네트워크 경로 거절, 재실행 후 모의 백업·닉네임 복구, 증분·낮은 걸음수 병합, 빈 백업 안내, refresh 회전, 저장 실패 후 재시도·손상 보존, 기존 계정/먹이/보상 원본 보존, 레거시 파일 복사, Debug/Release 메시지·파일·복원 대상 차단, 완료 후 지연된 중복 요청의 재처리 방지를 검증한다. [스트릭·닉네임](StreakAndNickname.md), [원본 이미지·펫 재생](AndroidMedia.md), [인사 동작 개선](SmoothPetAnimation.md)과 [네이티브 달리기·인사](NativePetAnimations.md)도 기록했다.
+공용 패키지 테스트 **169개**가 통과했다. 개발 모드 관련 테스트는 운영 네트워크 경로 거절, 재실행 후 모의 백업·닉네임 복구, 증분·낮은 걸음수 병합, 빈 백업 안내, refresh 회전, 저장 실패 후 재시도·손상 보존, 기존 계정/먹이/보상 원본 보존, 레거시 파일 복사, Debug/Release 메시지·파일·복원 대상 차단, 완료 후 지연된 중복 요청의 재처리 방지를 검증한다. [스트릭·닉네임](StreakAndNickname.md), [원본 이미지·펫 재생](AndroidMedia.md), [인사 동작 개선](SmoothPetAnimation.md)과 [네이티브 달리기·인사](NativePetAnimations.md)도 기록했다.
+
+2026-11-08 최신 작업은 **시뮬레이터에서만** 수행했다. 40mm/watchOS 11의 먹이·성장·스탯 저장 유지, 46mm/아이폰의 모의 백업 반복과 중복 보상 방지, 네이티브 SSE·인증 만료·취소 경합 수정은 [워치 전체 검토](WatchAudit-2026-11-08.md)를 따른다. 아래 실기기 기록은 시뮬레이터 전용 요청 이전의 이력이다.
 
 현재 Personal Team으로 아이폰·watchOS Debug 서명 빌드를 통과했고, 서명된 실행 파일에 Apple 로그인 entitlement가 없는 것을 확인했다. Release 시뮬레이터 빌드와 실행 파일의 모의 백엔드·로그인 진입점 제외도 확인했다.
 
@@ -55,7 +57,7 @@ Debug는 최초 실행 때 기존 워치의 **현재 펫·먹이·걸음수·지
 
 ```sh
 swift test --package-path Packages/PetPetCore
-xcodebuild -project PetPet.xcodeproj -scheme PetPet -configuration Debug -destination 'generic/platform=iOS' build
+xcodebuild -project PetPet.xcodeproj -scheme PetPet -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- build
 xcodebuild -project PetPet.xcodeproj -scheme PetPet -configuration Release -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
 ```
 

@@ -22,6 +22,7 @@ models, repository contracts, and sensor-session logic live in the local
 - [Smooth greeting animation and GIF preview](Docs/SmoothPetAnimation.md)
 - [Native running and greeting playback with simulator verification](Docs/NativePetAnimations.md)
 - [Watch games, leaderboards, and voice/AI chat](Docs/GamesAndChat.md)
+- [Watch parity audit, fixes, and simulator evidence (2026-11-08)](Docs/WatchAudit-2026-11-08.md)
 - [iPhone and Apple Watch synchronization](Docs/WatchSynchronization.md)
 - [Apple login, server backup, and restore setup](Docs/AccountAndBackup.md)
 - [Required backend changes for Apple login](Docs/AppleSignInServer.md)
@@ -55,7 +56,8 @@ supports Sign in with Apple. The server handoff guide documents those changes.
 The watch provides a monthly step calendar and date selection. The phone shows
 365 days of backed-up steps. Both apps can check and change a nickname; the watch
 relays authenticated profile requests through the phone. Debug supports the same
-flow with a persistent mock profile. Games, rankings, and voice remain subsequent milestones.
+flow with a persistent mock profile. The latest watch audit covers repeated chat,
+native SSE, sensor retry, restored game stats, and compact watch layouts.
 
 The default Debug build runs on a free Personal Team with a development login
 button and no Sign in with Apple entitlement. It supports real watch sensors and

@@ -4,9 +4,9 @@ Android 기준은 `Chaeros/StepMate`의 `4e2b5e54902efd9630dc5fe7595ca0fb2656d0e
 
 ## 워치에서 사용하기
 
-크라운 요약 페이지 순서는 **홈 → 성장 → 먹이 → 스트릭 → 계정과 백업**이다. 스트릭의 **월별 걸음 기록**을 열면 연속 일수, 월별 색상 기록, 날짜별 걸음수를 볼 수 있다. 이전·다음 달 버튼 또는 가운데 연·월 버튼으로 기간을 바꾼다. 연·월 선택은 watchOS 기본 Picker를 사용한다.
+크라운 요약 페이지 순서는 **홈 → 성장 → 먹이 → 스트릭 → 펫과 놀기 → 펫과 대화 → 계정과 백업**이다. 스트릭의 **월별 걸음 기록**을 열면 연속 일수, 월별 색상 기록, 날짜별 걸음수를 볼 수 있다. 이전·다음 달 버튼 또는 가운데 연·월 버튼으로 기간을 바꾼다. 연·월 선택은 별도 탐색 목록을 열고, 값을 누르면 월 선택 화면으로 돌아간다. **선택 완료**로 캘린더에 돌아온다.
 
-작은 캘린더 칸은 색상 확인용이며, 아래의 **날짜** 버튼을 열어 watchOS 기본 목록에서 날짜를 고른다. 크라운으로 목록을 스크롤할 수 있고, 선택한 날짜의 걸음수를 아래에 표시한다. 없는 날짜의 기록은 0걸음이다. 캘린더의 작은 칸 대신 날짜 목록을 사용하는 것은 워치의 터치 영역과 접근성을 위한 플랫폼 차이다. 이전·다음 달 버튼의 터치 영역은 각각 최소 44pt다.
+작은 캘린더 칸은 색상 확인용이며, 아래의 **날짜** 버튼을 열어 날짜 선택 목록에서 고른다. 크라운으로 목록을 스크롤할 수 있고, 선택하면 상세 화면으로 돌아와 해당 날짜의 걸음수를 표시한다. 없는 날짜의 기록은 0걸음이다. 캘린더의 작은 칸 대신 날짜 목록을 사용하는 것은 워치의 터치 영역과 접근성을 위한 플랫폼 차이다. 이전·다음 달 버튼의 터치 영역은 각각 최소 44pt다.
 
 상세 화면 아래에는 백업·보상 버튼과 닉네임 변경이 있다. **계정과 백업 → 백업 관리 → 닉네임 변경**으로도 같은 편집기를 연다. 시스템 입력 화면으로 입력한 뒤 중복 확인이 끝나면 **변경하기**가 활성화된다. 스트릭 조회에는 로그인이나 아이폰 연결이 필요하지 않다. 닉네임 확인·변경에는 로그인한 아이폰과의 직접 연결이 필요하다.
 
@@ -64,10 +64,11 @@ Android의 Kotlin `String.length`와 맞춰 UTF-16 길이 2 이상을 요구한�
 
 ## 검증 기록
 
+- 2026-11-08 워치 중심 후속 검토: 전체 공용 **169개 테스트** 및 Debug/Release 시뮬레이터 빌드 통과. 40mm/watchOS 11의 캘린더와 기본 Picker 복귀 문제를 확인한 뒤 명시적 탐색·선택 시 dismiss로 교체했다. 최종 선택·복귀 UI 조작은 입력 도구 오류로 미확인이다. 상세한 수정·시뮬레이터 검증 범위는 [워치 전체 검토](WatchAudit-2026-11-08.md)를 따른다. 아래는 이전 단계의 이력이다.
 - 공용 패키지 **123개 테스트** 통과: 연속 날짜·0보·빈 날짜·미래 날짜·월/연도/윤년/DST, 플랫폼별 스트릭 기준, 색상 구간, 닉네임 UTF-16·원문 보존·중복·인증·저장, 늦은 검사 응답, refresh·변경·로그아웃 경합, 계정별 캐시, 워치→아이폰 모의 프로필 왕복과 환경·응답 ID 검사.
 - iPhone·watchOS Debug 시뮬레이터 빌드, 무료 Personal Team Debug 실기기 서명 빌드, Release 시뮬레이터 빌드 통과. Release 실행 파일에서 모의 백엔드·모의 로그인 진입점이 제외되는 것도 확인했다.
 - 2026-11-07 페어링 시뮬레이터: 워치 스트릭 요약, 크라운의 5개 섹션, 아이폰 365일 히트맵, `StepMate` 중복 차단, `WatchBuddy` 변경 성공과 워치 계정 화면 반영을 확인했다. 앱 메인 스레드 정지는 없었다. 워치 상세 화면 자동 터치는 컴퓨터 조작 도구의 창 좌표 오류로 완료하지 못했다. 작은 워치 크기의 상세 레이아웃, 날짜/연·월 Picker 조작과 워치 입력 제출은 후속 수동 검증 항목이다.
 - 2026-11-08 최종 아이폰 시뮬레이터에서 월·요일 표시와 재실행 뒤 `WatchBuddy` 유지도 확인했다. 자정 이후 오늘 걸음수는 `—`, 마지막 백업 기록 기준 스트릭은 1일로 표시되어 두 데이터의 기준 차이를 확인했다.
 - 2026-11-07 23:59 iPhone 13 mini·Series 10에 앱 삭제 없이 업데이트 설치 완료. 2026-11-08 사용자가 실제 워치의 **월별 걸음 기록과 닉네임 변경 두 화면이 모두 열림**을 확인했다. 최종 입력·히트맵 보완 빌드도 2026-11-08 00:06 양쪽에 다시 업데이트했다. 실기기에서 닉네임 변경 제출과 운영 API 성공까지 확인한 것은 아니다.
 
-참조 소스: [워치 스트릭 ViewModel](https://github.com/Chaeros/StepMate/blob/4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3/app/src/main/java/com/chaeros/stepmate/feature_stepstreak/presentation/StepStreakViewModel.kt), [Android 저장소](https://github.com/Chaeros/StepMate/tree/4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3), [서버 저장소](https://github.com/Chaeros/StepMate_SpringBoot/tree/bcdcefbb226951785e09a82c30ab473ef77e39da). watchOS 날짜 선택은 [Apple의 navigationLink Picker](https://developer.apple.com/documentation/swiftui/pickerstyle/navigationlink)를 사용한다.
+참조 소스: [워치 스트릭 ViewModel](https://github.com/Chaeros/StepMate/blob/4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3/app/src/main/java/com/chaeros/stepmate/feature_stepstreak/presentation/StepStreakViewModel.kt), [Android 저장소](https://github.com/Chaeros/StepMate/tree/4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3), [서버 저장소](https://github.com/Chaeros/StepMate_SpringBoot/tree/bcdcefbb226951785e09a82c30ab473ef77e39da). watchOS 날짜 선택은 NavigationStack의 명시적 선택 목록을 사용한다.

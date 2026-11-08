@@ -34,7 +34,7 @@ public struct ChatSSEParser: Sendable {
     }
 }
 
-/// AsyncBytes.lines omits empty lines, which are meaningful SSE event separators.
+/// Line adapters can omit empty lines, which are meaningful SSE event separators.
 /// Frame bytes directly so CRLF, LF, CR and split UTF-8 scalars are preserved.
 public struct ChatSSEByteParser: Sendable {
     private var line = Data()
