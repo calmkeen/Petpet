@@ -17,6 +17,7 @@ public actor BackendClient {
     private var storageTail: Task<Void, Error>?
     private var nicknameTail: Task<String, Error>?
     private var nicknameRevision = 0
+    private var sessionInvalidationHandler: (@Sendable () async -> Void)?
 
     public init(baseURL: URL, transport: any BackendHTTPTransport = URLSessionBackendTransport(),
                 store: any BackendSessionStore) throws {
@@ -36,6 +37,20 @@ public actor BackendClient {
             }
         }
         return cached
+    }
+
+    public func setSessionInvalidationHandler(_ handler: (@Sendable () async -> Void)?) {
+        sessionInvalidationHandler = handler
+    }
+
+    private func invalidateSession() async throws {
+        defer {
+            if cached == nil, let handler = sessionInvalidationHandler {
+                // Notify outside the credential write; observers may read the session again.
+                Task { await handler() }
+            }
+        }
+        try await signOut()
     }
 
     @discardableResult
@@ -169,6 +184,27 @@ public actor BackendClient {
         return records
     }
 
+    /// Read the same backed-up pet that Android mobile displays, without restoring the watch.
+    public func petProfile(accountID: String, timeZone: TimeZone = .current) async throws -> PetProfile {
+        guard let current = try await session(), current.accountID == accountID else { throw BackendError.authenticationRequired }
+        guard current.selectedMateID == 1 else { throw BackendError.unsupportedMate }
+        let data = try await authorized(path: "api/v1/usermates/\(current.selectedMateID)", method: "GET", accountID: accountID)
+        let value: ServerPetResponse
+        do { value = try JSONDecoder().decode(ServerPetResponse.self, from: data) }
+        catch { throw BackendError.invalidResponse }
+        guard Int64(accountID).map({ $0 == value.userId }) ?? true else { throw BackendError.accountMismatch }
+        let lastFed: Date?
+        if let text = value.lastFedAt, !text.isEmpty {
+            guard let parsed = ServerDateTime.date(text, timeZone: timeZone) else { throw BackendError.invalidResponse }
+            lastFed = parsed
+        } else { lastFed = nil }
+        let pet = PetProfile(id: value.mateId, level: value.level, experience: value.experience,
+                             affection: value.affection, attack: value.attack, defense: value.defense,
+                             health: value.health, mood: value.status, lastFedAt: lastFed, statPoints: 0)
+        try ServerRestoreState.validate(pet: pet, steps: [])
+        return pet
+    }
+
     public func checkNickname(_ value: String, accountID: String) async throws -> Bool {
         try NicknameRules.validate(value)
         let data = try await authorized(path: "api/v1/users/nickname/check", method: "GET", accountID: accountID,
@@ -286,7 +322,7 @@ public actor BackendClient {
                 return
             } catch let BackendError.http(code) where code == 401 || code == 403 {
                 try checkEpoch(token)
-                guard attempt == 0 else { try await signOut(); throw BackendError.authenticationRequired }
+                guard attempt == 0 else { try await invalidateSession(); throw BackendError.authenticationRequired }
                 access = try await refresh(rejectedToken: access, epoch: token).accessToken
             }
         }
@@ -304,7 +340,7 @@ public actor BackendClient {
             response = try await send(path: path, method: method, data: data, bearer: renewed.accessToken, query: query)
             try checkEpoch(token)
             if response.statusCode == 401 || response.statusCode == 403 {
-                try await signOut()
+                try await invalidateSession()
                 throw BackendError.authenticationRequired
             }
         }
@@ -322,7 +358,7 @@ public actor BackendClient {
             return result
         }
         guard let refreshToken = current.refreshToken?.nonBlank else {
-            try await signOut(); throw BackendError.authenticationRequired
+            try await invalidateSession(); throw BackendError.authenticationRequired
         }
         let identifier = UUID()
         refreshID = identifier
@@ -362,7 +398,7 @@ public actor BackendClient {
         } catch {
             if token == epoch {
                 if refreshID == identifier { refreshTask = nil; refreshID = nil }
-                if error as? BackendError == .authenticationRequired { try await signOut() }
+                if error as? BackendError == .authenticationRequired { try await invalidateSession() }
             }
             throw error
         }
