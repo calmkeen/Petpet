@@ -59,7 +59,6 @@ struct FoodInventoryView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 20)
         }
-        .accessibilityIdentifier("watch.foodInventory")
     }
 
     private func foodRow(_ food: FoodDefinition, quantity: Int64) -> some View {
@@ -74,7 +73,7 @@ struct FoodInventoryView: View {
                         .accessibilityHidden(true)
                 }
                 VStack(alignment: .leading) {
-                    Text("\(food.name) \(quantity)개").font(.headline)
+                    Text("\(food.name) \(quantity)개").font(.headline).accessibilityIdentifier("watch.foodQuantity.\(food.id)")
                     Text(food.description).font(.caption2).foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 0)

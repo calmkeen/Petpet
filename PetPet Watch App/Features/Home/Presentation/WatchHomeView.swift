@@ -35,6 +35,7 @@ struct WatchHomeView: View {
                     Label("계정과 백업", systemImage: "icloud").font(.headline)
                     Text(cloudViewModel.account?.displayName ?? "아이폰에서 로그인해 주세요")
                         .font(.caption).multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.8)
+                        .accessibilityIdentifier("watch.accountName")
                     NavigationLink("백업 관리") { WatchCloudView(viewModel: cloudViewModel) }
                 }
                 .padding(.horizontal, 18)

@@ -7,7 +7,7 @@ struct PhoneNicknameView: View {
     init(editor: NicknameEditor) { _model = StateObject(wrappedValue: NicknameEditorViewModel(editor: editor)) }
     var body: some View {
         Form {
-            Section("현재 닉네임") { Text(model.state.currentNickname) }
+            Section("현재 닉네임") { Text(model.state.currentNickname).accessibilityIdentifier("nickname.current") }
             Section("새 닉네임") {
                 TextField("2자 이상", text: Binding(get: { model.state.input }, set: { model.setInput($0) }))
                     .textInputAutocapitalization(.never).autocorrectionDisabled()

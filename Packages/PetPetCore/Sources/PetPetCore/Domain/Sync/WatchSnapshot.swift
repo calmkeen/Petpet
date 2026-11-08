@@ -4,6 +4,8 @@ import Foundation
 /// stay on the watch; the phone never writes into the watch's game aggregate.
 public struct WatchSnapshot: Codable, Equatable, Sendable {
     public var version: Int
+    public var environment: CloudEnvironment?
+    public var resolvedEnvironment: CloudEnvironment { environment ?? .production }
     public var sourceID: UUID
     public var revision: Int64
     public var generatedAt: Date
@@ -12,8 +14,9 @@ public struct WatchSnapshot: Codable, Equatable, Sendable {
     public var inventory: [FoodInventoryItem]
 
     public init(sourceID: UUID, revision: Int64, generatedAt: Date,
-                steps: [DailyStepRecord], pet: PetProfile, inventory: [FoodInventoryItem]) {
-        version = 1
+                steps: [DailyStepRecord], pet: PetProfile, inventory: [FoodInventoryItem], environment: CloudEnvironment = .production) {
+        version = environment == .development ? 2 : 1
+        self.environment = environment == .development ? environment : nil
         self.sourceID = sourceID
         self.revision = revision
         self.generatedAt = generatedAt
@@ -47,7 +50,10 @@ public enum WatchSnapshotCodec {
     }
 
     public static func validate(_ value: WatchSnapshot) throws {
-        guard value.version == 1 else { throw SnapshotSyncError.unsupportedVersion(value.version) }
+        guard (value.version == 1 && value.resolvedEnvironment == .production)
+                || (value.version == 2 && value.environment == .development) else {
+            throw SnapshotSyncError.unsupportedVersion(value.version)
+        }
         let pet = value.pet
         guard value.revision > 0, value.generatedAt.timeIntervalSince1970.isFinite,
               value.steps.count <= maximumStepDays,

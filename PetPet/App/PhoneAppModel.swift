@@ -21,9 +21,8 @@ final class PhoneAppModel: ObservableObject {
         self.transport = transport
         let receiver = PhoneSnapshotReceiver(
             repository: FilePhoneSnapshotRepository(fileURL: directory.appendingPathComponent("watch-snapshot-v1.json")),
-            transport: transport
+            transport: transport, environment: configuration.environment
         )
-        home = PhoneHomeViewModel(receiver: receiver)
         let backend = configuration.baseURL.flatMap { url in
             #if DEBUG
             return try? BackendClient(baseURL: url,
@@ -38,14 +37,15 @@ final class PhoneAppModel: ObservableObject {
                 receipts: FileCloudReceiptStore(fileURL: directory.appendingPathComponent("cloud-receipts-v1.json")),
                 directory: directory.appendingPathComponent("CloudOutbox", isDirectory: true), environment: configuration.environment)
         }
+        let home = PhoneHomeViewModel(receiver: receiver, backend: backend,
+                                      petCache: FileAccountPetCache(fileURL: directory.appendingPathComponent("server-pet-v1.json")))
+        self.home = home
         features = backend.map { PhoneFeatureCoordinator(backend: $0, transport: transport, environment: configuration.environment) }
         extras = PhoneExtrasModel(backend:backend)
         let profile = backend.map { PhoneProfileCoordinator(backend: $0, transport: transport, environment: configuration.environment) }
         streak = PhoneStreakViewModel(backend: backend, cache: FileAccountStepCache(fileURL: directory.appendingPathComponent("server-streak-v1.json")))
         let account = AccountViewModel(backend: backend, cloud: cloud, profile: profile, configuration: configuration)
         self.account = account
-        features?.onSessionInvalidated = { [weak account] in await account?.refreshServerSession() }
-        extras.onSessionInvalidated = { [weak account] in await account?.refreshServerSession() }
         let snapshotConnection = transport.onConnectionChange
         transport.onConnectionChange = { [weak account] connection in
             snapshotConnection?(connection)
@@ -53,10 +53,14 @@ final class PhoneAppModel: ObservableObject {
         }
         let extras = self.extras
         let features = self.features
-        accountSubscription = account.$session.map { $0?.accountID }.removeDuplicates().sink { [weak extras, weak features] id in
+        accountSubscription = account.$session.map { $0?.accountID }.removeDuplicates().sink { [weak extras, weak features, weak home] id in
             features?.accountChanged()
             extras?.setAccount(id)
+            home?.setAccount(id)
         }
-        Task { [home] in await home.start(); await account.start(); await account.refreshProfile() }
+        Task { [home] in
+            await backend?.setSessionInvalidationHandler { [weak account] in await account?.refreshServerSession() }
+            await home.start(); await account.start(); await account.refreshProfile()
+        }
     }
 }

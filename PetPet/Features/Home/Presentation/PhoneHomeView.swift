@@ -18,7 +18,13 @@ struct PhoneHomeView: View {
                         Label("PetPet", systemImage: "pawprint.fill")
                             .font(.largeTitle.bold()).foregroundStyle(green)
                         Spacer()
-                        Image(systemName: "applewatch").font(.title2).foregroundStyle(green)
+                        NavigationLink {
+                            PhoneWatchSetupView(viewModel: viewModel)
+                        } label: {
+                            Image(systemName: "applewatch").font(.title2).frame(width: 44, height: 44)
+                        }
+                        .foregroundStyle(green).accessibilityLabel("워치 연결·설치 안내")
+                        .accessibilityIdentifier("phone.openWatchSetup")
                     }
                     Text("함께 걷고, 함께 자라는 하루")
                         .foregroundStyle(.secondary)
@@ -35,7 +41,7 @@ struct PhoneHomeView: View {
                             Label("계정 · 서버 백업", systemImage: "icloud")
                             Spacer()
                             Text(accountViewModel.session?.nickname ?? (accountViewModel.session == nil ? "로그인" : "연결됨"))
-                                .font(.caption)
+                                .font(.caption).lineLimit(1).truncationMode(.tail).frame(maxWidth: 120, alignment: .trailing)
                             Image(systemName: "chevron.right").font(.caption)
                         }
                         .foregroundStyle(green).padding(16)
@@ -66,7 +72,7 @@ struct PhoneHomeView: View {
                                             Image(systemName: "fork.knife").frame(width: 36, height: 36).accessibilityHidden(true)
                                         }
                                         Text(food.name).foregroundStyle(.secondary)
-                                        Text("\(quantity)개").font(.title3.bold()).monospacedDigit()
+                                        Text("\(quantity)개").font(.title3.bold()).monospacedDigit().accessibilityIdentifier("phone.food.\(food.id)")
                                     }
                                     .frame(maxWidth: .infinity)
                                 }
@@ -82,16 +88,16 @@ struct PhoneHomeView: View {
                         }
                         Text(viewModel.syncNote).font(.footnote).foregroundStyle(.secondary)
                         Button {
-                            Task { await viewModel.refresh() }
+                            Task { await refreshAll() }
                         } label: {
                             HStack {
-                                if viewModel.state.isRefreshing { ProgressView().tint(.white) }
+                                if viewModel.isRefreshing { ProgressView().tint(.white) }
                                 Label("지금 동기화", systemImage: "arrow.triangle.2.circlepath")
                             }
                             .frame(maxWidth: .infinity).padding(.vertical, 6)
                         }
                         .buttonStyle(.borderedProminent).tint(green)
-                        .disabled(viewModel.state.isRefreshing)
+                        .disabled(viewModel.isRefreshing)
                         .accessibilityIdentifier("phone.refreshWatchData")
                     }
                 }
@@ -99,11 +105,17 @@ struct PhoneHomeView: View {
             }
             .background(Color(uiColor: .systemGroupedBackground))
             .toolbar(.hidden, for: .navigationBar)
-            .refreshable { await viewModel.refresh() }
+            .refreshable { await refreshAll() }
         }
-        .task { await viewModel.start(); await streakViewModel.refresh(accountID: accountViewModel.session?.accountID) }
-        .onChange(of: accountViewModel.session?.accountID) { _, id in Task { await streakViewModel.refresh(accountID: id, force: true) } }
-        .onChange(of: accountViewModel.cloudState.lastBackupAt) { _, _ in Task { await streakViewModel.refresh(accountID: accountViewModel.session?.accountID, force: true) } }
+        .task { await viewModel.start(); await viewModel.refreshServerPet(); await streakViewModel.refresh(accountID: accountViewModel.session?.accountID) }
+        .onChange(of: accountViewModel.session?.accountID) { _, id in
+            Task { await viewModel.refreshServerPet(force: true) }
+            Task { await streakViewModel.refresh(accountID: id, force: true) }
+        }
+        .onChange(of: accountViewModel.cloudState.lastBackupAt) { _, _ in
+            Task { await viewModel.refreshServerPet(force: true) }
+            Task { await streakViewModel.refresh(accountID: accountViewModel.session?.accountID, force: true) }
+        }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 viewModel.refreshDate()
@@ -111,8 +123,14 @@ struct PhoneHomeView: View {
                 Task { await streakViewModel.refresh(accountID: accountViewModel.session?.accountID) }
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in viewModel.refreshDate() }
-        .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in viewModel.refreshDate() }
+        .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in viewModel.refreshDate(); streakViewModel.refreshDate() }
+        .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in viewModel.refreshDate(); streakViewModel.refreshDate() }
+    }
+
+    private func refreshAll() async {
+        async let home: Void = viewModel.refresh()
+        async let streak: Void = streakViewModel.refresh(accountID: accountViewModel.session?.accountID, force: true)
+        _ = await (home, streak)
     }
 
     private var stepsCard: some View {
@@ -137,7 +155,16 @@ struct PhoneHomeView: View {
     private var petCard: some View {
         card {
             Text("나의 펫").font(.headline)
-            if let pet = viewModel.snapshot?.pet {
+            if let pet = viewModel.displayedPet {
+                Label(viewModel.isShowingServerPet ? "서버 백업 기록" : "워치 기록",
+                      systemImage: viewModel.isShowingServerPet ? "icloud" : "applewatch")
+                    .font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("phone.petSource")
+                if viewModel.isShowingServerPet {
+                    Text("서버에 마지막으로 저장된 펫이에요. 현재 워치 상태와 다를 수 있어요.").font(.caption).foregroundStyle(.secondary)
+                    if let date = viewModel.serverPet?.fetchedAt {
+                        Text("마지막 서버 조회 \(date.formatted(date: .abbreviated, time: .shortened))").font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
                 HStack(spacing: 20) {
                     PhonePetPortrait()
                     VStack(alignment: .leading, spacing: 8) {
@@ -147,6 +174,7 @@ struct PhoneHomeView: View {
                         ProgressView(value: Double(pet.experience), total: Double(pet.level * 2)).tint(green)
                         Text("경험치 \(pet.experience) / \(pet.level * 2)")
                             .font(.caption).foregroundStyle(.secondary).monospacedDigit()
+                            .accessibilityIdentifier("phone.petExperience")
                     }
                 }
                 HStack {
@@ -158,7 +186,7 @@ struct PhoneHomeView: View {
                 HStack {
                     Label("호감도 \(pet.affection)", systemImage: "heart.fill").foregroundStyle(.pink)
                     Spacer()
-                    Text("스탯 포인트 \(pet.statPoints)").foregroundStyle(.secondary)
+                    if !viewModel.isShowingServerPet { Text("스탯 포인트 \(pet.statPoints)").foregroundStyle(.secondary) }
                 }
                 .font(.caption)
                 if let lastFed = pet.lastFedAt {
@@ -166,8 +194,13 @@ struct PhoneHomeView: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
             } else {
-                Label("워치의 펫을 기다리고 있어요", systemImage: "pawprint")
-                    .foregroundStyle(.secondary).padding(.vertical, 24)
+                if viewModel.isServerPetLoading { ProgressView("펫 기록을 불러오고 있어요") }
+                else { Label("워치의 펫을 기다리고 있어요", systemImage: "pawprint").foregroundStyle(.secondary).padding(.vertical, 24) }
+            }
+            if viewModel.snapshot == nil, let error = viewModel.serverPetError {
+                Text(error).font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("phone.serverPetFeedback")
+                Button("서버 펫 다시 불러오기") { Task { await viewModel.refreshServerPet(force: true) } }
+                    .disabled(viewModel.isServerPetLoading).accessibilityIdentifier("phone.refreshServerPet")
             }
         }
     }

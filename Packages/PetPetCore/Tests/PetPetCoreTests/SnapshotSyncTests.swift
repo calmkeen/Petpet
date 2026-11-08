@@ -31,6 +31,52 @@ final class SnapshotSyncTests: XCTestCase {
         XCTAssertEqual(next.revision, first.revision + 1)
     }
 
+    @MainActor
+    func testDisplaySnapshotsSeparateDevelopmentAndProductionIncludingOldCache() async throws {
+        let url = temporaryURL()
+        defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
+        let store = FilePhoneSnapshotRepository(fileURL: url)
+        let production = snapshot()
+        _ = try await store.accept(production, from: "A", at: now)
+        let transport = TestSnapshotTransport()
+        let receiver = PhoneSnapshotReceiver(repository: store, transport: transport, environment: .development)
+        await receiver.start()
+        XCTAssertNil(receiver.state.cached)
+        transport.onSnapshot?(try WatchSnapshotCodec.encode(production), "A")
+        await receiver.finishReceiving()
+        XCTAssertNil(receiver.state.cached)
+        XCTAssertTrue(receiver.state.hasEnvironmentMismatch)
+        let development = try await FileWatchSnapshotOutbox(fileURL: url.deletingLastPathComponent().appendingPathComponent("outbox"), environment: .development)
+            .prepare(steps: [], progress: .newUser(at: now), at: now)
+        XCTAssertEqual(development.version, 2)
+        XCTAssertEqual(development.environment, .development)
+        transport.onSnapshot?(try WatchSnapshotCodec.encode(development), "A")
+        await receiver.finishReceiving()
+        XCTAssertEqual(receiver.state.cached?.snapshot, development)
+        XCTAssertFalse(receiver.state.hasEnvironmentMismatch)
+        let productionTransport = TestSnapshotTransport()
+        let productionReceiver = PhoneSnapshotReceiver(repository: store, transport: productionTransport)
+        await productionReceiver.start()
+        XCTAssertNil(productionReceiver.state.cached)
+        productionTransport.onSnapshot?(try WatchSnapshotCodec.encode(development), "A")
+        await productionReceiver.finishReceiving()
+        XCTAssertNil(productionReceiver.state.cached)
+        XCTAssertTrue(productionReceiver.state.hasEnvironmentMismatch)
+    }
+
+    func testDevelopmentOutboxUpgradesOldFileWithoutLosingRevisionOrIdentity() async throws {
+        let url = temporaryURL()
+        defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
+        let old = try await FileWatchSnapshotOutbox(fileURL: url).prepare(steps: [], progress: .newUser(at: now), at: now)
+        let upgraded = try await FileWatchSnapshotOutbox(fileURL: url, environment: .development).prepare(steps: [], progress: .newUser(at: now), at: now)
+        XCTAssertEqual(old.sourceID, upgraded.sourceID)
+        XCTAssertEqual(old.revision + 1, upgraded.revision)
+        XCTAssertEqual(upgraded.environment, .development)
+        // A pre-tagging production decoder rejects this version before using it.
+        XCTAssertEqual(upgraded.version, 2)
+        XCTAssertEqual(try WatchSnapshotCodec.decode(WatchSnapshotCodec.encode(old)).resolvedEnvironment, .production)
+    }
+
     func testOutboxBoundsHistoryAndPreservesOriginalHistory() async throws {
         let url = temporaryURL()
         defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }

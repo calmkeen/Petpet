@@ -18,7 +18,7 @@ final class WatchSyncController: ObservableObject {
         self.transport = transport
         let publisher = WatchSnapshotPublisher(
             history: history, progress: progress,
-            outbox: FileWatchSnapshotOutbox(fileURL: outboxURL), transport: transport,
+            outbox: FileWatchSnapshotOutbox(fileURL: outboxURL, environment: .current), transport: transport,
             beforeReading: {
                 await home.flush()
                 guard !home.state.hasStorageError else { throw StepHistoryStoreError.invalidRecord }

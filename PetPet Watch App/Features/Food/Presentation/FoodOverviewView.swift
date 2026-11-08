@@ -31,7 +31,6 @@ struct FoodOverviewView: View {
             .accessibilityIdentifier("watch.manageFoodInventory")
         }
         .padding(.horizontal, 18)
-        .accessibilityIdentifier("watch.foodOverview")
     }
 
     private func foodCount(_ name: String, image: String, quantity: Int64) -> some View {

@@ -6,6 +6,7 @@ public struct PhoneSnapshotState: Equatable, Sendable {
     public var isRefreshing = false
     public var hasStorageError = false
     public var hasTransferError = false
+    public var hasEnvironmentMismatch = false
     public init(cached: CachedWatchSnapshot? = nil) { self.cached = cached }
 }
 
@@ -16,15 +17,17 @@ public final class PhoneSnapshotReceiver {
     private let repository: any PhoneSnapshotRepository
     private let transport: any SnapshotTransport
     private let now: () -> Date
+    private let environment: CloudEnvironment
     private var started = false
     private var receiveTask: Task<Void, Never>?
     private var refreshID: UUID?
 
     public init(repository: any PhoneSnapshotRepository, transport: any SnapshotTransport,
-                now: @escaping () -> Date = { Date() }) {
+                now: @escaping () -> Date = { Date() }, environment: CloudEnvironment = .production) {
         self.repository = repository
         self.transport = transport
         self.now = now
+        self.environment = environment
         transport.onSnapshot = { [weak self] data, peer in self?.receive(data, from: peer) }
         transport.onConnectionChange = { [weak self] connection in self?.connectionChanged(connection) }
     }
@@ -32,7 +35,12 @@ public final class PhoneSnapshotReceiver {
     public func start() async {
         guard !started else { return }
         started = true
-        do { state.cached = try await repository.load() }
+        do {
+            let saved = try await repository.load()
+            // Older Debug caches have no environment tag; wait for a fresh,
+            // tagged snapshot instead of displaying potentially mixed data.
+            state.cached = saved?.snapshot.resolvedEnvironment == environment ? saved : nil
+        }
         catch { state.hasStorageError = true }
         emit()
         transport.activate()
@@ -78,6 +86,9 @@ public final class PhoneSnapshotReceiver {
         let snapshot: WatchSnapshot
         do { snapshot = try WatchSnapshotCodec.decode(data) }
         catch { state.hasTransferError = true; emit(); return }
+        guard snapshot.resolvedEnvironment == environment else {
+            state.hasEnvironmentMismatch = true; emit(); return
+        }
         let previous = receiveTask
         let receivedAt = now()
         receiveTask = Task { [weak self, repository] in
@@ -89,6 +100,7 @@ public final class PhoneSnapshotReceiver {
                 self.state.cached = saved
                 self.state.hasStorageError = false
                 self.state.hasTransferError = false
+                self.state.hasEnvironmentMismatch = false
             } catch {
                 guard self.state.connection.peerID == peer else { return }
                 self.state.hasStorageError = true
@@ -105,6 +117,7 @@ public final class PhoneSnapshotReceiver {
             refreshID = nil
             state.isRefreshing = false
             state.hasTransferError = false
+            state.hasEnvironmentMismatch = false
         }
         if connection.isActivated {
             if !connection.isPaired {

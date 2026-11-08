@@ -4,10 +4,11 @@ import Foundation
 /// survives relaunches, so delayed packets cannot roll the phone back.
 public actor FileWatchSnapshotOutbox {
     private let fileURL: URL
+    private let environment: CloudEnvironment
     private var cached: WatchSnapshot?
     private var didLoad = false
 
-    public init(fileURL: URL) { self.fileURL = fileURL }
+    public init(fileURL: URL, environment: CloudEnvironment = .production) { self.fileURL = fileURL; self.environment = environment }
 
     public func prepare(steps: [DailyStepRecord], progress: PetProgress, at date: Date) throws -> WatchSnapshot {
         try loadIfNeeded()
@@ -17,7 +18,7 @@ public actor FileWatchSnapshotOutbox {
             sourceID: cached?.sourceID ?? UUID(), revision: previousRevision + 1,
             generatedAt: date,
             steps: Array(steps.sorted { $0.date > $1.date }.prefix(WatchSnapshotCodec.maximumStepDays)),
-            pet: progress.pet, inventory: progress.inventory
+            pet: progress.pet, inventory: progress.inventory, environment: environment
         )
         let data = try WatchSnapshotCodec.encode(snapshot)
         try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
