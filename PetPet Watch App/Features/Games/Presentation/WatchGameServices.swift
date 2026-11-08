@@ -20,7 +20,15 @@ import PetPetCore
     private let services: WatchGameServices
     private var task: Task<Void, Never>?
     private var revision = UUID()
-    init(services: WatchGameServices) { self.services = services }
+    private var accountSubscription: AnyCancellable?
+    init(services: WatchGameServices) {
+        self.services = services
+        accountSubscription = services.cloud.$account.map { $0?.id }.removeDuplicates().dropFirst().sink { [weak self] id in
+            guard let self else { return }
+            self.stop(); self.ranking = nil
+            self.message = id == nil ? "아이폰에서 로그인한 뒤 랭킹을 다시 확인해 주세요." : "계정이 바뀌었어요. 로컬 기록은 유지돼요. 랭킹을 다시 확인해 주세요."
+        }
+    }
     func loadBest(_ game: MiniGame) async {
         do { best = try await services.records.best(game) }
         catch { message = "최고 기록을 불러오지 못했어요" }

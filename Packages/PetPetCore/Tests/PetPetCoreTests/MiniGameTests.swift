@@ -2,6 +2,22 @@ import XCTest
 @testable import PetPetCore
 
 final class MiniGameTests: XCTestCase {
+    func testShootingPreservesMaximumRestoredStatsWithoutFloatingPointConversion() {
+        var game = ShootingGame(attack:Int64.max,health:Int64.max,seed:3)
+        game.start(); game.apply(.heal); game.apply(.attack)
+        XCTAssertEqual(game.attack,Int64.max); XCTAssertEqual(game.initialHP,Int64.max)
+        XCTAssertEqual(game.hp,Int64.max)
+        for _ in 0..<1000 { game.advance(seconds:1.0/60) }
+        XCTAssertLessThan(game.hp,Int64.max)
+        XCTAssertGreaterThan(game.hp,Int64.max-1000)
+        game.apply(.heal); XCTAssertLessThanOrEqual(game.hp,game.initialHP)
+    }
+    func testZeroAttackMatchesAndroidInsteadOfGrantingFreeAttack() {
+        var game = ShootingGame(attack:0,health:1000,seed:8); game.start()
+        XCTAssertEqual(game.baseAttack,0)
+        for _ in 0..<1000 { game.advance(seconds:1.0/60) }
+        XCTAssertEqual(game.score,0)
+    }
     func testStairTimeLimitsMatchAndroidBoundaries() {
         for (score,limit) in [(0,1.5),(19,1.5),(20,1.2),(49,1.2),(50,1.0),(99,1.0),(100,0.8),(199,0.8),(200,0.65)] {
             XCTAssertEqual(StarStairGame.timeLimit(score:score),limit)

@@ -59,11 +59,11 @@ struct WatchStarStairView: View {
         }
         .task(id:isTiming) {
             guard isTiming else { lastTick = nil; return }
-            lastTick = Date().timeIntervalSinceReferenceDate
+            lastTick = ProcessInfo.processInfo.systemUptime
             while !Task.isCancelled {
                 do { try await Task.sleep(for:.milliseconds(33)) } catch { return }
                 guard isTiming else { return }
-                let now = Date().timeIntervalSinceReferenceDate
+                let now = ProcessInfo.processInfo.systemUptime
                 if let lastTick { game.advance(seconds:now-lastTick) }; lastTick = now
                 finishIfNeeded()
             }
@@ -92,7 +92,7 @@ struct WatchStarStairView: View {
     private func input(_ direction: StairDirection) {
         guard game.status == .playing, !paused, phase == .active, !dimmed else { return }
         // Charge elapsed time before accepting input so an expired round cannot be rescued between ticks.
-        let now = Date().timeIntervalSinceReferenceDate
+        let now = ProcessInfo.processInfo.systemUptime
         let previousLife = game.life
         if let lastTick { game.advance(seconds: now-lastTick) }; lastTick = now
         guard game.status == .playing else { finishIfNeeded(); return }

@@ -32,9 +32,10 @@ public struct ShootingBoss: Sendable {
 public struct ShootingGame: Sendable {
     public private(set) var status: MiniGameStatus = .ready
     public private(set) var playerX = 215.0
-    public private(set) var hp: Double
-    public let initialHP: Double
-    public let baseAttack: Double
+    public private(set) var hp: Int64
+    public let initialHP: Int64
+    public let attack: Int64
+    public var baseAttack: Double { Double(attack) }
     public private(set) var score = 0
     public private(set) var combo = 0
     public private(set) var maxCombo = 0
@@ -51,7 +52,7 @@ public struct ShootingGame: Sendable {
     private var random: GameRandom
 
     public init(attack: Int64, health: Int64, seed: UInt64 = UInt64.random(in: 1...UInt64.max)) {
-        baseAttack = Double(max(1, attack)); initialHP = Double(max(1, health)); hp = initialHP
+        self.attack = max(0, attack); initialHP = max(1, health); hp = initialHP
         random = GameRandom(seed: seed)
     }
     public mutating func start() {
@@ -72,7 +73,7 @@ public struct ShootingGame: Sendable {
         switch kind {
         case .speed: speedMultiplier = min(100, speedMultiplier * 1.2)
         case .attack: attackMultiplier = min(1e9, attackMultiplier * 1.2)
-        case .heal: hp = min(initialHP, hp + 20)
+        case .heal: hp = initialHP-hp <= 20 ? initialHP : hp+20
         case .wipe:
             score += entities.filter { $0.kind == .meteor }.count
             entities.removeAll { [.meteor, .star, .trash, .alien, .enemyLaser, .bossLaser].contains($0.kind) }
@@ -88,7 +89,7 @@ public struct ShootingGame: Sendable {
         score += points; combo += combos; maxCombo = max(maxCombo, combo)
         if speedBonus, combo > 0, combo % 100 == 0 { speedMultiplier = min(100, speedMultiplier * 1.2) }
     }
-    private mutating func damage(_ amount: Double) { hp = max(0, hp - amount); combo = 0 }
+    private mutating func damage(_ amount: Int64) { hp -= min(hp,max(0,amount)); combo = 0 }
     private mutating func tick() {
         elapsed += 1.0 / 60
         if random.unit() < 0.02 { add(.meteor, y: 0, hp: 50) }
@@ -169,7 +170,7 @@ public struct ShootingGame: Sendable {
             let b = bosses[i]
             let hits = entities.filter { $0.kind == .laser && (stage == 1 || abs($0.x-b.x) < (stage == 2 ? 67.5 : 36)) && $0.y >= b.y && $0.y <= b.y + (stage == 3 ? 54 : 80) }
             let defense = stage == 3 ? (b.phase == 1 ? 24.0 : (b.phase == 2 ? 12 : 0)) : 0
-            bosses[i].hp -= Double(hits.count) * max(1, floor(baseAttack * attackMultiplier) - defense)
+            bosses[i].hp -= Double(hits.count) * max(stage == 3 ? 1 : 0, floor(baseAttack * attackMultiplier) - defense)
             let hitIDs = Set(hits.map(\.id)); entities.removeAll { hitIDs.contains($0.id) }
             if bosses[i].hp <= 0 {
                 bosses.remove(at: i); defeated.insert(stage)
