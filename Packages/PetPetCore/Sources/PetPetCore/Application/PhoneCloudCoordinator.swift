@@ -26,6 +26,7 @@ public final class PhoneCloudCoordinator {
     private let now: () -> Date
     private var activeAccountID: String?
     private var work: Task<Void, Never>?
+    private var startingBackup = false
 
     public init(backend: BackendClient, transport: any CloudTransport, receipts: FileCloudReceiptStore,
                 directory: URL, environment: CloudEnvironment = .production, now: @escaping () -> Date = { Date() }) {
@@ -64,9 +65,16 @@ public final class PhoneCloudCoordinator {
     }
 
     public func requestBackup() async {
+        guard !startingBackup, state.phase == .idle else { return }
+        startingBackup = true
+        defer { startingBackup = false }
         do {
             guard let session = try await backend.session() else { throw BackendError.authenticationRequired }
             await synchronizeAccount()
+            // Reconnection may have resumed a pending restore while awaiting
+            // account synchronization. Keep that operation instead of replacing it.
+            guard state.phase == .idle else { return }
+            guard try await backend.session()?.accountID == session.accountID else { throw BackendError.sessionChanged }
             guard transport.connection.isActivated, transport.connection.isCounterpartInstalled else { throw BackendError.watchUnavailable }
             let operationID = UUID()
             state.operationID = operationID; state.phase = .waitingForWatch

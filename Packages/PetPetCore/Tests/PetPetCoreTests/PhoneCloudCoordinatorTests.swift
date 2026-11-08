@@ -5,6 +5,23 @@ import XCTest
 final class PhoneCloudCoordinatorTests: XCTestCase {
     private let now = Date()
 
+    func testRepeatedBackupRequestDoesNotReplaceAnOperationWaitingForWatch() async throws {
+        let folder = directory()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let (coordinator, transport, _, _) = try setup(folder: folder)
+        await withTaskGroup(of: Void.self) { group in
+            for _ in 0..<4 { group.addTask { await coordinator.requestBackup() } }
+            await group.waitForAll()
+        }
+        let original = coordinator.state.operationID
+        await coordinator.requestBackup()
+        let requests = try transport.controls.map { try CloudWire.decodeControl($0) }.filter {
+            if case .exportRequested = $0 { return true }; return false
+        }
+        XCTAssertEqual(requests.count, 1)
+        XCTAssertEqual(coordinator.state.operationID, original)
+    }
+
     func testDevelopmentExportIsRejectedBeforeProductionServerRequest() async throws {
         let folder = directory()
         defer { try? FileManager.default.removeItem(at: folder) }
