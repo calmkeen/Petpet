@@ -15,6 +15,7 @@ public protocol BackendHTTPTransport: Sendable {
 
 public struct URLSessionBackendTransport: BackendHTTPTransport {
     let session: URLSession
+    init(session: URLSession) { self.session = session }
     public init() {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForRequest = 30

@@ -33,6 +33,40 @@ public struct ChatSSEParser: Sendable {
         return lines.isEmpty ? nil : ChatStreamEvent(name: name, data: lines.joined(separator: "\n"))
     }
 }
+
+/// AsyncBytes.lines omits empty lines, which are meaningful SSE event separators.
+/// Frame bytes directly so CRLF, LF, CR and split UTF-8 scalars are preserved.
+public struct ChatSSEByteParser: Sendable {
+    private var line = Data()
+    private var parser = ChatSSEParser()
+    private var followsCR = false
+    private var firstLine = true
+    public init() {}
+    public mutating func byte(_ value: UInt8) throws -> ChatStreamEvent? {
+        if value == 13 { followsCR = true; return try finishLine() }
+        if value == 10 {
+            if followsCR { followsCR = false; return nil }
+            return try finishLine()
+        }
+        followsCR = false
+        guard line.count < 32_000 else { throw BackendError.transferTooLarge }
+        line.append(value)
+        return nil
+    }
+    public mutating func finish() throws -> ChatStreamEvent? {
+        if !line.isEmpty { _ = try finishLine() }
+        return parser.finish()
+    }
+    private mutating func finishLine() throws -> ChatStreamEvent? {
+        guard var text = String(data:line,encoding:.utf8) else { throw BackendError.invalidResponse }
+        line.removeAll(keepingCapacity:true)
+        if firstLine {
+            firstLine = false
+            if text.hasPrefix("\u{feff}") { text.removeFirst() }
+        }
+        return try parser.line(text)
+    }
+}
 public struct ChatProgress: Codable, Equatable, Sendable {
     public var text = ""
     public var status = "AI 응답을 기다리고 있어요"
