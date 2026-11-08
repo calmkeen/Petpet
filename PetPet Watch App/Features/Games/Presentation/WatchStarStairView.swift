@@ -17,12 +17,15 @@ struct WatchStarStairView: View {
             if game.status == .finished {
                 WatchGameResultView(model: result, replay: { result.clear(); game.start(); paused = false; lastTick = nil })
             } else if game.status == .ready {
-                VStack(spacing: 10) {
-                    Text("별계단 훈련").font(.headline)
-                    Text("다음 계단 방향을 눌러요.\n목숨 3개, 올라갈수록 빨라져요.").font(.caption2).multilineTextAlignment(.center).fixedSize(horizontal:false,vertical:true)
-                    if let best = result.best { Text("최고 \(best.score)계단 · 콤보 \(best.maxCombo)").font(.caption2).foregroundStyle(.secondary) }
-                    Button("시작") { game.start(); lastTick = nil }.accessibilityIdentifier("game.start")
-                }
+                ScrollView {
+                    VStack(spacing: 6) {
+                        Text("별계단 훈련").font(.headline)
+                        Text("다음 계단 방향을 눌러요.\n목숨 3개, 올라갈수록 빨라져요.").font(.caption2).multilineTextAlignment(.center).fixedSize(horizontal:false,vertical:true)
+                        if let best = result.best { Text("최고 \(best.score)계단 · 콤보 \(best.maxCombo)").font(.caption2).foregroundStyle(.secondary) }
+                        Button("시작") { paused = false; game.start(); lastTick = nil }.accessibilityIdentifier("game.start")
+                    }
+                    .frame(maxWidth: .infinity).padding(.horizontal, 6).padding(.bottom, 8)
+                }.scrollBounceBehavior(.basedOnSize)
             } else {
                 VStack(spacing: 4) {
                     HStack { Text("\(game.score)계단 · \(game.combo)콤보"); Spacer(); Text(String(repeating: "♥", count: game.life)).foregroundStyle(.pink) }.font(.caption2).monospacedDigit()
@@ -50,6 +53,7 @@ struct WatchStarStairView: View {
                 ToolbarItem(placement:.topBarTrailing) {
                     Button { paused.toggle(); lastTick = nil } label: { Image(systemName:paused ? "play.fill" : "pause.fill") }
                         .accessibilityLabel(paused ? "계속하기" : "일시정지")
+                        .accessibilityIdentifier("game.pause")
                 }
             }
         }

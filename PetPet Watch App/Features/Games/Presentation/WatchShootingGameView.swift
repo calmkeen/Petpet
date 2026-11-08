@@ -120,13 +120,16 @@ struct WatchShootingGameView: View {
         Group {
             if scene.finished { WatchGameResultView(model:result,replay:{ result.clear(); scene.start(); paused = false; crown = 0.5 }) }
             else if !started {
-                VStack(spacing:10) {
-                    Text("지구를 지켜라").font(.headline)
-                    Text("크라운 또는 좌우 드래그로 이동해요.\n자동 발사 · 펫의 공격력과 체력 적용").font(.caption2).multilineTextAlignment(.center).fixedSize(horizontal:false,vertical:true)
-                    Text("공격 \(scene.game.attack) · 체력 \(scene.game.initialHP)").font(.caption2).lineLimit(2).minimumScaleFactor(0.7)
-                    if let best = result.best { Text("최고 기록 \(best.score)점").font(.caption2).foregroundStyle(.secondary) }
-                    Button("시작") { started = true; scene.start() }.accessibilityIdentifier("game.start")
-                }
+                ScrollView {
+                    VStack(spacing:6) {
+                        Text("지구를 지켜라").font(.headline)
+                        Text("크라운·드래그로 좌우 이동\n자동 발사 · 펫 능력치 적용").font(.caption2).multilineTextAlignment(.center).fixedSize(horizontal:false,vertical:true)
+                        Text("공격 \(scene.game.attack) · 체력 \(scene.game.initialHP)").font(.caption2).lineLimit(2).minimumScaleFactor(0.7)
+                        if let best = result.best { Text("최고 기록 \(best.score)점").font(.caption2).foregroundStyle(.secondary) }
+                        Button("시작") { paused = false; started = true; scene.start() }.accessibilityIdentifier("game.start")
+                    }
+                    .frame(maxWidth: .infinity).padding(.horizontal, 6).padding(.bottom, 8)
+                }.scrollBounceBehavior(.basedOnSize)
             } else {
                 ZStack(alignment:.top) {
                     arena
@@ -153,6 +156,7 @@ struct WatchShootingGameView: View {
                 ToolbarItem(placement:.topBarTrailing) {
                     Button { paused.toggle(); scene.pause(paused) } label: { Image(systemName:paused ? "play.fill" : "pause.fill") }
                         .accessibilityLabel(paused ? "계속하기" : "일시정지")
+                        .accessibilityIdentifier("game.pause")
                 }
             }
         }
@@ -176,7 +180,10 @@ struct WatchShootingGameView: View {
                     crown = min(1.0,max(0.0,normalized)); scene.move(crown)
                 })
             }
+                .accessibilityElement(children: .ignore)
                 .accessibilityLabel("슈팅 게임 영역")
+                .accessibilityValue("좌우 위치 \(Int(crown * 100))%")
+                .accessibilityIdentifier("game.shootingArena")
                 .accessibilityAdjustableAction(adjust)
         }.frame(maxWidth:.infinity,maxHeight:.infinity)
     }
