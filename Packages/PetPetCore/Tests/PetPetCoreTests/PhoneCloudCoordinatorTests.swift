@@ -22,6 +22,24 @@ final class PhoneCloudCoordinatorTests: XCTestCase {
         XCTAssertEqual(coordinator.state.operationID, original)
     }
 
+    func testBackupRequestKeepsARestoreResumedDuringAccountSynchronization() async throws {
+        let folder = directory()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let (coordinator, transport, receipts, _) = try setup(folder: folder)
+        let game = FileGameRepository(directory: folder.appendingPathComponent("watch"))
+        let target = try await game.challenge()
+        let command = WatchRestoreImport(target: target, state: try ServerRestoreState(accountID: "7", pet: target.pet, steps: []))
+        try await receipts.saveRestore(command)
+        await coordinator.requestBackup()
+        XCTAssertEqual(coordinator.state.phase, .restoring)
+        XCTAssertEqual(coordinator.state.operationID, command.operationID)
+        XCTAssertEqual(transport.files.count, 1)
+        let exports = try transport.controls.map { try CloudWire.decodeControl($0) }.filter {
+            if case .exportRequested = $0 { return true }; return false
+        }
+        XCTAssertTrue(exports.isEmpty)
+    }
+
     func testDevelopmentExportIsRejectedBeforeProductionServerRequest() async throws {
         let folder = directory()
         defer { try? FileManager.default.removeItem(at: folder) }
