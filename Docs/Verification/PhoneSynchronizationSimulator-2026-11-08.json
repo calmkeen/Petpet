@@ -1,0 +1,30 @@
+{
+  "verifiedAt": "2026-11-08T09:32:21.687385+00:00",
+  "scope": "Paired iPhone 17 Pro iOS 26.5 and Series 11 46mm watchOS 26.5 simulators, Debug local backend only",
+  "checks": {
+    "phonePetEqualsWatch": true,
+    "phoneInventoryEqualsWatch": true,
+    "phoneSnapshotEqualsPublishedState": true,
+    "phoneStepsEqualWatchDays": true,
+    "nicknameMatches": true,
+    "developmentSnapshotTagged": true,
+    "watchPendingBackupsEmpty": true,
+    "phonePendingRestoresEmpty": true
+  },
+  "milkQuantity": 6,
+  "petLevel": 1,
+  "petExperience": 1,
+  "steps": [
+    {
+      "stepCount": 0,
+      "date": "2026-11-08"
+    },
+    {
+      "stepCount": 4321,
+      "date": "2026-11-07"
+    }
+  ],
+  "snapshotRevision": 70,
+  "appliedBackupCount": 4,
+  "appliedRestoreCount": 2
+}
