@@ -27,6 +27,5 @@ struct PetOverviewView: View {
         }
         .padding(.horizontal, 18)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .accessibilityIdentifier("watch.petOverview")
     }
 }

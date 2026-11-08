@@ -9,7 +9,7 @@ struct PetStatisticsView: View {
             VStack(spacing: 10) {
                 Text("나의 펫").font(.headline)
                 if let progress = viewModel.progress {
-                    Text("Lv.\(progress.pet.level)").font(.title2.bold())
+                    Text("Lv.\(progress.pet.level)").font(.title2.bold()).accessibilityIdentifier("watch.petLevel")
                     Text(progress.pet.mood.displayName)
                         .font(.caption).foregroundStyle(.secondary)
                     ProgressView(value: Double(progress.pet.experience), total: Double(progress.experienceRequired))
@@ -20,6 +20,7 @@ struct PetStatisticsView: View {
                         .foregroundStyle(.pink).font(.caption)
                     Text("스탯 포인트 \(progress.pet.statPoints)")
                         .font(.caption).foregroundStyle(.yellow)
+                        .accessibilityIdentifier("watch.statPoints")
                     statistic("공격력", value: progress.pet.attack, type: .attack)
                     statistic("방어력", value: progress.pet.defense, type: .defense)
                     statistic("체력", value: progress.pet.health, type: .health)
@@ -31,14 +32,13 @@ struct PetStatisticsView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 20)
         }
-        .accessibilityIdentifier("watch.petStatistics")
     }
 
     private func statistic(_ name: String, value: Int64, type: TrainableStatistic) -> some View {
         HStack {
             Text(name)
             Spacer()
-            Text(value.formatted()).monospacedDigit()
+            Text(value.formatted()).monospacedDigit().accessibilityIdentifier("watch.stat.\(type.rawValue)")
             Button {
                 Task { await viewModel.allocate(type) }
             } label: {
@@ -48,6 +48,7 @@ struct PetStatisticsView: View {
             .fixedSize()
             .disabled(viewModel.isBusy || (viewModel.progress?.pet.statPoints ?? 0) == 0)
             .accessibilityLabel("\(name) 1 올리기")
+            .accessibilityIdentifier("watch.allocate.\(type.rawValue)")
         }
         .font(.caption)
     }

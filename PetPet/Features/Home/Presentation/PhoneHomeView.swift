@@ -179,9 +179,9 @@ struct PhoneHomeView: View {
                     }
                 }
                 HStack {
-                    statistic("공격력", value: pet.attack)
-                    statistic("방어력", value: pet.defense)
-                    statistic("체력", value: pet.health)
+                    statistic("공격력", value: pet.attack, id: "attack")
+                    statistic("방어력", value: pet.defense, id: "defense")
+                    statistic("체력", value: pet.health, id: "health")
                 }
                 Divider().padding(.vertical, 4)
                 HStack {
@@ -206,10 +206,10 @@ struct PhoneHomeView: View {
         }
     }
 
-    private func statistic(_ name: String, value: Int64) -> some View {
+    private func statistic(_ name: String, value: Int64, id: String) -> some View {
         VStack(spacing: 5) {
             Text(name).font(.caption).foregroundStyle(.secondary)
-            Text(value.formatted()).font(.headline).monospacedDigit()
+            Text(value.formatted()).font(.headline).monospacedDigit().accessibilityIdentifier("phone.stat.\(id)")
         }.frame(maxWidth: .infinity)
     }
 

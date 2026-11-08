@@ -24,6 +24,7 @@ struct AccountView: View {
                         .accessibilityIdentifier("phone.editNickname")
                     Button("로그아웃", role: .destructive) { Task { await viewModel.signOut() } }
                         .disabled(viewModel.isSigningIn)
+                        .accessibilityIdentifier("phone.signOut")
                 } else {
                     #if DEBUG
                     Button { Task { await viewModel.signInForDevelopment() } } label: {

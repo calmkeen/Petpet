@@ -49,6 +49,7 @@ struct FoodInventoryView: View {
                     }
                     if let message = cloudViewModel.message {
                         Text(message).font(.caption2).multilineTextAlignment(.center)
+                            .accessibilityIdentifier("watch.cloudFeedback")
                     }
                     if pending.isEmpty {
                         Text("다음 1,000걸음 보상을 향해 걸어요.")

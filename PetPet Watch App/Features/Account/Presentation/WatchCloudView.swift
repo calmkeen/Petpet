@@ -28,6 +28,7 @@ struct WatchCloudView: View {
                 }
                 if let message = viewModel.message {
                     Text(message).font(.caption2).multilineTextAlignment(.center)
+                        .accessibilityIdentifier("watch.cloudFeedback")
                 }
                 Text("서버 복원은 아이폰에서 기록을 확인한 뒤 진행해요.")
                     .font(.caption2).foregroundStyle(.secondary).multilineTextAlignment(.center)
@@ -38,6 +39,5 @@ struct WatchCloudView: View {
             }
             .padding(.horizontal, 14).padding(.vertical, 20)
         }
-        .accessibilityIdentifier("watch.cloudAccount")
     }
 }
