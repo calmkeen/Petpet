@@ -3,6 +3,52 @@ import XCTest
 import Foundation
 
 final class CompanionFeatureTests: XCTestCase {
+    @MainActor func testCompletedChatsDoNotBlockTheFifthQuestion() async throws {
+        let backend = try BackendClient(baseURL:URL(string:"https://api.example.test/")!,transport:ImmediateChatHTTP(),store:TestSessionStore(session:featureSession()))
+        let transport = FeatureLoopback()
+        let phone = PhoneFeatureCoordinator(backend:backend,transport:transport,environment:.development)
+        defer { phone.accountChanged() }
+        let watch = WatchFeatureClient(transport:transport,environment:.development)
+        for _ in 0..<6 {
+            let id = UUID()
+            _ = try await watch.request(.startChat(id,"질문"),accountID:"7")
+            var completed = false
+            for _ in 0..<100 {
+                if case let .chat(value) = try await watch.request(.pollChat(id),accountID:"7"), value.finished { completed = true; break }
+                await Task.yield()
+            }
+            XCTAssertTrue(completed)
+        }
+    }
+    @MainActor func testCancellationArrivingBeforeStartPreventsAnOrphanChat() async throws {
+        let http = ImmediateChatHTTP()
+        let backend = try BackendClient(baseURL:URL(string:"https://api.example.test/")!,transport:http,store:TestSessionStore(session:featureSession()))
+        let transport = FeatureLoopback()
+        let phone = PhoneFeatureCoordinator(backend:backend,transport:transport,environment:.development)
+        defer { phone.accountChanged() }
+        let watch = WatchFeatureClient(transport:transport,environment:.development), id = UUID()
+        _ = try await watch.request(.cancelChat(id),accountID:"7")
+        do { _ = try await watch.request(.startChat(id,"취소된 질문"),accountID:"7"); XCTFail("Cancelled request was restarted") } catch { }
+        let calls = await http.calls; XCTAssertEqual(calls,0)
+    }
+    @MainActor func testLateCancelledJobCannotFailAReplacementWithTheSameID() async throws {
+        let oldGate = StreamEpochGate(), newGate = StreamEpochGate()
+        let backend = try BackendClient(baseURL:URL(string:"https://api.example.test/")!,transport:ReplacementChatHTTP(gates:[oldGate,newGate]),store:TestSessionStore(session:featureSession()))
+        let transport = FeatureLoopback()
+        let phone = PhoneFeatureCoordinator(backend:backend,transport:transport,environment:.development)
+        let watch = WatchFeatureClient(transport:transport,environment:.development), id = UUID()
+        _ = try await watch.request(.startChat(id,"이전 질문"),accountID:"7")
+        while !(await oldGate.blocked) { await Task.yield() }
+        phone.accountChanged()
+        _ = try await watch.request(.startChat(id,"새 질문"),accountID:"7")
+        while !(await newGate.blocked) { await Task.yield() }
+        await oldGate.release()
+        for _ in 0..<20 { await Task.yield() }
+        if case let .chat(value) = try await watch.request(.pollChat(id),accountID:"7") {
+            XCTAssertEqual(value.text,"새 질문"); XCTAssertFalse(value.finished); XCTAssertFalse(value.failed)
+        } else { XCTFail() }
+        phone.accountChanged(); await newGate.release()
+    }
     func testRankingRequestsMatchBothAndroidPathsAndPayloads() async throws {
         let http = RankContractHTTP()
         let backend = try BackendClient(baseURL:URL(string:"https://api.example.test/")!,transport:http,store:TestSessionStore(session:featureSession()))
@@ -138,6 +184,28 @@ final class CompanionFeatureTests: XCTestCase {
         phone.accountChanged()
     }
     #endif
+}
+private actor ImmediateChatHTTP: BackendHTTPTransport, BackendChatTransport {
+    var calls = 0
+    func send(_ request:URLRequest) async throws -> BackendHTTPResponse { throw BackendError.network }
+    func stream(_ request:URLRequest,onEvent:@escaping @Sendable (ChatStreamEvent) async throws -> Void) async throws {
+        calls += 1
+        try await onEvent(ChatStreamEvent(name:"token",data:"답변"))
+        try await onEvent(ChatStreamEvent(name:"done",data:"{}"))
+    }
+}
+private actor ReplacementChatHTTP: BackendHTTPTransport, BackendChatTransport {
+    let gates: [StreamEpochGate]
+    var calls = 0
+    init(gates:[StreamEpochGate]) { self.gates = gates }
+    func send(_ request:URLRequest) async throws -> BackendHTTPResponse { throw BackendError.network }
+    func stream(_ request:URLRequest,onEvent:@escaping @Sendable (ChatStreamEvent) async throws -> Void) async throws {
+        let index = calls; calls += 1
+        let body = try JSONDecoder().decode([String:String].self,from:request.httpBody!)
+        try await onEvent(ChatStreamEvent(name:"token",data:body["question"]!))
+        await gates[index].wait()
+        try await onEvent(ChatStreamEvent(name:"done",data:"{}"))
+    }
 }
 private func featureSession() -> BackendSession {
     BackendSession(accountID:"7",serverOrigin:"https://api.example.test/",accessToken:"access",refreshToken:"refresh",email:nil,name:nil,nickname:"여우")

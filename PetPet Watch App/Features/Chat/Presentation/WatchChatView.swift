@@ -14,8 +14,10 @@ import PetPetCore
     init(services: WatchGameServices) { self.services = services }
     func dictate() {
         guard !busy, let controller = WKExtension.shared().visibleInterfaceController else { return }
+        let accountAtInput = services.cloud.account?.id
         controller.presentTextInputController(withSuggestions:nil,allowedInputMode:.plain) { [weak self] values in
-            if let text = values?.first as? String { self?.question = String(text.prefix(2000)) }
+            guard let self, self.services.cloud.account?.id == accountAtInput else { return }
+            if let text = values?.first as? String { self.question = String(text.prefix(2000)) }
         }
     }
     func send() {
@@ -35,7 +37,11 @@ import PetPetCore
                     guard self.jobID == id, services.cloud.account?.id == account else { return }
                     guard case let .chat(value) = reply else { throw BackendError.invalidResponse }
                     progress = value
-                    if value.finished { return }
+                    if value.finished {
+                        _ = try? await services.client.request(.cancelChat(id),accountID:account)
+                        if self.jobID == id { self.jobID = nil; self.accountID = nil; self.busy = false }
+                        return
+                    }
                     try await Task.sleep(for:.milliseconds(300))
                 }
             } catch is CancellationError { }
@@ -44,13 +50,14 @@ import PetPetCore
         }
     }
     func stop(clear: Bool = false) {
+        let wasBusy = busy
         task?.cancel(); task = nil
         if let id = jobID, let accountID {
             Task { [services] in _ = try? await services.client.request(.cancelChat(id),accountID:accountID) }
         }
         jobID = nil; accountID = nil; busy = false
         if clear { question = ""; progress = ChatProgress() }
-        else if !progress.finished { progress.fail("응답을 중단했어요") }
+        else if wasBusy && !progress.finished { progress.fail("응답을 중단했어요") }
     }
 }
 
