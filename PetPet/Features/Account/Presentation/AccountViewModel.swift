@@ -53,6 +53,13 @@ final class AccountViewModel: ObservableObject {
         guard !isSigningIn, let id = session?.accountID else { return }
         try? await profile?.refresh(accountID: id)
     }
+    func refreshServerSession() async {
+        do {
+            session = try await backend?.session()
+            if session == nil { preview = nil }
+            await cloud?.synchronizeAccount()
+        } catch { message = BackendError.storage.localizedDescription }
+    }
     func makeNicknameEditor() -> NicknameEditor {
         let id = session?.accountID
         return NicknameEditor(currentNickname: session?.nickname ?? "미설정", check: { [weak self] value in

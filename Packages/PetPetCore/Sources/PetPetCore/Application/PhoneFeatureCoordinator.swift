@@ -2,6 +2,7 @@ import Foundation
 
 /// Tokens stay on the phone. The watch polls bounded text snapshots while URLSession streams.
 @MainActor public final class PhoneFeatureCoordinator {
+    public var onSessionInvalidated: (() async -> Void)?
     private struct ChatJob {
         let generation: UUID
         let accountID: String
@@ -53,7 +54,10 @@ import Foundation
                             }
                             self?.end(id, generation: generation)
                         } catch is CancellationError { self?.fail(id, generation: generation, message: "응답을 중단했어요") }
-                        catch { self?.fail(id, generation: generation, message: (error as? BackendError ?? .network).localizedDescription) }
+                        catch {
+                            self?.fail(id, generation: generation, message: (error as? BackendError ?? .network).localizedDescription)
+                            await self?.notifySessionChange(expected: request.accountID)
+                        }
                     }
                     jobs[id] = ChatJob(generation: generation, accountID: request.accountID, progress: ChatProgress(), touchedAt: Date(), task: task)
                     result = .accepted
@@ -67,7 +71,10 @@ import Foundation
                 result = .accepted
             }
             guard try await backend.session()?.accountID == request.accountID else { throw BackendError.sessionChanged }
-        } catch { result = .failure(ProfileFailure(error)) }
+        } catch {
+            result = .failure(ProfileFailure(error))
+            await notifySessionChange(expected: request.accountID)
+        }
         let reply = try JSONEncoder().encode(CompanionFeatureReply(request: request, result: result))
         guard reply.count <= 60_000 else { throw BackendError.transferTooLarge }
         return reply
@@ -81,6 +88,11 @@ import Foundation
     private func end(_ id: UUID, generation: UUID) {
         guard jobs[id]?.generation == generation else { return }
         jobs[id]?.progress.end(); jobs[id]?.task = nil
+    }
+    private func notifySessionChange(expected accountID: String) async {
+        do {
+            if try await backend.session()?.accountID != accountID { await onSessionInvalidated?() }
+        } catch { /* A storage error does not prove the session was revoked. */ }
     }
     private func fail(_ id: UUID, generation: UUID, message: String) {
         guard jobs[id]?.generation == generation else { return }

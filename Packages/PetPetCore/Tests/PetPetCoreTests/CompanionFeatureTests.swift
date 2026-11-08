@@ -3,6 +3,20 @@ import XCTest
 import Foundation
 
 final class CompanionFeatureTests: XCTestCase {
+    @MainActor func testExpiredChatSessionNotifiesCompanionAccountUI() async throws {
+        let backend = try BackendClient(baseURL:URL(string:"https://api.example.test/")!,transport:RejectedChatHTTP(),store:TestSessionStore(session:featureSession()))
+        let transport = FeatureLoopback()
+        let phone = PhoneFeatureCoordinator(backend:backend,transport:transport,environment:.development)
+        let notified = expectation(description:"Companion session was invalidated")
+        phone.onSessionInvalidated = {
+            let current = try? await backend.session()
+            XCTAssertNil(current); notified.fulfill()
+        }
+        let watch = WatchFeatureClient(transport:transport,environment:.development)
+        _ = try await watch.request(.startChat(UUID(),"질문"),accountID:"7")
+        await fulfillment(of:[notified],timeout:2)
+        phone.accountChanged()
+    }
     @MainActor func testCompletedChatsDoNotBlockTheFifthQuestion() async throws {
         let backend = try BackendClient(baseURL:URL(string:"https://api.example.test/")!,transport:ImmediateChatHTTP(),store:TestSessionStore(session:featureSession()))
         let transport = FeatureLoopback()
@@ -184,6 +198,10 @@ final class CompanionFeatureTests: XCTestCase {
         phone.accountChanged()
     }
     #endif
+}
+private struct RejectedChatHTTP: BackendHTTPTransport, BackendChatTransport {
+    func send(_ request:URLRequest) async throws -> BackendHTTPResponse { BackendHTTPResponse(statusCode:401) }
+    func stream(_ request:URLRequest,onEvent:@escaping @Sendable (ChatStreamEvent) async throws -> Void) async throws { throw BackendError.http(401) }
 }
 private actor ImmediateChatHTTP: BackendHTTPTransport, BackendChatTransport {
     var calls = 0

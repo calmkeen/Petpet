@@ -44,6 +44,8 @@ final class PhoneAppModel: ObservableObject {
         streak = PhoneStreakViewModel(backend: backend, cache: FileAccountStepCache(fileURL: directory.appendingPathComponent("server-streak-v1.json")))
         let account = AccountViewModel(backend: backend, cloud: cloud, profile: profile, configuration: configuration)
         self.account = account
+        features?.onSessionInvalidated = { [weak account] in await account?.refreshServerSession() }
+        extras.onSessionInvalidated = { [weak account] in await account?.refreshServerSession() }
         let snapshotConnection = transport.onConnectionChange
         transport.onConnectionChange = { [weak account] connection in
             snapshotConnection?(connection)

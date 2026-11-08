@@ -3,6 +3,7 @@ import SwiftUI
 import PetPetCore
 
 @MainActor final class PhoneExtrasModel: ObservableObject {
+    var onSessionInvalidated: (() async -> Void)?
     @Published var question = ""
     @Published private(set) var progress = ChatProgress()
     @Published private(set) var ranking: GameRanking?
@@ -32,7 +33,10 @@ import PetPetCore
                 guard self.accountID == accountID, self.rankRevision == revision, !Task.isCancelled else { return }
                 ranking = value
             } catch is CancellationError { }
-            catch { if self.rankRevision == revision { rankMessage = (error as? BackendError ?? .network).localizedDescription } }
+            catch {
+                if self.rankRevision == revision { rankMessage = (error as? BackendError ?? .network).localizedDescription }
+                await notifySessionChange(expected: accountID)
+            }
         }
     }
     func send() {
@@ -49,12 +53,20 @@ import PetPetCore
                 }
                 if self.chatRevision == revision { progress.end() }
             } catch is CancellationError { }
-            catch { if self.chatRevision == revision { progress.fail((error as? BackendError ?? .network).localizedDescription) } }
+            catch {
+                if self.chatRevision == revision { progress.fail((error as? BackendError ?? .network).localizedDescription) }
+                await notifySessionChange(expected: accountID)
+            }
         }
     }
     private func receive(_ event: ChatStreamEvent, revision: UUID, accountID: String) throws {
         guard self.accountID == accountID, chatRevision == revision else { throw CancellationError() }
         try progress.receive(event)
+    }
+    private func notifySessionChange(expected accountID: String) async {
+        do {
+            if try await backend?.session()?.accountID != accountID { await onSessionInvalidated?() }
+        } catch { }
     }
     func stop() {
         chatTask?.cancel(); rankTask?.cancel(); chatTask = nil; rankTask = nil
