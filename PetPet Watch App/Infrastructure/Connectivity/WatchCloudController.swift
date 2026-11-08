@@ -58,7 +58,10 @@ final class WatchCloudController: ObservableObject {
     func requestBackup() async {
         guard !isBusy else { return }
         guard let account else { fail(.authenticationRequired); return }
-        await export(operationID: UUID(), account: account)
+        let operationID = UUID()
+        activeOperation = operationID
+        isBusy = true
+        await export(operationID: operationID, account: account)
     }
 
     private func export(operationID: UUID, account: CloudAccount) async {
