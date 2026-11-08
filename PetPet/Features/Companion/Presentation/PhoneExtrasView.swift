@@ -84,6 +84,7 @@ struct PhoneExtrasView: View {
     @ObservedObject var model: PhoneExtrasModel
     let development: Bool
     @State private var game = MiniGame.shooting
+    @FocusState private var questionFocused: Bool
     @Environment(\.scenePhase) private var phase
     var body: some View {
         List {
@@ -110,14 +111,22 @@ struct PhoneExtrasView: View {
             }
             Section("펫과 AI 대화") {
                 TextField("질문을 입력해 주세요",text:$model.question,axis:.vertical).lineLimit(2...5).disabled(model.chatting).accessibilityIdentifier("chat.question")
+                    .focused($questionFocused)
                 Text("키보드의 마이크로도 입력할 수 있어요. 내용을 확인한 뒤 보내 주세요.").font(.caption).foregroundStyle(.secondary)
-                Button("AI에 질문 보내기") { model.send() }.disabled(model.chatting || model.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty).accessibilityIdentifier("chat.send")
+                Button("AI에 질문 보내기") { questionFocused = false; model.send() }.disabled(model.chatting || model.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty).accessibilityIdentifier("chat.send")
                 if model.chatting { ProgressView(); Button("응답 중단") { model.cancelChat() }.accessibilityIdentifier("chat.cancel") }
                 Text(model.progress.status).font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("chat.status")
                 if !model.progress.text.isEmpty { Text(model.progress.text).textSelection(.enabled).accessibilityIdentifier("chat.answer") }
             }
         }.navigationTitle("게임과 대화")
+            .scrollDismissesKeyboard(.interactively)
             .toolbar(.visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("완료") { questionFocused = false }.accessibilityIdentifier("chat.dismissKeyboard")
+                }
+            }
             .task { model.load(game) }
             .onChange(of:game) { _,value in model.load(value) }
             .onDisappear { model.stop() }

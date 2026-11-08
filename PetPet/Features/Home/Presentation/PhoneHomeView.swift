@@ -104,6 +104,7 @@ struct PhoneHomeView: View {
                 .padding(20)
             }
             .background(Color(uiColor: .systemGroupedBackground))
+            .clipped()
             .toolbar(.hidden, for: .navigationBar)
             .refreshable { await refreshAll() }
         }

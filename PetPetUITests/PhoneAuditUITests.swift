@@ -16,9 +16,13 @@ final class PhoneAuditUITests: XCTestCase {
         backToHome()
         signIn()
         app.buttons["phone.openExtras"].tap()
-        reveal(app.textFields["chat.question"])
-        app.textFields["chat.question"].tap()
-        app.textFields["chat.question"].typeText("How is my pet?")
+        let question = revealQuestionInput()
+        question.tap()
+        question.typeText("How is my pet?")
+        let done = app.buttons["chat.dismissKeyboard"]
+        XCTAssertTrue(done.waitForExistence(timeout: 5))
+        done.tap()
+        XCTAssertTrue(wait { !self.app.keyboards.firstMatch.exists })
         reveal(app.buttons["chat.send"])
         app.buttons["chat.send"].tap()
         let answer = app.staticTexts["chat.answer"]
@@ -110,6 +114,18 @@ final class PhoneAuditUITests: XCTestCase {
             app.swipeUp()
         }
         XCTAssertTrue(element.exists && element.isHittable, "Missing control: \(element)")
+    }
+    private func revealQuestionInput() -> XCUIElement {
+        // SwiftUI's vertical TextField is exposed as TextView on iOS 18 and
+        // TextField on newer runtimes. Follow the actual accessible input.
+        for _ in 0..<10 {
+            for input in [app.textFields["chat.question"], app.textViews["chat.question"]] {
+                if input.exists && input.isHittable { return input }
+            }
+            app.swipeUp()
+        }
+        XCTFail("The AI question input is unavailable")
+        return app.textFields["chat.question"]
     }
     private func wait(timeout: TimeInterval = 10, _ condition: @escaping () -> Bool) -> Bool {
         XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in condition() }, object: nil)], timeout: timeout) == .completed
