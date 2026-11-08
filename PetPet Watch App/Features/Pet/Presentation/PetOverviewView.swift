@@ -5,7 +5,7 @@ struct PetOverviewView: View {
     @ObservedObject var viewModel: PetProgressViewModel
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 4) {
             Text("성장").font(.headline)
             if let progress = viewModel.progress {
                 Text("Lv.\(progress.pet.level)").font(.title2.bold())
@@ -26,6 +26,7 @@ struct PetOverviewView: View {
             .accessibilityIdentifier("watch.managePetStatistics")
         }
         .padding(.horizontal, 18)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityIdentifier("watch.petOverview")
     }
 }

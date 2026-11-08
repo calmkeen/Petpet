@@ -53,17 +53,19 @@ struct WatchStreakView: View {
                             }
                     }
                 }
-                .accessibilityHidden(true) // date/count selection is available in the full-size picker below
+                .accessibilityHidden(true) // Date/count selection is available in the full-size list below.
                 HStack(spacing: 4) {
                     Text("적음")
                     ForEach(0..<5) { index in RoundedRectangle(cornerRadius: 2).fill(StepIntensity(rawValue: index)!.watchColor).frame(width: 12, height: 10) }
                     Text("많음")
                 }.font(.system(size: 10)).foregroundStyle(.secondary)
                 Text("진한 파랑: 10,000걸음 이상").font(.caption2).foregroundStyle(.secondary)
-                Picker("날짜", selection: Binding(get: { model.selectedDay }, set: { model.selectDay($0) })) {
-                    ForEach(1...model.month.dayCount, id: \.self) { day in Text("\(day)일").tag(day) }
-                }
-                .pickerStyle(.navigationLink).accessibilityIdentifier("watch.streakDate")
+                NavigationLink {
+                    WatchStreakNumberSelection(title: "날짜", suffix: "일", values: 1...model.month.dayCount,
+                                               selected: model.selectedDay, select: model.selectDay)
+                } label: {
+                    LabeledContent("날짜", value: "\(model.selectedDay)일")
+                }.accessibilityIdentifier("watch.streakDate")
                 Text("\(model.month.month)월 \(model.selectedDay)일\n\(model.selectedCount.formatted())걸음")
                     .font(.headline).multilineTextAlignment(.center).monospacedDigit()
                     .accessibilityIdentifier("watch.selectedDaySteps")
@@ -88,17 +90,49 @@ struct WatchStreakView: View {
         .onDisappear { model.disappear() }
         .sheet(isPresented: $selectingMonth) {
             NavigationStack {
-                Form {
-                    Picker("연도", selection: Binding(get: { model.month.year }, set: { year in
-                        if let month = StepMonth(year: year, month: model.month.month) { model.select(month) }
-                    })) { ForEach(Array(model.years), id: \.self) { Text(String($0)).tag($0) } }
-                    Picker("월", selection: Binding(get: { model.month.month }, set: { value in
-                        if let month = StepMonth(year: model.month.year, month: value) { model.select(month) }
-                    })) { ForEach(1...12, id: \.self) { Text("\($0)월").tag($0) } }
+                List {
+                    NavigationLink {
+                        WatchStreakNumberSelection(title: "연도", suffix: "년", values: model.years, selected: model.month.year) { year in
+                            if let value = StepMonth(year: year, month: model.month.month) { model.select(value) }
+                        }
+                    } label: { LabeledContent("연도", value: String(model.month.year)) }
+                        .accessibilityIdentifier("watch.streakYearPicker")
+                    NavigationLink {
+                        WatchStreakNumberSelection(title: "월", suffix: "월", values: 1...12, selected: model.month.month) { month in
+                            if let value = StepMonth(year: model.month.year, month: month) { model.select(value) }
+                        }
+                    } label: { LabeledContent("월", value: "\(model.month.month)월") }
+                        .accessibilityIdentifier("watch.streakMonthPicker")
                     Button("선택 완료") { selectingMonth = false }
                 }.navigationTitle("월 선택")
             }
         }
+    }
+}
+
+/// Use explicit navigation and dismiss on selection across supported watchOS versions.
+private struct WatchStreakNumberSelection: View {
+    let title: String
+    let suffix: String
+    let values: ClosedRange<Int>
+    let selected: Int
+    let select: (Int) -> Void
+    @Environment(\.dismiss) private var dismiss
+    var body: some View {
+        List {
+            ForEach(values, id: \.self) { value in
+                Button {
+                    select(value)
+                    dismiss()
+                } label: {
+                    HStack {
+                        Text("\(String(value))\(suffix)")
+                        Spacer()
+                        if value == selected { Image(systemName: "checkmark").foregroundStyle(.green).accessibilityHidden(true) }
+                    }
+                }.accessibilityIdentifier("watch.streakValue.\(value)")
+            }
+        }.navigationTitle(title)
     }
 }
 

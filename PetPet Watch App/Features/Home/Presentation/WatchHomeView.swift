@@ -34,7 +34,7 @@ struct WatchHomeView: View {
                 VStack(spacing: 12) {
                     Label("계정과 백업", systemImage: "icloud").font(.headline)
                     Text(cloudViewModel.account?.displayName ?? "아이폰에서 로그인해 주세요")
-                        .font(.caption).multilineTextAlignment(.center)
+                        .font(.caption).multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.8)
                     NavigationLink("백업 관리") { WatchCloudView(viewModel: cloudViewModel) }
                 }
                 .padding(.horizontal, 18)
@@ -81,19 +81,21 @@ struct WatchHomeView: View {
         TimelineView(.periodic(from: Date(timeIntervalSince1970: floor(Date().timeIntervalSince1970 / 60) * 60), by: 60)) { context in
             let period = PetDaylightPeriod(date: context.date)
             GeometryReader { geometry in
+                let compact = geometry.size.width < 180 || geometry.size.height < 210
+                let petHeight = compact ? (viewModel.errorMessage == nil ? 68.0 : 54.0) : 90.0
                 ZStack {
                     Image(period.backgroundImageName)
                         .resizable().scaledToFill()
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .clipped()
-                    VStack(spacing: 4) {
+                    VStack(spacing: compact ? 2 : 4) {
                         Button {
                             guard character.handleTouch() else { return }
                             Task { await petViewModel.touch() }
                         } label: {
                             WatchPetSpriteView(state: character.state, backgroundImageName: period.backgroundImageName,
                                                backgroundCanvas: geometry.size, backgroundCoordinateSpace: "pet.home")
-                                .frame(height: min(90, geometry.size.height * 0.38))
+                                .frame(height: min(petHeight, geometry.size.height * 0.38))
                         }
                         .buttonStyle(.plain)
                         .contentShape(Rectangle())
@@ -133,11 +135,12 @@ struct WatchHomeView: View {
                         .font(.caption2)
                         .buttonStyle(.bordered)
                         .tint(.white.opacity(0.8))
-                        Text("크라운을 돌려 섹션 이동")
-                            .font(.system(size: 10))
+                        Text("크라운으로 섹션 이동")
+                            .font(.system(size: compact ? 9 : 10))
                     }
                     .foregroundStyle(period.usesLightText ? .white : .black)
                     .padding(.horizontal, 12)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }.coordinateSpace(name: "pet.home")
             }
         }
