@@ -18,6 +18,7 @@ public final class PhoneSnapshotReceiver {
     private let now: () -> Date
     private var started = false
     private var receiveTask: Task<Void, Never>?
+    private var refreshID: UUID?
 
     public init(repository: any PhoneSnapshotRepository, transport: any SnapshotTransport,
                 now: @escaping () -> Date = { Date() }) {
@@ -48,17 +49,25 @@ public final class PhoneSnapshotReceiver {
             emit()
             return
         }
+        let refreshID = UUID()
+        self.refreshID = refreshID
         state.isRefreshing = true
         state.hasTransferError = false
         emit()
-        defer { state.isRefreshing = false; emit() }
+        defer {
+            if self.refreshID == refreshID {
+                self.refreshID = nil
+                state.isRefreshing = false
+                emit()
+            }
+        }
         do {
             let data = try await transport.requestLatest()
-            guard peer == state.connection.peerID else { return }
+            guard peer == state.connection.peerID, self.refreshID == refreshID else { return }
             receive(data, from: peer)
             await finishReceiving()
         } catch {
-            state.hasTransferError = true
+            if peer == state.connection.peerID, self.refreshID == refreshID { state.hasTransferError = true }
         }
     }
 
@@ -80,7 +89,10 @@ public final class PhoneSnapshotReceiver {
                 self.state.cached = saved
                 self.state.hasStorageError = false
                 self.state.hasTransferError = false
-            } catch { self.state.hasStorageError = true }
+            } catch {
+                guard self.state.connection.peerID == peer else { return }
+                self.state.hasStorageError = true
+            }
             self.emit()
         }
     }
@@ -89,6 +101,11 @@ public final class PhoneSnapshotReceiver {
         let wasReachable = state.connection.isReachable
         let oldPeer = state.connection.peerID
         state.connection = connection
+        if oldPeer != connection.peerID || !connection.isPaired {
+            refreshID = nil
+            state.isRefreshing = false
+            state.hasTransferError = false
+        }
         if connection.isActivated {
             if !connection.isPaired {
                 state.cached = nil

@@ -186,6 +186,29 @@ final class SnapshotSyncTests: XCTestCase {
     }
 
     @MainActor
+    func testSwitchingWatchStartsFreshRequestAndIgnoresOldRequestFailure() async throws {
+        let url = temporaryURL()
+        defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
+        let transport = HeldSnapshotTransport()
+        let receiver = PhoneSnapshotReceiver(repository: FilePhoneSnapshotRepository(fileURL: url), transport: transport)
+        await receiver.start()
+        for _ in 0..<500 where transport.requests.isEmpty { await Task.yield() }
+        XCTAssertEqual(transport.requests, ["A"])
+        transport.connection.peerID = "B"
+        transport.onConnectionChange?(transport.connection)
+        for _ in 0..<500 where transport.requests.count < 2 { await Task.yield() }
+        XCTAssertEqual(transport.requests, ["A", "B"], "The new watch must not wait for the old watch's request")
+        transport.complete("A", with: .failure(SnapshotSyncError.transferFailed))
+        for _ in 0..<500 { await Task.yield() }
+        XCTAssertFalse(receiver.state.hasTransferError, "An old watch's failure does not describe the current connection")
+        XCTAssertTrue(receiver.state.isRefreshing, "The current watch's refresh must remain in progress")
+        transport.complete("B", with: .success(try WatchSnapshotCodec.encode(snapshot())))
+        for _ in 0..<1000 where receiver.state.cached?.peerID != "B" { await Task.yield() }
+        await receiver.finishReceiving()
+        XCTAssertEqual(receiver.state.cached?.peerID, "B")
+    }
+
+    @MainActor
     func testPublisherSerializesSendingAndQueuesLatestAfterDisconnectedRestart() async throws {
         let url = temporaryURL()
         let directory = url.deletingLastPathComponent()
@@ -236,4 +259,22 @@ private final class TestSnapshotTransport: SnapshotTransport {
     func activate() { onConnectionChange?(connection) }
     func publish(_ data: Data) { sent.append(data) }
     func requestLatest() async throws -> Data { throw SnapshotSyncError.notReachable }
+}
+
+@MainActor
+private final class HeldSnapshotTransport: SnapshotTransport {
+    var connection = SnapshotConnection(isActivated: true, isPaired: true, isCounterpartInstalled: true, isReachable: true, peerID: "A")
+    var onConnectionChange: ((SnapshotConnection) -> Void)?
+    var onSnapshot: ((Data, String) -> Void)?
+    var onSnapshotRequest: (() async throws -> Data)?
+    var requests: [String] = []
+    private var pending: [String: CheckedContinuation<Data, Error>] = [:]
+    func activate() { onConnectionChange?(connection) }
+    func publish(_ data: Data) {}
+    func requestLatest() async throws -> Data {
+        let peer = connection.peerID!
+        requests.append(peer)
+        return try await withCheckedThrowingContinuation { pending[peer] = $0 }
+    }
+    func complete(_ peer: String, with result: Result<Data, Error>) { pending.removeValue(forKey: peer)?.resume(with: result) }
 }
