@@ -7,7 +7,7 @@ struct WatchNicknameView: View {
     init(editor: NicknameEditor) { _model = StateObject(wrappedValue: NicknameEditorViewModel(editor: editor)) }
     var body: some View {
         List {
-            Section("현재 닉네임") { Text(model.state.currentNickname).lineLimit(3) }
+            Section("현재 닉네임") { Text(model.state.currentNickname).font(.caption).fixedSize(horizontal: false, vertical: true) }
             Section("새 닉네임") {
                 TextField("2자 이상 입력", text: Binding(get: { model.state.input }, set: { model.setInput($0) }))
                     .textInputAutocapitalization(.never).autocorrectionDisabled()

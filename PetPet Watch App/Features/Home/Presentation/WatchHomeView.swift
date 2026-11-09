@@ -12,6 +12,7 @@ struct WatchHomeView: View {
     @Environment(\.isLuminanceReduced) private var luminanceReduced
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @StateObject private var character = CharacterActivityViewModel()
+    @State private var showingStepError = false
     @State private var selectedSection: WatchSection = .home
 
     private enum WatchSection: Hashable {
@@ -31,14 +32,7 @@ struct WatchHomeView: View {
                     WatchGameOverview(services:games,pet:petViewModel).tag(WatchSection.games)
                     WatchChatOverview(services:games).tag(WatchSection.chat)
                 }
-                VStack(spacing: 12) {
-                    Label("계정과 백업", systemImage: "icloud").font(.headline)
-                    Text(cloudViewModel.account?.displayName ?? "아이폰에서 로그인해 주세요")
-                        .font(.caption).multilineTextAlignment(.center).lineLimit(2).minimumScaleFactor(0.8)
-                        .accessibilityIdentifier("watch.accountName")
-                    NavigationLink("백업 관리") { WatchCloudView(viewModel: cloudViewModel) }
-                }
-                .padding(.horizontal, 18)
+                WatchCloudOverview(viewModel: cloudViewModel)
                 .tag(WatchSection.cloud)
             }
             // Keep pages short so the Crown always changes sections. Long
@@ -82,70 +76,82 @@ struct WatchHomeView: View {
         TimelineView(.periodic(from: Date(timeIntervalSince1970: floor(Date().timeIntervalSince1970 / 60) * 60), by: 60)) { context in
             let period = PetDaylightPeriod(date: context.date)
             GeometryReader { geometry in
-                let compact = geometry.size.width < 180 || geometry.size.height < 210
-                let petHeight = compact ? (viewModel.errorMessage == nil ? 68.0 : 54.0) : 90.0
                 ZStack {
                     Image(period.backgroundImageName)
                         .resizable().scaledToFill()
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .clipped()
-                    VStack(spacing: compact ? 2 : 4) {
-                        Button {
-                            guard character.handleTouch() else { return }
-                            Task { await petViewModel.touch() }
-                        } label: {
-                            WatchPetSpriteView(state: character.state, backgroundImageName: period.backgroundImageName,
-                                               backgroundCanvas: geometry.size, backgroundCoordinateSpace: "pet.home")
-                                .frame(height: min(petHeight, geometry.size.height * 0.38))
-                        }
-                        .buttonStyle(.plain)
-                        .contentShape(Rectangle())
-                        .disabled(petViewModel.isBusy || petViewModel.progress == nil)
-                        .accessibilityLabel("펫 쓰다듬기")
-                        .accessibilityIdentifier("watch.petTouch")
-                        if let progress = petViewModel.progress {
-                            Text("Lv.\(progress.pet.level) · \(progress.pet.mood.displayName)")
-                                .font(.caption2)
-                        }
-                        Text("오늘 \(viewModel.state.stepCount.formatted())걸음")
-                            .font(.headline).monospacedDigit()
-                            .accessibilityIdentifier("watch.stepCount")
-                        if viewModel.state.isLoading { ProgressView() }
-                        if let message = viewModel.errorMessage {
-                            Button {
-                                Task { await viewModel.refresh() }
-                            } label: {
-                                Label(message,systemImage:"arrow.clockwise").font(.caption2).lineLimit(2).minimumScaleFactor(0.75)
-                            }.buttonStyle(.plain).accessibilityLabel(message + " 다시 시도")
-                                .accessibilityIdentifier("watch.retrySteps")
-                        }
-                        HStack(spacing: 8) {
-                            Button {
-                                withAnimation { selectedSection = .statistics }
-                            } label: {
-                                Label("성장", systemImage: "chart.bar.fill")
-                            }
-                            .accessibilityIdentifier("watch.openPetStatistics")
-                            Button {
-                                withAnimation { selectedSection = .food }
-                            } label: {
-                                Label("먹이", systemImage: "carrot.fill")
-                            }
-                            .accessibilityIdentifier("watch.openFoodInventory")
-                        }
-                        .font(.caption2)
-                        .buttonStyle(.bordered)
-                        .tint(.white.opacity(0.8))
-                        Text("크라운으로 섹션 이동")
-                            .font(.system(size: compact ? 9 : 10))
+                    ViewThatFits(in: .vertical) {
+                        homeContents(period: period, canvas: geometry.size, hint: true)
+                        homeContents(period: period, canvas: geometry.size, hint: false)
                     }
                     .foregroundStyle(period.usesLightText ? .white : .black)
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, 10)
+                    .padding(.top, 32)
+                    .padding(.bottom, 4)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }.coordinateSpace(name: "pet.home")
             }
         }
         .ignoresSafeArea()
+        .alert("걸음수 확인", isPresented: $showingStepError) {
+            Button("다시 시도") { Task { await viewModel.refresh() } }
+            Button("닫기", role: .cancel) { }
+        } message: { Text(viewModel.errorMessage ?? "걸음수를 다시 불러와 주세요.") }
+    }
+
+    private func homeContents(period: PetDaylightPeriod, canvas: CGSize, hint: Bool) -> some View {
+        VStack(spacing: 4) {
+            HStack(alignment: .center, spacing: 4) {
+                VStack(spacing: 0) {
+                    Button {
+                        guard character.handleTouch() else { return }
+                        Task { await petViewModel.touch() }
+                    } label: {
+                        WatchPetSpriteView(state: character.state, backgroundImageName: period.backgroundImageName,
+                                           backgroundCanvas: canvas, backgroundCoordinateSpace: "pet.home")
+                            .frame(width: 64, height: 64)
+                    }
+                    .buttonStyle(.plain).contentShape(Rectangle())
+                    .disabled(petViewModel.isBusy || petViewModel.progress == nil)
+                    .accessibilityLabel("펫 쓰다듬기").accessibilityIdentifier("watch.petTouch")
+                    if let progress = petViewModel.progress {
+                        Text("Lv.\(WatchNumber.compact(progress.pet.level))").font(.caption2.bold()).lineLimit(1).accessibilityLabel("레벨 \(progress.pet.level)")
+                        Text(progress.pet.mood.shortName).font(.caption2).lineLimit(1)
+                            .accessibilityLabel(progress.pet.mood.displayName)
+                    }
+                }
+                VStack(spacing: 0) {
+                    Text("오늘").font(.caption2)
+                    Text(WatchNumber.compact(viewModel.state.stepCount))
+                        .font(.title2.bold()).monospacedDigit().lineLimit(1).minimumScaleFactor(0.7)
+                        .accessibilityLabel("오늘 \(viewModel.state.stepCount.formatted())걸음")
+                        .accessibilityIdentifier("watch.stepCount")
+                    if viewModel.errorMessage != nil {
+                        Button { showingStepError = true } label: {
+                            Label("확인", systemImage: "exclamationmark.circle")
+                                .font(.caption2).frame(maxWidth: .infinity, minHeight: 44)
+                        }.buttonStyle(.plain)
+                            .accessibilityLabel("걸음수 권한 안내 및 다시 시도")
+                            .accessibilityIdentifier("watch.retrySteps")
+                    } else if viewModel.state.isLoading {
+                        ProgressView().accessibilityLabel("걸음수 불러오는 중")
+                    } else {
+                        Text("걸음").font(.caption2)
+                    }
+                }.frame(maxWidth: .infinity)
+            }
+            HStack(spacing: 6) {
+                Button { withAnimation { selectedSection = .statistics } } label: { Text("성장") }
+                    .accessibilityIdentifier("watch.openPetStatistics")
+                Button { withAnimation { selectedSection = .food } } label: { Text("먹이") }
+                    .accessibilityIdentifier("watch.openFoodInventory")
+            }
+            .buttonStyle(WatchActionStyle(color: .black, backgroundOpacity: 0.7))
+            if hint { Text("크라운으로 이동").font(.caption2) }
+        }
+        .fixedSize(horizontal: false, vertical: true)
+
     }
 
     private var characterIsVisible: Bool { selectedSection == .home && scenePhase == .active && !luminanceReduced }

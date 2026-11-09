@@ -15,6 +15,7 @@ struct PetPetWatchApp: App {
 
     var body: some Scene {
         WindowGroup {
+          Group {
             #if DEBUG
             if previewing {
                 NavigationStack {
@@ -26,6 +27,12 @@ struct PetPetWatchApp: App {
             #else
             WatchHomeView(viewModel: model.home, petViewModel: model.pet, cloudViewModel: model.cloud, streakViewModel: model.streak, games:model.games)
             #endif
+          }
+          #if DEBUG
+          .transformEnvironment(\.dynamicTypeSize) { size in
+              if ProcessInfo.processInfo.arguments.contains("--watch-ui-large-text") { size = .xxxLarge }
+          }
+          #endif
         }
         .backgroundTask(.watchConnectivity) { await model.finishBackgroundTransfer() }
     }

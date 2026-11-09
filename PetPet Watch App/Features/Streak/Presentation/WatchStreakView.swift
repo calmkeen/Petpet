@@ -5,16 +5,18 @@ struct WatchStreakOverview: View {
     @ObservedObject var model: WatchStreakViewModel
     @ObservedObject var cloud: WatchCloudController
     var body: some View {
-        VStack(spacing: 8) {
+        WatchOverviewLayout { compact in
+          VStack(spacing: 6) {
             Label("스트릭", systemImage: model.summary.currentDays >= 7 ? "flame.fill" : "calendar")
                 .font(.headline)
-            Text("연속 \(model.summary.currentDays)일").font(.system(size: 30, weight: .bold, design: .rounded))
-                .minimumScaleFactor(0.65).lineLimit(1).accessibilityIdentifier("watch.currentStreak")
-            Text("오늘부터 하루 1보 이상").font(.caption2).foregroundStyle(.secondary)
+            Text("연속 \(model.summary.currentDays)일").font(.title2.bold())
+                .lineLimit(1).accessibilityIdentifier("watch.currentStreak")
+            if !compact { Text("오늘부터 하루 1보 이상").font(.caption2).foregroundStyle(.secondary) }
             NavigationLink("월별 걸음 기록") { WatchStreakView(model: model, cloud: cloud) }
+                .buttonStyle(WatchActionStyle())
                 .accessibilityIdentifier("watch.openStreak")
         }
-        .padding(.horizontal, 14)
+        }
         .task { await model.appear() }
         .onDisappear { model.disappear() }
     }
@@ -32,17 +34,16 @@ struct WatchStreakView: View {
             VStack(spacing: 12) {
                 Text("\(model.summary.currentDays >= 7 ? "🔥 " : "")연속 \(model.summary.currentDays)일")
                     .font(.headline).accessibilityIdentifier("watch.streakDays")
-                HStack(spacing: 0) {
-                    Button { model.moveMonth(-1) } label: { Image(systemName: "chevron.left").frame(minWidth: 44, minHeight: 44) }
-                        .buttonStyle(.plain).accessibilityLabel("이전 달").accessibilityIdentifier("watch.previousMonth")
-                    Button("\(String(model.month.year))년 \(model.month.month)월") { selectingMonth = true }
-                        .buttonStyle(.plain).font(.caption).lineLimit(1).minimumScaleFactor(0.6)
-                        .frame(maxWidth: .infinity, minHeight: 44).accessibilityIdentifier("watch.chooseMonth")
-                    Button { model.moveMonth(1) } label: { Image(systemName: "chevron.right").frame(minWidth: 44, minHeight: 44) }
-                        .buttonStyle(.plain).accessibilityLabel("다음 달").accessibilityIdentifier("watch.nextMonth")
-                }
+                Button("\(String(model.month.year))년 \(model.month.month)월") { selectingMonth = true }
+                    .buttonStyle(WatchActionStyle()).accessibilityIdentifier("watch.chooseMonth")
+                HStack(spacing: 6) {
+                    Button { model.moveMonth(-1) } label: { Label("이전", systemImage: "chevron.left") }
+                        .accessibilityLabel("이전 달").accessibilityIdentifier("watch.previousMonth")
+                    Button { model.moveMonth(1) } label: { Label("다음", systemImage: "chevron.right") }
+                        .accessibilityLabel("다음 달").accessibilityIdentifier("watch.nextMonth")
+                }.buttonStyle(WatchActionStyle(color: .gray))
                 LazyVGrid(columns: columns, spacing: 4) {
-                    ForEach(weekdays.indices, id: \.self) { Text(weekdays[$0]).font(.system(size: 10)).foregroundStyle(.secondary) }
+                    ForEach(weekdays.indices, id: \.self) { Text(weekdays[$0]).font(.caption2).foregroundStyle(.secondary) }
                     ForEach(0..<model.month.leadingEmptyDays, id: \.self) { _ in Color.clear.frame(height: 18) }
                     ForEach(1...model.month.dayCount, id: \.self) { day in
                         let count = model.summary.counts[model.month.dateKey(day: day)] ?? 0
@@ -56,18 +57,18 @@ struct WatchStreakView: View {
                 .accessibilityHidden(true) // Date/count selection is available in the full-size list below.
                 HStack(spacing: 4) {
                     Text("적음")
-                    ForEach(0..<5) { index in RoundedRectangle(cornerRadius: 2).fill(StepIntensity(rawValue: index)!.watchColor).frame(width: 12, height: 10) }
+                    ForEach(0..<5) { index in RoundedRectangle(cornerRadius: 2).fill(StepIntensity(rawValue: index)!.watchColor).frame(maxWidth: .infinity).frame(height: 10) }
                     Text("많음")
-                }.font(.system(size: 10)).foregroundStyle(.secondary)
+                }.font(.caption2).foregroundStyle(.secondary)
                 Text("진한 파랑: 10,000걸음 이상").font(.caption2).foregroundStyle(.secondary)
                 NavigationLink {
                     WatchStreakNumberSelection(title: "날짜", suffix: "일", values: 1...model.month.dayCount,
                                                selected: model.selectedDay, select: model.selectDay)
                 } label: {
                     LabeledContent("날짜", value: "\(model.selectedDay)일")
-                }.accessibilityIdentifier("watch.streakDate")
+                }.buttonStyle(WatchActionStyle()).accessibilityIdentifier("watch.streakDate")
                 Text("\(model.month.month)월 \(model.selectedDay)일\n\(model.selectedCount.formatted())걸음")
-                    .font(.headline).multilineTextAlignment(.center).monospacedDigit()
+                    .font(.headline).multilineTextAlignment(.center).monospacedDigit().fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("watch.selectedDaySteps")
                 Text("오늘부터 매일 1보 이상 기록하면 이어져요.").font(.caption2).foregroundStyle(.secondary)
                 if let error = model.error {
@@ -75,13 +76,14 @@ struct WatchStreakView: View {
                     Button("다시 불러오기") { Task { await model.refresh() } }
                 }
                 Divider()
-                Button(cloud.isDevelopment ? "모의 백업·보상 받기" : "서버 백업·보상 받기") { Task { await cloud.requestBackup() } }
-                    .disabled(cloud.account == nil || cloud.isBusy)
+                Button("백업·보상 받기") { Task { await cloud.requestBackup() } }
+                    .buttonStyle(WatchActionStyle()).disabled(cloud.account == nil || cloud.isBusy)
                 if let date = cloud.lastBackupAt { Text("최근 백업 \(date.formatted(date: .abbreviated, time: .shortened))").font(.caption2).foregroundStyle(.secondary) }
                 if let message = cloud.message { Text(message).font(.caption2) }
-                Text("현재 닉네임\n\(cloud.account?.displayName ?? "미설정")").font(.caption).multilineTextAlignment(.center).lineLimit(3)
+                Text("현재 닉네임\n\(cloud.account?.displayName ?? "미설정")").font(.caption).multilineTextAlignment(.center).lineLimit(2).truncationMode(.middle)
+                    .accessibilityLabel("현재 닉네임 \(cloud.account?.displayName ?? "미설정")")
                 NavigationLink("닉네임 변경") { WatchNicknameView(editor: cloud.makeNicknameEditor()) }
-                    .disabled(cloud.account == nil).accessibilityIdentifier("watch.streakNickname")
+                    .buttonStyle(WatchActionStyle()).disabled(cloud.account == nil).accessibilityIdentifier("watch.streakNickname")
                 if cloud.account == nil { Text("닉네임 변경·백업은 아이폰에서 로그인한 뒤 사용할 수 있어요.").font(.caption2).foregroundStyle(.secondary) }
             }.padding(.horizontal, 10).padding(.bottom, 18)
         }

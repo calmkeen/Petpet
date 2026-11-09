@@ -22,7 +22,7 @@ struct WatchStarStairView: View {
                         Text("별계단 훈련").font(.headline)
                         Text("다음 계단 방향을 눌러요.\n목숨 3개, 올라갈수록 빨라져요.").font(.caption2).multilineTextAlignment(.center).fixedSize(horizontal:false,vertical:true)
                         if let best = result.best { Text("최고 \(best.score)계단 · 콤보 \(best.maxCombo)").font(.caption2).foregroundStyle(.secondary) }
-                        Button("시작") { paused = false; game.start(); lastTick = nil }.accessibilityIdentifier("game.start")
+                        Button("시작") { paused = false; game.start(); lastTick = nil }.buttonStyle(WatchActionStyle()).accessibilityIdentifier("game.start")
                     }
                     .frame(maxWidth: .infinity).padding(.horizontal, 6).padding(.bottom, 8)
                 }.scrollBounceBehavior(.basedOnSize)
@@ -41,7 +41,7 @@ struct WatchStarStairView: View {
                     .onChange(of: crown) { old, new in if !paused { input(new > old ? .right : .left) } }
             }
         }
-        .navigationTitle(game.status == .finished ? "게임 결과" : "별계단")
+        .navigationTitle(game.status == .finished ? "결과" : "별계단")
         .navigationBarBackButtonHidden(game.status == .playing)
         .task { await result.loadBest(.starStair) }
         .toolbar {
@@ -88,8 +88,8 @@ struct WatchStarStairView: View {
                         .position(x: proxy.size.width / 2 + CGFloat(stair.lane-game.currentLane) * 21, y: proxy.size.height - 8 - CGFloat(stair.id-game.score)*stepHeight)
                 }
                 Image("stepmate_fox_idle").resizable().scaledToFit().frame(width:petHeight*0.8,height:petHeight).position(x:proxy.size.width/2,y:proxy.size.height-8-petHeight/2)
-                Image(systemName: game.nextDirection == .left ? "arrow.up.left" : "arrow.up.right").font(.caption.bold()).foregroundStyle(.yellow).position(x:proxy.size.width/2,y:8)
-                if game.feedback == "SPEED UP!" { Text(game.feedback).font(.system(size:9,weight:.bold)).foregroundStyle(.yellow).frame(maxWidth:.infinity,maxHeight:.infinity,alignment:.topTrailing) }
+                Image(systemName: game.nextDirection == .left ? "arrow.up.left" : "arrow.up.right").font(.caption.bold()).foregroundStyle(.yellow).position(x:proxy.size.width/2,y:12)
+                if game.feedback == "SPEED UP!" { Text(game.feedback).font(.caption2.bold()).foregroundStyle(.yellow).frame(maxWidth:.infinity,maxHeight:.infinity,alignment:.topTrailing) }
             }.clipped()
         }.accessibilityElement(children: .ignore).accessibilityLabel("다음 계단 \(game.nextDirection == .left ? "왼쪽" : "오른쪽")")
     }

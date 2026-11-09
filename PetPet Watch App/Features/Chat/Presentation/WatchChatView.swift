@@ -71,12 +71,14 @@ import PetPetCore
 struct WatchChatOverview: View {
     let services: WatchGameServices
     var body: some View {
-        VStack(spacing:12) {
-            Image(systemName:"bubble.left.and.bubble.right.fill").font(.largeTitle).foregroundStyle(.cyan)
+        WatchOverviewLayout { compact in
+          VStack(spacing:6) {
+            Image(systemName:"bubble.left.and.bubble.right.fill").font(.title2).foregroundStyle(.cyan)
             Text("펫과 대화").font(.headline)
-            Text("음성으로 질문하고\n답변을 받아요").font(.caption2).multilineTextAlignment(.center).fixedSize(horizontal:false,vertical:true)
-            NavigationLink("AI 대화 열기") { WatchChatView(services:services) }.accessibilityIdentifier("watch.openChat")
-        }.padding(.horizontal,16)
+            if !compact { Text("음성으로 질문하고\n답변을 받아요").font(.caption2).multilineTextAlignment(.center).fixedSize(horizontal:false,vertical:true) }
+            NavigationLink("AI 대화 열기") { WatchChatView(services:services) }.buttonStyle(WatchActionStyle()).accessibilityIdentifier("watch.openChat")
+          }
+        }
     }
 }
 struct WatchChatView: View {
@@ -87,23 +89,28 @@ struct WatchChatView: View {
         _model = StateObject(wrappedValue:WatchChatViewModel(services:services)); cloud = services.cloud
     }
     var body: some View {
+      ScrollViewReader { scroll in
         List {
             if cloud.isDevelopment { Text("개발용 모의 AI · 외부 전송 없음").font(.caption2).foregroundStyle(.orange) }
             Section("질문") {
-                Button { model.dictate() } label: { Label("음성으로 입력",systemImage:"mic.fill") }.disabled(model.busy).accessibilityIdentifier("chat.dictate")
+                Button { model.dictate() } label: { Label("음성 입력",systemImage:"mic.fill") }.disabled(model.busy).accessibilityIdentifier("chat.dictate")
                 TextField("질문 입력·수정",text:$model.question).disabled(model.busy).accessibilityIdentifier("chat.question")
                 Text("입력한 내용을 확인한 뒤 보내 주세요.").font(.caption2).foregroundStyle(.secondary)
-                Button("AI에 질문 보내기") { model.send() }.disabled(model.busy || model.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty).accessibilityIdentifier("chat.send")
+                Button("질문 보내기") { model.send() }.disabled(model.busy || model.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty).accessibilityIdentifier("chat.send")
             }
             Section("답변") {
-                Text(model.progress.status).font(.caption2).foregroundStyle(model.progress.failed ? .orange : .secondary).accessibilityIdentifier("chat.status")
-                if !model.progress.text.isEmpty { Text(model.progress.text).font(.caption).accessibilityIdentifier("chat.answer") }
-                if model.busy { ProgressView(); Button("응답 중단") { model.stop() }.accessibilityIdentifier("chat.cancel") }
+                Text(model.progress.status).font(.caption2).foregroundStyle(model.progress.failed ? .orange : .secondary).accessibilityIdentifier("chat.status").id("chat.response")
+                if model.busy { Button("응답 중단") { model.stop() }.accessibilityIdentifier("chat.cancel"); ProgressView() }
+                if !model.progress.text.isEmpty { Text(model.progress.text).font(.caption).fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("chat.answer") }
             }
             Text("아이폰의 PetPet과 연결이 필요해요.").font(.caption2).foregroundStyle(.secondary)
         }.navigationTitle("AI 대화")
+            .onChange(of: model.busy) { _, busy in
+                if busy { withAnimation { scroll.scrollTo("chat.response", anchor: .top) } }
+            }
             .onDisappear { model.stop() }
             .onChange(of:phase) { _,value in if value == .background { model.stop() } }
             .onChange(of:cloud.account?.id) { _,_ in model.stop(clear:true) }
+      }
     }
 }

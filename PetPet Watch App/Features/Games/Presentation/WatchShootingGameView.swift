@@ -126,9 +126,9 @@ struct WatchShootingGameView: View {
                     VStack(spacing:6) {
                         Text("지구를 지켜라").font(.headline)
                         Text("크라운·드래그로 좌우 이동\n자동 발사 · 펫 능력치 적용").font(.caption2).multilineTextAlignment(.center).fixedSize(horizontal:false,vertical:true)
-                        Text("공격 \(scene.game.attack) · 체력 \(scene.game.initialHP)").font(.caption2).lineLimit(2).minimumScaleFactor(0.7)
+                        Text("공격 \(scene.game.attack) · 체력 \(scene.game.initialHP)").font(.caption2).fixedSize(horizontal: false, vertical: true)
                         if let best = result.best { Text("최고 기록 \(best.score)점").font(.caption2).foregroundStyle(.secondary) }
-                        Button("시작") { paused = false; started = true; scene.start() }.accessibilityIdentifier("game.start")
+                        Button("시작") { paused = false; started = true; scene.start() }.buttonStyle(WatchActionStyle()).accessibilityIdentifier("game.start")
                     }
                     .frame(maxWidth: .infinity).padding(.horizontal, 6).padding(.bottom, 8)
                 }.scrollBounceBehavior(.basedOnSize)
@@ -136,11 +136,11 @@ struct WatchShootingGameView: View {
                 ZStack(alignment:.top) {
                     arena
                     VStack(spacing:4) {
-                        HStack { Text("\(scene.score)점"); Spacer(); Text("♥ \(scene.health)").foregroundStyle(.pink) }.font(.caption).monospacedDigit().lineLimit(1).minimumScaleFactor(0.6)
+                        HStack { Text("\(scene.score)점"); Spacer(); Text("♥ \(WatchNumber.compact(scene.health))").foregroundStyle(.pink).accessibilityLabel("체력 \(scene.health)") }.font(.caption2).monospacedDigit().lineLimit(1)
                         Text("\(scene.combo) COMBO!").font(.caption2).foregroundStyle(.cyan).monospacedDigit()
                             .accessibilityIdentifier("game.combo")
                         Spacer()
-                        Text(scene.bossText.isEmpty ? "크라운 · 좌우 이동" : scene.bossText).font(.system(size:9)).lineLimit(1).minimumScaleFactor(0.6)
+                        Text(scene.bossText.isEmpty ? "크라운 · 좌우 이동" : scene.bossText).font(.caption2).lineLimit(2)
                     }.padding(6).allowsHitTesting(false)
                 }
                 .overlay { if paused { Button("계속하기") { paused = false; scene.pause(false) }.buttonStyle(.borderedProminent).accessibilityIdentifier("game.resume") } }
@@ -148,7 +148,7 @@ struct WatchShootingGameView: View {
                 .onChange(of:crown) { _,value in if !paused { scene.move(value) } }
             }
         }
-        .navigationTitle(scene.finished ? "게임 결과" : "지구를 지켜라")
+        .navigationTitle(scene.finished ? "결과" : "슈팅")
         .navigationBarBackButtonHidden(started && !scene.finished)
         .task { await result.loadBest(.shooting) }
         .toolbar {
