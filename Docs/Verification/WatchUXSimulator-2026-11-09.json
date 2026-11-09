@@ -1,0 +1,599 @@
+{
+  "date": "2026-11-09",
+  "xcode": "27.2 (27B52)",
+  "appSourceCommit": "4c1adea5674350f6478fb568fba259d1dd0a3288",
+  "simulatorOnly": true,
+  "watch": "Apple Watch SE (2nd generation) 40mm, watchOS 11.0",
+  "phone": "iPhone SE (3rd generation), iOS 18.0",
+  "uniquePassedTests": 14,
+  "failedTests": 0,
+  "skippedTests": 0,
+  "textSizes": [
+    "system default",
+    "xxxLarge (Debug launch argument)"
+  ],
+  "builds": {
+    "debugSimulatorBuild": "passed",
+    "releaseSimulatorBuild": "passed",
+    "largeTextLaunchArgumentPresent": {
+      "Debug": true,
+      "Release": false
+    }
+  },
+  "stages": [
+    {
+      "stage": 0,
+      "suite": "WatchUXUITests",
+      "test": "test00OverviewPages",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:43:13.608668+00:00",
+      "shootingHealthSetup": null,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-00-184220.xcresult",
+      "targets": [
+        {
+          "identifier": "watch.openPetStatistics",
+          "x": 10.0,
+          "y": 141.5,
+          "width": 68.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.petTouch",
+          "x": 10.0,
+          "y": 39.5,
+          "width": 64.0,
+          "height": 64.0
+        },
+        {
+          "identifier": "watch.openFoodInventory",
+          "x": 84.0,
+          "y": 141.5,
+          "width": 68.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.retrySteps",
+          "x": 78.0,
+          "y": 92.0,
+          "width": 74.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.managePetStatistics",
+          "x": 14.0,
+          "y": 132.5,
+          "width": 134.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.manageFoodInventory",
+          "x": 14.0,
+          "y": 119.5,
+          "width": 134.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.openStreak",
+          "x": 14.0,
+          "y": 127.5,
+          "width": 134.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.openGames",
+          "x": 14.0,
+          "y": 125.0,
+          "width": 134.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.openChat",
+          "x": 14.0,
+          "y": 117.0,
+          "width": 134.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "account.backupManagement",
+          "x": 14.0,
+          "y": 110.0,
+          "width": 134.0,
+          "height": 44.0
+        }
+      ]
+    },
+    {
+      "stage": 1,
+      "suite": "WatchUXUITests",
+      "test": "test01LargeTextOverviewPages",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:44:09.362388+00:00",
+      "shootingHealthSetup": null,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-01-184314.xcresult",
+      "targets": [
+        {
+          "identifier": "watch.openPetStatistics",
+          "x": 10.0,
+          "y": 145.0,
+          "width": 68.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.petTouch",
+          "x": 10.0,
+          "y": 36.0,
+          "width": 64.0,
+          "height": 64.0
+        },
+        {
+          "identifier": "watch.openFoodInventory",
+          "x": 84.0,
+          "y": 145.0,
+          "width": 68.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.retrySteps",
+          "x": 78.0,
+          "y": 96.0,
+          "width": 74.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.managePetStatistics",
+          "x": 14.0,
+          "y": 138.5,
+          "width": 134.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.manageFoodInventory",
+          "x": 14.0,
+          "y": 123.0,
+          "width": 134.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.openStreak",
+          "x": 14.0,
+          "y": 120.0,
+          "width": 134.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.openGames",
+          "x": 14.0,
+          "y": 127.0,
+          "width": 134.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.openChat",
+          "x": 14.0,
+          "y": 121.0,
+          "width": 134.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "account.backupManagement",
+          "x": 14.0,
+          "y": 113.5,
+          "width": 134.0,
+          "height": 44.0
+        }
+      ]
+    },
+    {
+      "stage": 2,
+      "suite": "WatchUXUITests",
+      "test": "test10DetailControls",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:12:47.109448+00:00",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-02-181112.xcresult",
+      "targets": [
+        {
+          "identifier": "watch.allocate.attack",
+          "x": 108.5,
+          "y": 105.5,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.allocate.defense",
+          "x": 108.5,
+          "y": 98.0,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.allocate.health",
+          "x": 108.5,
+          "y": 90.5,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.feedFood.1",
+          "x": 9.5,
+          "y": 112.0,
+          "width": 143.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.claimStepRewards",
+          "x": 2.0,
+          "y": 133.5,
+          "width": 158.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.chooseMonth",
+          "x": 12.0,
+          "y": 79.0,
+          "width": 138.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.previousMonth",
+          "x": 12.0,
+          "y": 135.0,
+          "width": 66.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.nextMonth",
+          "x": 84.0,
+          "y": 135.0,
+          "width": 66.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.editNickname",
+          "x": 2.0,
+          "y": 113.0,
+          "width": 158.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "nickname.submit",
+          "x": 2.0,
+          "y": 116.5,
+          "width": 158.0,
+          "height": 44.0
+        }
+      ]
+    },
+    {
+      "stage": 3,
+      "suite": "WatchUXUITests",
+      "test": "test11LargeTextDetailControls",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:14:25.313606+00:00",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-03-181247.xcresult",
+      "targets": [
+        {
+          "identifier": "watch.allocate.attack",
+          "x": 108.5,
+          "y": 113.5,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.allocate.defense",
+          "x": 108.5,
+          "y": 109.0,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.allocate.health",
+          "x": 108.5,
+          "y": 104.5,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.feedFood.1",
+          "x": 9.5,
+          "y": 118.0,
+          "width": 143.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.claimStepRewards",
+          "x": 2.0,
+          "y": 90.5,
+          "width": 158.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.chooseMonth",
+          "x": 12.0,
+          "y": 82.5,
+          "width": 138.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.previousMonth",
+          "x": 12.0,
+          "y": 138.5,
+          "width": 66.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.nextMonth",
+          "x": 84.0,
+          "y": 138.5,
+          "width": 66.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "watch.editNickname",
+          "x": 2.0,
+          "y": 126.5,
+          "width": 158.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "nickname.submit",
+          "x": 2.0,
+          "y": 135.0,
+          "width": 158.0,
+          "height": 44.0
+        }
+      ]
+    },
+    {
+      "stage": 4,
+      "suite": "WatchSmallScreenUITests",
+      "test": "testDateSelectionReturnsToCalendar",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:16:27.432252+00:00",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-04-181517.xcresult"
+    },
+    {
+      "stage": 5,
+      "suite": "WatchSmallScreenUITests",
+      "test": "testYearAndMonthSelectionReturnAndRespectLeapDay",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:18:11.986073+00:00",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-05-181628.xcresult"
+    },
+    {
+      "stage": 6,
+      "suite": "WatchSmallScreenUITests",
+      "test": "testShootingStartPauseFinishReplayAndSavedBest",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:23:38.273305+00:00",
+      "shootingHealthSetup": {
+        "originalHealth": 9,
+        "testHealth": 99,
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-06-182206.xcresult"
+    },
+    {
+      "stage": 7,
+      "suite": "WatchSmallScreenUITests",
+      "test": "testStairsControlsTimeoutResultAndReplay",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:24:31.860321+00:00",
+      "shootingHealthSetup": null,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-07-182338.xcresult"
+    },
+    {
+      "stage": 8,
+      "suite": "WatchGameFlowUITests",
+      "test": "test12StandaloneRankingRefresh",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:25:21.573523+00:00",
+      "shootingHealthSetup": null,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-08-182432.xcresult"
+    },
+    {
+      "stage": 9,
+      "suite": "WatchGameFlowUITests",
+      "test": "test20ChatThroughSystemInput",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:35:41.105385+00:00",
+      "shootingHealthSetup": null,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-09-183415.xcresult"
+    },
+    {
+      "stage": 10,
+      "suite": "WatchGameFlowUITests",
+      "test": "test22ChatCancellationAndReturn",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:36:59.002178+00:00",
+      "shootingHealthSetup": null,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-10-183541.xcresult"
+    },
+    {
+      "stage": 11,
+      "suite": "WatchFinalAuditUITests",
+      "test": "test20WatchNicknameChangeSurvivesRelaunch",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:38:41.651034+00:00",
+      "shootingHealthSetup": null,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-11-183659.xcresult"
+    },
+    {
+      "stage": 12,
+      "suite": "WatchSmallScreenUITests",
+      "test": "testLargeTextShootingStartPauseFinishReplayAndSavedBest",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:40:16.846370+00:00",
+      "shootingHealthSetup": {
+        "originalHealth": 9,
+        "testHealth": 99,
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-12-183842.xcresult"
+    },
+    {
+      "stage": 13,
+      "suite": "WatchSmallScreenUITests",
+      "test": "testLargeTextStairsControlsTimeoutResultAndReplay",
+      "passed": true,
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "verifiedAt": "2026-11-09T09:41:14.041555+00:00",
+      "shootingHealthSetup": null,
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-watch-ux/ux-13-184017.xcresult"
+    }
+  ],
+  "screenshots": [
+    "Docs/Screenshots/WatchUX/ux-chat-cancelled.png",
+    "Docs/Screenshots/WatchUX/ux-chat-cancelling.png",
+    "Docs/Screenshots/WatchUX/ux-chat-return-cleared.png",
+    "Docs/Screenshots/WatchUX/ux-chat-sixth-answer.png",
+    "Docs/Screenshots/WatchUX/ux-large-account.png",
+    "Docs/Screenshots/WatchUX/ux-large-calendar.png",
+    "Docs/Screenshots/WatchUX/ux-large-chat.png",
+    "Docs/Screenshots/WatchUX/ux-large-food-detail.png",
+    "Docs/Screenshots/WatchUX/ux-large-food.png",
+    "Docs/Screenshots/WatchUX/ux-large-games.png",
+    "Docs/Screenshots/WatchUX/ux-large-growth.png",
+    "Docs/Screenshots/WatchUX/ux-large-home.png",
+    "Docs/Screenshots/WatchUX/ux-large-nickname.png",
+    "Docs/Screenshots/WatchUX/ux-large-rewards.png",
+    "Docs/Screenshots/WatchUX/ux-large-shooting-best-after-relaunch.png",
+    "Docs/Screenshots/WatchUX/ux-large-shooting-paused.png",
+    "Docs/Screenshots/WatchUX/ux-large-shooting-result.png",
+    "Docs/Screenshots/WatchUX/ux-large-shooting-start.png",
+    "Docs/Screenshots/WatchUX/ux-large-stairs-finish-result.png",
+    "Docs/Screenshots/WatchUX/ux-large-stairs-paused-controls.png",
+    "Docs/Screenshots/WatchUX/ux-large-stairs-start.png",
+    "Docs/Screenshots/WatchUX/ux-large-stairs-timeout-result.png",
+    "Docs/Screenshots/WatchUX/ux-large-statistics.png",
+    "Docs/Screenshots/WatchUX/ux-large-step-guidance.png",
+    "Docs/Screenshots/WatchUX/ux-large-streak.png",
+    "Docs/Screenshots/WatchUX/ux-normal-account.png",
+    "Docs/Screenshots/WatchUX/ux-normal-calendar.png",
+    "Docs/Screenshots/WatchUX/ux-normal-chat.png",
+    "Docs/Screenshots/WatchUX/ux-normal-food-detail.png",
+    "Docs/Screenshots/WatchUX/ux-normal-food.png",
+    "Docs/Screenshots/WatchUX/ux-normal-games.png",
+    "Docs/Screenshots/WatchUX/ux-normal-growth.png",
+    "Docs/Screenshots/WatchUX/ux-normal-home.png",
+    "Docs/Screenshots/WatchUX/ux-normal-nickname.png",
+    "Docs/Screenshots/WatchUX/ux-normal-rewards.png",
+    "Docs/Screenshots/WatchUX/ux-normal-shooting-best-after-relaunch.png",
+    "Docs/Screenshots/WatchUX/ux-normal-shooting-paused.png",
+    "Docs/Screenshots/WatchUX/ux-normal-shooting-result.png",
+    "Docs/Screenshots/WatchUX/ux-normal-shooting-start.png",
+    "Docs/Screenshots/WatchUX/ux-normal-stairs-finish-result.png",
+    "Docs/Screenshots/WatchUX/ux-normal-stairs-paused-controls.png",
+    "Docs/Screenshots/WatchUX/ux-normal-stairs-start.png",
+    "Docs/Screenshots/WatchUX/ux-normal-stairs-timeout-result.png",
+    "Docs/Screenshots/WatchUX/ux-normal-statistics.png",
+    "Docs/Screenshots/WatchUX/ux-normal-step-guidance.png",
+    "Docs/Screenshots/WatchUX/ux-normal-streak.png"
+  ],
+  "finalState": {
+    "pet": {
+      "lastFedAt": 815896370.407832,
+      "statPoints": 0,
+      "experience": 2,
+      "id": 1,
+      "health": 9,
+      "defense": 0,
+      "attack": 50,
+      "level": 2,
+      "mood": "HAPPY",
+      "affection": 0
+    },
+    "inventory": [
+      {
+        "quantity": 2,
+        "id": 1,
+        "foodID": 1
+      },
+      {
+        "id": 2,
+        "foodID": 2,
+        "quantity": 2
+      }
+    ],
+    "steps": {
+      "2026-11-08": 4321,
+      "2026-11-07": 2000,
+      "2026-11-09": 0
+    },
+    "appliedBackups": 5,
+    "pendingBackups": 0,
+    "phoneSnapshotMatchesWatch": true,
+    "petStatsAndFoodUnchanged": true,
+    "shootingHealthRestored": true,
+    "mockNicknameMatchesWatch": true,
+    "nickname": "FinalWatch217069"
+  }
+}
