@@ -4,6 +4,16 @@ import PetPetCore
 
 @MainActor
 final class WatchCompanionModelTests: XCTestCase {
+    func testZeroHealthShootingSceneImmediatelyEmitsFinishedResult() {
+        let scene = ShootingScene(pet: nil)
+        scene.game = ShootingGame(attack: 50, health: 0, seed: 1)
+        var scores: [Int] = []
+        scene.onFinish = { scores.append($0.score) }
+        scene.start()
+        XCTAssertTrue(scene.finished); XCTAssertEqual(scene.health, 0)
+        scene.start()
+        XCTAssertTrue(scene.finished); XCTAssertEqual(scores, [0, 0])
+    }
     func testFinishedChatAllowsNextQuestionBeforeCleanupReply() async throws {
         let (services, wire, directory, _) = try await setup()
         defer { wire.releaseAll(); try? FileManager.default.removeItem(at: directory) }

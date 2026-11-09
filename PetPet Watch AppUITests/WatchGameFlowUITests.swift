@@ -11,6 +11,9 @@ final class WatchGameFlowUITests: XCTestCase {
         reveal(app.buttons["game.start"]); app.buttons["game.start"].tap()
         let pause = app.buttons["game.pause"].firstMatch
         XCTAssertTrue(pause.waitForExistence(timeout: 4)); pause.tap()
+        let combo = app.staticTexts["game.combo"]
+        XCTAssertTrue(combo.waitForExistence(timeout: 3)); XCTAssertTrue(combo.label.hasSuffix("COMBO!"))
+        XCTAssertTrue(app.windows.firstMatch.frame.contains(combo.frame), "The shooting combo must fit the 40mm watch")
         XCTAssertTrue(app.buttons["game.resume"].waitForExistence(timeout: 4))
         capture("games-shooting-paused")
         app.buttons["game.resume"].tap()

@@ -4,6 +4,7 @@ import PetPetCore
 
 @MainActor final class ShootingScene: SKScene, ObservableObject {
     @Published private(set) var score = 0
+    @Published private(set) var combo = 0
     @Published private(set) var health: Int64 = 0
     @Published private(set) var bossText = ""
     @Published private(set) var finished = false
@@ -43,13 +44,14 @@ import PetPetCore
     func start() {
         nodes.values.forEach { $0.removeFromParent() }; nodes.removeAll()
         bossNodes.values.forEach { $0.removeFromParent() }; bossNodes.removeAll()
-        game.start(); finished = false; score = 0; health = game.hp; lastUpdate = nil; lastHUD = 0; bossText = ""
+        game.start(); finished = false; score = 0; combo = 0; health = game.hp; lastUpdate = nil; lastHUD = 0; bossText = ""
         isPaused = false; render()
+        if game.status == .finished { finishRun() }
     }
     func pause(_ value: Bool) { isPaused = value; lastUpdate = nil }
     func finishRun() {
         guard !finished else { return }
-        game.finish(); score = game.score; health = game.hp; finished = true; isPaused = true
+        game.finish(); score = game.score; combo = game.combo; health = game.hp; finished = true; isPaused = true
         onFinish?(GameScore(game:.shooting,score:game.score,maxCombo:game.maxCombo))
     }
     func move(_ normalized: Double) { game.move(to: 70 + min(1,max(0,normalized))*290); renderPlayer() }
@@ -59,7 +61,7 @@ import PetPetCore
         guard let lastUpdate else { return }
         game.advance(seconds: currentTime-lastUpdate); render()
         if currentTime-lastHUD >= 0.1 || game.status == .finished {
-            score = game.score; health = game.hp
+            score = game.score; combo = game.combo; health = game.hp
             bossText = game.bosses.map { "보스 \($0.stage) · \(Int(ceil($0.remaining)))초 · \(Int(max(0,$0.hp)/$0.maxHP*100))%" }.joined(separator:" / ")
             lastHUD = currentTime
         }
@@ -135,6 +137,8 @@ struct WatchShootingGameView: View {
                     arena
                     VStack(spacing:4) {
                         HStack { Text("\(scene.score)점"); Spacer(); Text("♥ \(scene.health)").foregroundStyle(.pink) }.font(.caption).monospacedDigit().lineLimit(1).minimumScaleFactor(0.6)
+                        Text("\(scene.combo) COMBO!").font(.caption2).foregroundStyle(.cyan).monospacedDigit()
+                            .accessibilityIdentifier("game.combo")
                         Spacer()
                         Text(scene.bossText.isEmpty ? "크라운 · 좌우 이동" : scene.bossText).font(.system(size:9)).lineLimit(1).minimumScaleFactor(0.6)
                     }.padding(6).allowsHitTesting(false)

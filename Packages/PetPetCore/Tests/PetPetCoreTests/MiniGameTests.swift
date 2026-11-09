@@ -2,6 +2,17 @@ import XCTest
 @testable import PetPetCore
 
 final class MiniGameTests: XCTestCase {
+    func testZeroHealthDoesNotGrantAnExtraLife() {
+        for health: Int64 in [0, -1] {
+            var game = ShootingGame(attack: 50, health: health, seed: 1)
+            game.start()
+            XCTAssertEqual(game.initialHP, 0); XCTAssertEqual(game.hp, 0)
+            XCTAssertEqual(game.status, .finished)
+            game.advance(seconds: 10)
+            XCTAssertEqual(game.score, 0)
+            game.start(); XCTAssertEqual(game.status, .finished)
+        }
+    }
     func testShootingPreservesMaximumRestoredStatsWithoutFloatingPointConversion() {
         var game = ShootingGame(attack:Int64.max,health:Int64.max,seed:3)
         game.start(); game.apply(.heal); game.apply(.attack)

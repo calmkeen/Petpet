@@ -52,11 +52,11 @@ public struct ShootingGame: Sendable {
     private var random: GameRandom
 
     public init(attack: Int64, health: Int64, seed: UInt64 = UInt64.random(in: 1...UInt64.max)) {
-        self.attack = max(0, attack); initialHP = max(1, health); hp = initialHP
+        self.attack = max(0, attack); initialHP = max(0, health); hp = initialHP
         random = GameRandom(seed: seed)
     }
     public mutating func start() {
-        status = .playing; hp = initialHP; score = 0; combo = 0; maxCombo = 0
+        status = initialHP > 0 ? .playing : .finished; hp = initialHP; score = 0; combo = 0; maxCombo = 0
         playerX = 215; entities = []; bosses = []; spawned = []; defeated = []
         elapsed = 0; accumulator = 0; lastFire = -1; speedMultiplier = 1; attackMultiplier = 1
     }
