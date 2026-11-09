@@ -1,0 +1,854 @@
+{
+  "schema": 1,
+  "verifiedAt": "2026-11-09T03:16:31.595580+00:00",
+  "sourceCommit": "1144d7b87cf63b6c22adb27208d12af4e78e2299",
+  "scope": "Simulator only; Debug mock backend; native system text input, no real microphone validation",
+  "targets": {
+    "phone": "iPhone SE 3 / iOS 18.0",
+    "watch": "Apple Watch SE 2 40mm / watchOS 11.0"
+  },
+  "coreTests": {
+    "passed": 179,
+    "failed": 0
+  },
+  "watchModelTests": {
+    "passed": 7,
+    "failed": 0
+  },
+  "builds": {
+    "debug": "passed (ad hoc signing)",
+    "release": "passed (simulator, signing disabled)"
+  },
+  "baseline": {
+    "pet": {
+      "experience": 1,
+      "defense": 0,
+      "id": 1,
+      "statPoints": 0,
+      "health": 9,
+      "level": 2,
+      "affection": 0,
+      "attack": 50
+    },
+    "inventory": [
+      {
+        "foodID": 1,
+        "quantity": 3,
+        "id": 1
+      },
+      {
+        "foodID": 2,
+        "quantity": 1,
+        "id": 2
+      }
+    ],
+    "localRecords": {
+      "starStair": {
+        "game": "starStair",
+        "score": 1,
+        "maxCombo": 1
+      },
+      "shooting": {
+        "game": "shooting",
+        "score": 4,
+        "maxCombo": 3
+      }
+    },
+    "serverRecords": {
+      "starStair": {
+        "score": 1,
+        "maxCombo": 1,
+        "game": "starStair"
+      },
+      "shooting": {
+        "score": 4,
+        "game": "shooting",
+        "maxCombo": 0
+      }
+    },
+    "watchHasAccount": true
+  },
+  "stages": [
+    {
+      "pet": {
+        "level": 2,
+        "experience": 1,
+        "defense": 0,
+        "health": 9,
+        "id": 1,
+        "attack": 50,
+        "affection": 0,
+        "statPoints": 0
+      },
+      "inventory": [
+        {
+          "id": 1,
+          "foodID": 1,
+          "quantity": 3
+        },
+        {
+          "foodID": 2,
+          "id": 2,
+          "quantity": 1
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "score": 1,
+          "maxCombo": 1
+        },
+        "shooting": {
+          "game": "shooting",
+          "score": 4,
+          "maxCombo": 3
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "score": 1,
+          "maxCombo": 1,
+          "game": "starStair"
+        },
+        "shooting": {
+          "score": 4,
+          "game": "shooting",
+          "maxCombo": 0
+        }
+      },
+      "watchHasAccount": true,
+      "stage": 0,
+      "test": "test00EnsureDevelopmentLogin",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:41:44.381969+00:00",
+      "xctest": {
+        "bundle": "stage-00-test00EnsureDevelopmentLogin-114126.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "level": 2,
+        "health": 9,
+        "experience": 1,
+        "defense": 0,
+        "statPoints": 0,
+        "id": 1,
+        "affection": 0,
+        "attack": 50
+      },
+      "inventory": [
+        {
+          "foodID": 1,
+          "quantity": 3,
+          "id": 1
+        },
+        {
+          "foodID": 2,
+          "id": 2,
+          "quantity": 1
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "maxCombo": 1,
+          "game": "starStair",
+          "score": 1
+        },
+        "shooting": {
+          "game": "shooting",
+          "maxCombo": 3,
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "score": 1,
+          "game": "starStair",
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 0,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "watchHasAccount": true,
+      "stage": 1,
+      "test": "test10ShootingResultSubmitsAndReplayKeepsBest",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:43:21.482572+00:00",
+      "xctest": {
+        "bundle": "stage-01-test10ShootingResultSubmitsAndReplayKeepsBest-114144.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "level": 2,
+        "defense": 0,
+        "statPoints": 0,
+        "experience": 1,
+        "attack": 50,
+        "affection": 0,
+        "health": 9,
+        "id": 1
+      },
+      "inventory": [
+        {
+          "foodID": 1,
+          "quantity": 3,
+          "id": 1
+        },
+        {
+          "quantity": 1,
+          "foodID": 2,
+          "id": 2
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "score": 1,
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 3,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "score": 1,
+          "game": "starStair",
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 0,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "watchHasAccount": true,
+      "stage": 2,
+      "test": "test11StairsResultSubmitsAndLeaderboardReloads",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:45:13.112220+00:00",
+      "xctest": {
+        "bundle": "stage-02-test11StairsResultSubmitsAndLeaderboardReloads-114321.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "experience": 1,
+        "health": 9,
+        "level": 2,
+        "id": 1,
+        "statPoints": 0,
+        "attack": 50,
+        "affection": 0,
+        "defense": 0
+      },
+      "inventory": [
+        {
+          "quantity": 3,
+          "id": 1,
+          "foodID": 1
+        },
+        {
+          "foodID": 2,
+          "id": 2,
+          "quantity": 1
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "score": 1,
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 3,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "score": 1,
+          "game": "starStair",
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 0,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "watchHasAccount": true,
+      "stage": 3,
+      "test": "test12StandaloneRankingRefresh",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:49:40.572775+00:00",
+      "xctest": {
+        "bundle": "stage-03-test12StandaloneRankingRefresh-114850.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "affection": 0,
+        "experience": 1,
+        "defense": 0,
+        "statPoints": 0,
+        "id": 1,
+        "level": 2,
+        "health": 9,
+        "attack": 50
+      },
+      "inventory": [
+        {
+          "foodID": 1,
+          "quantity": 3,
+          "id": 1
+        },
+        {
+          "quantity": 1,
+          "foodID": 2,
+          "id": 2
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "score": 1,
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 3,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "score": 1,
+          "game": "starStair",
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 0,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "watchHasAccount": true,
+      "stage": 4,
+      "test": "test21BothRankingsShowWatchRecords",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:50:09.985026+00:00",
+      "xctest": {
+        "bundle": "stage-04-test21BothRankingsShowWatchRecords-114940.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "id": 1,
+        "level": 2,
+        "defense": 0,
+        "health": 9,
+        "affection": 0,
+        "attack": 50,
+        "experience": 1,
+        "statPoints": 0
+      },
+      "inventory": [
+        {
+          "foodID": 1,
+          "id": 1,
+          "quantity": 3
+        },
+        {
+          "id": 2,
+          "quantity": 1,
+          "foodID": 2
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "score": 1,
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 3,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "score": 1,
+          "game": "starStair",
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 0,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "watchHasAccount": true,
+      "stage": 5,
+      "test": "test20ChatThroughSystemInput",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:54:14.442398+00:00",
+      "xctest": {
+        "bundle": "stage-05-test20ChatThroughSystemInput-115233.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "attack": 50,
+        "affection": 0,
+        "health": 9,
+        "defense": 0,
+        "statPoints": 0,
+        "level": 2,
+        "id": 1,
+        "experience": 1
+      },
+      "inventory": [
+        {
+          "quantity": 3,
+          "id": 1,
+          "foodID": 1
+        },
+        {
+          "foodID": 2,
+          "quantity": 1,
+          "id": 2
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "score": 1,
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 3,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "score": 1,
+          "game": "starStair",
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 0,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "watchHasAccount": true,
+      "stage": 6,
+      "test": "test22ChatCancellationAndReturn",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:55:31.655502+00:00",
+      "xctest": {
+        "bundle": "stage-06-test22ChatCancellationAndReturn-115414.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "id": 1,
+        "health": 9,
+        "experience": 1,
+        "affection": 0,
+        "level": 2,
+        "attack": 50,
+        "statPoints": 0,
+        "defense": 0
+      },
+      "inventory": [
+        {
+          "quantity": 3,
+          "foodID": 1,
+          "id": 1
+        },
+        {
+          "quantity": 1,
+          "id": 2,
+          "foodID": 2
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "score": 1,
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 3,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "score": 1,
+          "game": "starStair",
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 0,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "watchHasAccount": false,
+      "stage": 7,
+      "test": "test30Logout",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:55:44.544082+00:00",
+      "xctest": {
+        "bundle": "stage-07-test30Logout-115531.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "defense": 0,
+        "statPoints": 0,
+        "experience": 1,
+        "health": 9,
+        "id": 1,
+        "level": 2,
+        "attack": 50,
+        "affection": 0
+      },
+      "inventory": [
+        {
+          "id": 1,
+          "quantity": 3,
+          "foodID": 1
+        },
+        {
+          "id": 2,
+          "foodID": 2,
+          "quantity": 1
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "maxCombo": 1,
+          "score": 1
+        },
+        "shooting": {
+          "maxCombo": 3,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "score": 1,
+          "game": "starStair",
+          "maxCombo": 1
+        },
+        "shooting": {
+          "maxCombo": 0,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "watchHasAccount": false,
+      "stage": 8,
+      "test": "test31LoggedOutGameKeepsLocalRecordAndChatRequiresLogin",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:57:14.624785+00:00",
+      "xctest": {
+        "bundle": "stage-08-test31LoggedOutGameKeepsLocalRecordAndChatRequiresLogin-115544.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "attack": 50,
+        "id": 1,
+        "affection": 0,
+        "health": 9,
+        "experience": 1,
+        "defense": 0,
+        "statPoints": 0,
+        "level": 2
+      },
+      "inventory": [
+        {
+          "id": 1,
+          "foodID": 1,
+          "quantity": 3
+        },
+        {
+          "quantity": 1,
+          "id": 2,
+          "foodID": 2
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "maxCombo": 1,
+          "score": 1
+        },
+        "shooting": {
+          "maxCombo": 3,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "maxCombo": 1,
+          "score": 1,
+          "game": "starStair"
+        },
+        "shooting": {
+          "game": "shooting",
+          "score": 5,
+          "maxCombo": 0
+        }
+      },
+      "watchHasAccount": true,
+      "stage": 9,
+      "test": "test00EnsureDevelopmentLogin",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:57:27.383448+00:00",
+      "xctest": {
+        "bundle": "stage-09-test00EnsureDevelopmentLogin-115714.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "affection": 0,
+        "defense": 0,
+        "level": 2,
+        "health": 9,
+        "attack": 50,
+        "experience": 1,
+        "id": 1,
+        "statPoints": 0
+      },
+      "inventory": [
+        {
+          "foodID": 1,
+          "id": 1,
+          "quantity": 3
+        },
+        {
+          "quantity": 1,
+          "id": 2,
+          "foodID": 2
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "maxCombo": 1,
+          "score": 1
+        },
+        "shooting": {
+          "maxCombo": 3,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "maxCombo": 1,
+          "score": 1,
+          "game": "starStair"
+        },
+        "shooting": {
+          "game": "shooting",
+          "score": 5,
+          "maxCombo": 0
+        }
+      },
+      "watchHasAccount": true,
+      "stage": 10,
+      "test": "test12StandaloneRankingRefresh",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:58:17.263722+00:00",
+      "xctest": {
+        "bundle": "stage-10-test12StandaloneRankingRefresh-115727.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "id": 1,
+        "level": 2,
+        "statPoints": 0,
+        "experience": 1,
+        "affection": 0,
+        "defense": 0,
+        "health": 9,
+        "attack": 50
+      },
+      "inventory": [
+        {
+          "id": 1,
+          "foodID": 1,
+          "quantity": 3
+        },
+        {
+          "quantity": 1,
+          "id": 2,
+          "foodID": 2
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "maxCombo": 1,
+          "score": 1
+        },
+        "shooting": {
+          "maxCombo": 3,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "maxCombo": 1,
+          "score": 1,
+          "game": "starStair"
+        },
+        "shooting": {
+          "game": "shooting",
+          "score": 5,
+          "maxCombo": 0
+        }
+      },
+      "watchHasAccount": true,
+      "stage": 11,
+      "test": "test20ChatThroughSystemInput",
+      "passed": true,
+      "verifiedAt": "2026-11-09T02:59:57.737283+00:00",
+      "xctest": {
+        "bundle": "stage-11-test20ChatThroughSystemInput-115817.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    },
+    {
+      "pet": {
+        "experience": 1,
+        "id": 1,
+        "defense": 0,
+        "level": 2,
+        "affection": 0,
+        "attack": 50,
+        "health": 9,
+        "statPoints": 0
+      },
+      "inventory": [
+        {
+          "quantity": 3,
+          "id": 1,
+          "foodID": 1
+        },
+        {
+          "id": 2,
+          "quantity": 1,
+          "foodID": 2
+        }
+      ],
+      "localRecords": {
+        "starStair": {
+          "game": "starStair",
+          "maxCombo": 1,
+          "score": 1
+        },
+        "shooting": {
+          "maxCombo": 3,
+          "game": "shooting",
+          "score": 5
+        }
+      },
+      "serverRecords": {
+        "starStair": {
+          "maxCombo": 1,
+          "score": 1,
+          "game": "starStair"
+        },
+        "shooting": {
+          "game": "shooting",
+          "score": 5,
+          "maxCombo": 0
+        }
+      },
+      "watchHasAccount": true,
+      "stage": 12,
+      "test": "test40PhoneChatRepeatsAndCancels",
+      "passed": true,
+      "verifiedAt": "2026-11-09T03:14:49.023799+00:00",
+      "xctest": {
+        "bundle": "stage-12-test40PhoneChatRepeatsAndCancels-121402.xcresult",
+        "passedTests": 1,
+        "failedTests": 0,
+        "result": "Passed"
+      }
+    }
+  ],
+  "additionalUIRegression": {
+    "test": "PhoneAuditUITests.testConnectionGuideAndExtrasReturnHome",
+    "passed": true,
+    "petAndInventoryPreserved": true,
+    "bundle": "compatibility-phone-audit-121508.xcresult",
+    "passedTests": 1,
+    "failedTests": 0
+  },
+  "phoneInputLayout": {
+    "runtime": "iOS 18.0 / iPhone SE 3",
+    "longQuestionWords": 150,
+    "beforeFixRowHeight": 579.5,
+    "afterFixPreviewRowHeight": 109.5
+  }
+}
