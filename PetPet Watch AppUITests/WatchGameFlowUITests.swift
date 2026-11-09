@@ -90,6 +90,9 @@ final class WatchGameFlowUITests: XCTestCase {
         reveal(app.buttons["chat.send"]); app.buttons["chat.send"].tap()
         XCTAssertTrue(app.buttons["chat.cancel"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["chat.cancel"].isHittable, "Cancellation must remain above the growing answer")
+        capture("games-chat-cancelling")
+        XCTAssertTrue(app.windows.firstMatch.frame.contains(app.buttons["chat.cancel"].frame), "Show the whole cancellation button without scrolling: \(app.buttons["chat.cancel"].frame)")
+        XCTAssertGreaterThanOrEqual(app.buttons["chat.cancel"].frame.height, 44)
         app.buttons["chat.cancel"].tap()
         reveal(app.staticTexts["chat.status"], down: false); waitForStatus("응답을 중단했어요")
         reveal(app.buttons["chat.send"], down: false); XCTAssertTrue(app.buttons["chat.send"].isEnabled)
@@ -147,12 +150,22 @@ final class WatchGameFlowUITests: XCTestCase {
         // session before XCTest injects text so a dictation failure cannot lock Done.
         let dictation = app.buttons["Stop dictation"]
         if dictation.waitForExistence(timeout: 1) { dictation.tap() }
+        let method = app.buttons["Change input method"]
+        if method.exists {
+            method.tap()
+            let scribble = app.descendants(matching: .any).matching(NSPredicate(format: "label IN %@", ["Scribble", "손글씨 입력"])).firstMatch
+            guard scribble.waitForExistence(timeout: 3) else { XCTFail("System input methods:\n\(app.debugDescription)"); return }
+            scribble.tap()
+        }
         capture("games-chat-system-input")
         app.typeText(text)
         let done = app.buttons.matching(NSPredicate(format: "label IN %@", ["완료", "Done"])).firstMatch
         let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in done.exists && done.isEnabled }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 5), .completed, "System input must accept injected text before returning to the app")
         done.tap()
+        let host = app.descendants(matching: .any).matching(identifier: "TextInputHost").firstMatch
+        let returned = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in !host.exists }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [returned], timeout: 5), .completed, "System text editor must close before querying app controls")
     }
     private func waitForStatus(_ text: String) {
         let done = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in self.app.staticTexts["chat.status"].exists && self.app.staticTexts["chat.status"].label == text }, object: nil)

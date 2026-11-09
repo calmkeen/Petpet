@@ -100,13 +100,17 @@ struct WatchChatView: View {
             }
             Section("답변") {
                 Text(model.progress.status).font(.caption2).foregroundStyle(model.progress.failed ? .orange : .secondary).accessibilityIdentifier("chat.status").id("chat.response")
-                if model.busy { Button("응답 중단") { model.stop() }.accessibilityIdentifier("chat.cancel"); ProgressView() }
+                if model.busy { Button("응답 중단") { model.stop() }.accessibilityIdentifier("chat.cancel").id("chat.cancellation"); ProgressView() }
                 if !model.progress.text.isEmpty { Text(model.progress.text).font(.caption).fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("chat.answer") }
             }
             Text("아이폰의 PetPet과 연결이 필요해요.").font(.caption2).foregroundStyle(.secondary)
         }.navigationTitle("AI 대화")
-            .onChange(of: model.busy) { _, busy in
-                if busy { withAnimation { scroll.scrollTo("chat.response", anchor: .top) } }
+            .task(id: model.busy) {
+                guard model.busy else { return }
+                // Let List insert the cancellation row before resolving its position.
+                try? await Task.sleep(for: .milliseconds(150))
+                guard !Task.isCancelled, model.busy else { return }
+                withAnimation { scroll.scrollTo("chat.cancellation", anchor: .center) }
             }
             .onDisappear { model.stop() }
             .onChange(of:phase) { _,value in if value == .background { model.stop() } }
