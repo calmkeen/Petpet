@@ -28,6 +28,7 @@ struct WatchGameLibraryView: View {
             }.accessibilityIdentifier("game.openStairs")
             ForEach(MiniGame.allCases, id: \.self) { game in
                 NavigationLink("\(game.title) 랭킹") { WatchLeaderboardView(game: game, services: services) }
+                    .accessibilityIdentifier("game.openRanking.\(game.rawValue)")
             }
         }.navigationTitle("게임")
     }
@@ -37,9 +38,8 @@ private struct WatchLeaderboardView: View {
     @StateObject private var model: WatchGameResultModel
     init(game: MiniGame, services: WatchGameServices) { self.game = game; _model = StateObject(wrappedValue: WatchGameResultModel(services: services)) }
     var body: some View {
-        WatchGameResultView(model: model, replay: nil)
+        WatchGameResultView(model: model, replay: nil, refresh: { model.loadRanking(game) })
             .navigationTitle("랭킹").task { model.loadRanking(game) }
-            .toolbar { Button { model.loadRanking(game) } label: { Image(systemName: "arrow.clockwise") }.disabled(model.busy) }
             .onDisappear { model.stop() }
     }
 }
