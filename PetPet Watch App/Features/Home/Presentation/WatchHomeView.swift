@@ -123,15 +123,13 @@ struct WatchHomeView: View {
                 }
                 VStack(spacing: 0) {
                     Text("오늘").font(.caption2)
-                    Text(WatchNumber.compact(viewModel.state.stepCount))
+                    Text(WatchNumber.compact(Int64(viewModel.state.stepCount)))
                         .font(.title2.bold()).monospacedDigit().lineLimit(1).minimumScaleFactor(0.7)
                         .accessibilityLabel("오늘 \(viewModel.state.stepCount.formatted())걸음")
                         .accessibilityIdentifier("watch.stepCount")
                     if viewModel.errorMessage != nil {
-                        Button { showingStepError = true } label: {
-                            Label("확인", systemImage: "exclamationmark.circle")
-                                .font(.caption2).frame(maxWidth: .infinity, minHeight: 44)
-                        }.buttonStyle(.plain)
+                        Button { showingStepError = true } label: { Text("확인").font(.caption2) }
+                            .buttonStyle(WatchActionStyle(color: .black, backgroundOpacity: 0.7))
                             .accessibilityLabel("걸음수 권한 안내 및 다시 시도")
                             .accessibilityIdentifier("watch.retrySteps")
                     } else if viewModel.state.isLoading {
