@@ -116,16 +116,11 @@ final class PhoneAuditUITests: XCTestCase {
         XCTAssertTrue(element.exists && element.isHittable, "Missing control: \(element)")
     }
     private func revealQuestionInput() -> XCUIElement {
-        // SwiftUI's vertical TextField is exposed as TextView on iOS 18 and
-        // TextField on newer runtimes. Follow the actual accessible input.
-        for _ in 0..<10 {
-            for input in [app.textFields["chat.question"], app.textViews["chat.question"]] {
-                if input.exists && input.isHittable { return input }
-            }
-            app.swipeUp()
-        }
-        XCTFail("The AI question input is unavailable")
-        return app.textFields["chat.question"]
+        let edit = app.buttons["chat.editQuestion"]
+        reveal(edit); edit.tap()
+        let input = app.textViews["chat.question"]
+        XCTAssertTrue(input.waitForExistence(timeout: 5))
+        return input
     }
     private func wait(timeout: TimeInterval = 10, _ condition: @escaping () -> Bool) -> Bool {
         XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in condition() }, object: nil)], timeout: timeout) == .completed

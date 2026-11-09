@@ -84,6 +84,7 @@ struct PhoneExtrasView: View {
     @ObservedObject var model: PhoneExtrasModel
     let development: Bool
     @State private var game = MiniGame.shooting
+    @State private var editingQuestion = false
     @FocusState private var questionFocused: Bool
     @Environment(\.scenePhase) private var phase
     var body: some View {
@@ -111,8 +112,13 @@ struct PhoneExtrasView: View {
                 Text("게임은 Apple Watch에서 플레이할 수 있어요.").font(.caption).foregroundStyle(.secondary)
             }
             Section("펫과 AI 대화") {
-                TextField("질문을 입력해 주세요",text:$model.question,axis:.vertical).lineLimit(2...5).disabled(model.chatting).accessibilityIdentifier("chat.question")
-                    .focused($questionFocused)
+                Button { editingQuestion = true } label: {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Label("질문 작성·수정", systemImage: "square.and.pencil").font(.caption)
+                        Text(model.question.isEmpty ? "질문을 입력해 주세요" : model.question)
+                            .foregroundStyle(model.question.isEmpty ? .secondary : .primary).lineLimit(3)
+                    }
+                }.disabled(model.chatting).accessibilityIdentifier("chat.editQuestion")
                 Text("키보드의 마이크로도 입력할 수 있어요. 내용을 확인한 뒤 보내 주세요.").font(.caption).foregroundStyle(.secondary)
                 Button("AI에 질문 보내기") { questionFocused = false; model.send() }.disabled(model.chatting || model.question.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty).accessibilityIdentifier("chat.send")
                 if model.chatting { ProgressView(); Button("응답 중단") { model.cancelChat() }.accessibilityIdentifier("chat.cancel") }
@@ -122,10 +128,18 @@ struct PhoneExtrasView: View {
         }.navigationTitle("게임과 대화")
             .scrollDismissesKeyboard(.interactively)
             .toolbar(.visible, for: .navigationBar)
-            .toolbar {
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button("완료") { questionFocused = false }.accessibilityIdentifier("chat.dismissKeyboard")
+            .sheet(isPresented: $editingQuestion) {
+                NavigationStack {
+                    TextEditor(text: $model.question).padding()
+                        .accessibilityLabel("질문을 입력해 주세요").accessibilityIdentifier("chat.question")
+                        .focused($questionFocused).navigationTitle("질문 작성")
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button("완료") { questionFocused = false; editingQuestion = false }
+                                    .accessibilityIdentifier("chat.dismissKeyboard")
+                            }
+                        }
+                        .task { questionFocused = true }
                 }
             }
             .task { model.load(game) }

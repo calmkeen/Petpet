@@ -30,8 +30,10 @@ final class PhoneGameFlowUITests: XCTestCase {
 
     func test40PhoneChatRepeatsAndCancels() {
         app.buttons["phone.openExtras"].tap()
-        let question = app.descendants(matching: .any).matching(identifier: "chat.question").firstMatch
-        reveal(question); question.tap(); app.typeText("Hello phone")
+        let question = app.buttons["chat.editQuestion"]
+        reveal(question); question.tap()
+        let editor = app.textViews["chat.question"]
+        XCTAssertTrue(editor.waitForExistence(timeout: 5)); editor.tap(); app.typeText("Hello phone")
         app.buttons["chat.dismissKeyboard"].tap()
         for index in 0..<2 {
             reveal(app.buttons["chat.send"], down: index == 0); app.buttons["chat.send"].tap()
@@ -40,11 +42,17 @@ final class PhoneGameFlowUITests: XCTestCase {
             XCTAssertTrue(app.staticTexts["chat.answer"].label.contains("Hello phone"))
         }
         reveal(question, down: false); question.tap()
+        XCTAssertTrue(editor.waitForExistence(timeout: 5)); editor.tap()
         app.typeText(Array(repeating: "cancel", count: 150).joined(separator: " "))
         app.buttons["chat.dismissKeyboard"].tap()
+        XCTAssertLessThan(question.frame.height, app.windows.firstMatch.frame.height / 2, "A long question must leave space for the send button and reply")
         reveal(app.buttons["chat.send"]); app.buttons["chat.send"].tap()
         reveal(app.buttons["chat.cancel"]); app.buttons["chat.cancel"].tap()
         reveal(app.staticTexts["chat.status"]); waitForStatus("응답을 중단했어요")
+        if question.exists { XCTAssertLessThan(question.frame.height, app.windows.firstMatch.frame.height / 2) }
+        let hierarchy = XCTAttachment(string: app.debugDescription); hierarchy.name = "games-phone-chat-layout"; hierarchy.lifetime = .keepAlways; add(hierarchy)
+        let questionRow = app.cells.containing(.button, identifier: "chat.editQuestion").firstMatch
+        if questionRow.exists { XCTAssertLessThan(questionRow.frame.height, app.windows.firstMatch.frame.height / 2, "The input preview row must stay bounded when streaming stops") }
         XCTAssertTrue(app.buttons["chat.send"].isEnabled)
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "games-phone-chat-cancelled"; shot.lifetime = .keepAlways; add(shot)
     }
