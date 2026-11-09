@@ -31,7 +31,7 @@ struct WatchGameResultView: View {
             if model.busy { ProgressView("랭킹 확인 중") }
             if let message = model.message {
                 Text(message).font(.caption2).accessibilityIdentifier("game.feedback")
-                if model.score != nil { Button("저장·랭킹 다시 시도") { model.retry() }.accessibilityIdentifier("game.retry") }
+                if model.canRetry { Button("저장·랭킹 다시 시도") { model.retry() }.accessibilityIdentifier("game.retry") }
             }
             if let replay { Button("다시 하기", action: replay).accessibilityIdentifier("game.replay") }
             if let refresh { Button("랭킹 새로고침", action: refresh).disabled(model.busy).accessibilityIdentifier("game.refreshRanking") }

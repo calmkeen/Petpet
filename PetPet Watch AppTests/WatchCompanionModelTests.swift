@@ -5,7 +5,7 @@ import PetPetCore
 @MainActor
 final class WatchCompanionModelTests: XCTestCase {
     func testFinishedChatAllowsNextQuestionBeforeCleanupReply() async throws {
-        let (services, wire, directory) = try await setup()
+        let (services, wire, directory, _) = try await setup()
         defer { wire.releaseAll(); try? FileManager.default.removeItem(at: directory) }
         let model = WatchChatViewModel(services: services)
         defer { model.stop(); wire.releaseAll() }
@@ -16,7 +16,7 @@ final class WatchCompanionModelTests: XCTestCase {
     }
 
     func testFailedChatAlsoReleasesInputBeforeCleanupReply() async throws {
-        let (services, wire, directory) = try await setup()
+        let (services, wire, directory, _) = try await setup()
         defer { wire.releaseAll(); try? FileManager.default.removeItem(at: directory) }
         wire.failPoll = true
         let model = WatchChatViewModel(services: services)
@@ -28,7 +28,7 @@ final class WatchCompanionModelTests: XCTestCase {
     }
 
     func testOldCleanupCannotReleaseANewChat() async throws {
-        let (services, wire, directory) = try await setup()
+        let (services, wire, directory, _) = try await setup()
         defer { wire.releaseAll(); try? FileManager.default.removeItem(at: directory) }
         let model = WatchChatViewModel(services: services)
         defer { model.stop(); wire.releaseAll() }
@@ -45,7 +45,71 @@ final class WatchCompanionModelTests: XCTestCase {
         XCTAssertFalse(model.progress.finished)
     }
 
-    private func setup() async throws -> (WatchGameServices, ChatModelWire, URL) {
+    func testRankingFailureKeepsBestAndRetrySubmitsCurrentRun() async throws {
+        let (base, _, directory, _) = try await setup()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let wire = RankingModelWire()
+        let services = WatchGameServices(client: WatchFeatureClient(transport: wire, environment: .development), records: base.records, cloud: base.cloud)
+        let model = WatchGameResultModel(services: services)
+        wire.fail = true; model.finish(GameScore(game: .shooting, score: 42))
+        await until { model.message != nil }
+        XCTAssertEqual(model.best?.score, 42); XCTAssertFalse(model.busy)
+        wire.fail = false; model.retry()
+        await until { model.ranking != nil }
+        XCTAssertEqual(model.ranking?.entries.first?.score, 42)
+        XCTAssertEqual(wire.submissions.last?.score, 42)
+    }
+
+    func testAccountChangeClearsRankingAndDoesNotUploadPreviousAccountsBest() async throws {
+        let (base, _, directory, cloudWire) = try await setup()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let wire = RankingModelWire()
+        let services = WatchGameServices(client: WatchFeatureClient(transport: wire, environment: .development), records: base.records, cloud: base.cloud)
+        let model = WatchGameResultModel(services: services)
+        model.finish(GameScore(game: .shooting, score: 42))
+        await until { model.ranking != nil }
+        cloudWire.onCloudControl?(try CloudWire.encodeControl(.account(nil), environment: .development))
+        await base.cloud.finishWork()
+        XCTAssertNil(model.ranking); XCTAssertEqual(model.best?.score, 42)
+        model.finish(GameScore(game: .shooting, score: 0))
+        await until { model.message?.contains("로컬 기록") == true }
+        XCTAssertEqual(wire.submissions.count, 1)
+        cloudWire.onCloudControl?(try CloudWire.encodeControl(.account(CloudAccount(id: "8", displayName: "Other")), environment: .development))
+        await base.cloud.finishWork()
+        model.retry(); await until { model.ranking != nil }
+        XCTAssertEqual(model.best?.score, 42)
+        XCTAssertEqual(wire.lastAccount, "8"); XCTAssertEqual(wire.submissions.last?.score, 0)
+        XCTAssertEqual(model.ranking?.entries.first?.score, 0)
+    }
+
+    func testLoggedOutChatDoesNotSendARequest() async throws {
+        let (services, wire, directory, cloudWire) = try await setup()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        cloudWire.onCloudControl?(try CloudWire.encodeControl(.account(nil), environment: .development))
+        await services.cloud.finishWork()
+        let model = WatchChatViewModel(services: services)
+        model.question = "hello"; model.send()
+        XCTAssertTrue(model.progress.failed); XCTAssertFalse(model.busy); XCTAssertEqual(wire.starts, 0)
+    }
+
+    func testAccountSwitchCannotRetryAnotherAccountsFinishedRun() async throws {
+        let (base, _, directory, cloudWire) = try await setup()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let wire = RankingModelWire()
+        let services = WatchGameServices(client: WatchFeatureClient(transport: wire, environment: .development), records: base.records, cloud: base.cloud)
+        let model = WatchGameResultModel(services: services)
+        model.finish(GameScore(game: .shooting, score: 42))
+        await until { model.ranking != nil }
+        cloudWire.onCloudControl?(try CloudWire.encodeControl(.account(CloudAccount(id: "8", displayName: "Other")), environment: .development))
+        await base.cloud.finishWork()
+        XCTAssertFalse(model.canRetry)
+        model.retry()
+        try? await Task.sleep(for: .milliseconds(100))
+        XCTAssertEqual(wire.submissions.count, 1, "A finished run from account 7 cannot be resubmitted as account 8")
+        XCTAssertEqual(model.best?.score, 42)
+    }
+
+    private func setup() async throws -> (WatchGameServices, ChatModelWire, URL, PreviewCloudTransport) {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let game = FileGameRepository(directory: directory)
         let cloudWire = PreviewCloudTransport()
@@ -55,11 +119,28 @@ final class WatchCompanionModelTests: XCTestCase {
         cloudWire.onCloudControl?(try CloudWire.encodeControl(.account(CloudAccount(id: "7", displayName: "Test")), environment: .development))
         await cloud.finishWork()
         let wire = ChatModelWire()
-        return (WatchGameServices(client: WatchFeatureClient(transport: wire, environment: .development), records: FileMiniGameRecords(fileURL: directory.appendingPathComponent("records.json")), cloud: cloud), wire, directory)
+        return (WatchGameServices(client: WatchFeatureClient(transport: wire, environment: .development), records: FileMiniGameRecords(fileURL: directory.appendingPathComponent("records.json")), cloud: cloud), wire, directory, cloudWire)
     }
     private func until(_ condition: () -> Bool) async {
-        for _ in 0..<1000 { if condition() { return }; await Task.yield() }
+        for _ in 0..<200 { if condition() { return }; try? await Task.sleep(for: .milliseconds(10)) }
         XCTFail("The expected request did not arrive")
+    }
+}
+
+@MainActor private final class RankingModelWire: CompanionFeatureTransport {
+    var onFeatureRequest: ((Data) async throws -> Data)?
+    var fail = false
+    var submissions: [GameScore] = []
+    var lastAccount: String?
+    private var best: [String: Int] = [:]
+    func requestFeature(_ data: Data) async throws -> Data {
+        let request = try JSONDecoder().decode(CompanionFeatureRequest.self, from: data)
+        if fail { throw BackendError.watchUnavailable }
+        guard case let .submit(score) = request.action else { throw BackendError.invalidResponse }
+        submissions.append(score); lastAccount = request.accountID
+        best[request.accountID] = max(best[request.accountID] ?? 0, score.score)
+        let value = GameRanking(game: score.game, position: 1, entries: [GameRankEntry(rank: 1, userID: Int64(request.accountID), name: "Test", score: best[request.accountID]!)])
+        return try JSONEncoder().encode(CompanionFeatureReply(request: request, result: .ranking(value)))
     }
 }
 
