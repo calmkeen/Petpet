@@ -38,16 +38,23 @@ import PetPetCore
                     guard case let .chat(value) = reply else { throw BackendError.invalidResponse }
                     progress = value
                     if value.finished {
+                        releaseJob(id)
                         _ = try? await services.client.request(.cancelChat(id),accountID:account)
-                        if self.jobID == id { self.jobID = nil; self.accountID = nil; self.busy = false }
                         return
                     }
                     try await Task.sleep(for:.milliseconds(300))
                 }
             } catch is CancellationError { }
             catch { if self.jobID == id { progress.fail((error as? BackendError ?? .network).localizedDescription) } }
-            if self.jobID == id { _ = try? await services.client.request(.cancelChat(id),accountID:account) }
+            if self.jobID == id {
+                releaseJob(id)
+                _ = try? await services.client.request(.cancelChat(id),accountID:account)
+            }
         }
+    }
+    private func releaseJob(_ id: UUID) {
+        guard jobID == id else { return }
+        jobID = nil; accountID = nil; busy = false; task = nil
     }
     func stop(clear: Bool = false) {
         let wasBusy = busy
@@ -91,7 +98,7 @@ struct WatchChatView: View {
             Section("답변") {
                 Text(model.progress.status).font(.caption2).foregroundStyle(model.progress.failed ? .orange : .secondary).accessibilityIdentifier("chat.status")
                 if !model.progress.text.isEmpty { Text(model.progress.text).font(.caption).accessibilityIdentifier("chat.answer") }
-                if model.busy { ProgressView(); Button("응답 중단") { model.stop() } }
+                if model.busy { ProgressView(); Button("응답 중단") { model.stop() }.accessibilityIdentifier("chat.cancel") }
             }
             Text("아이폰의 PetPet과 연결이 필요해요.").font(.caption2).foregroundStyle(.secondary)
         }.navigationTitle("AI 대화")
