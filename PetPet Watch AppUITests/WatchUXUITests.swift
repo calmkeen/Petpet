@@ -36,6 +36,7 @@ final class WatchUXUITests: XCTestCase {
             capture("ux-\(prefix)-\(name)")
             checkTarget(action, minimum: 44, top: 30)
             if name == "home" {
+                checkTarget(app.buttons["watch.petTouch"], minimum: 44, top: 30)
                 checkTarget(app.buttons["watch.openFoodInventory"], minimum: 44, top: 30)
                 let retry = app.buttons["watch.retrySteps"]
                 if retry.exists {

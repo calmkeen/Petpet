@@ -8,7 +8,7 @@ struct WatchGameOverview: View {
         WatchOverviewLayout { compact in
           VStack(spacing: 6) {
             Label("펫과 놀기", systemImage: "gamecontroller.fill").font(.headline)
-            Image("stepmate_game_shootinggame_icon").resizable().scaledToFit().frame(width: compact ? 32 : 44, height: compact ? 32 : 44).clipShape(Circle())
+            Image("stepmate_game_shootinggame_icon").resizable().scaledToFit().frame(width: compact ? 52 : 64, height: compact ? 52 : 64).clipShape(Circle())
             NavigationLink("게임 선택") { WatchGameLibraryView(services: services, pet: pet) }
                 .buttonStyle(WatchActionStyle())
                 .accessibilityIdentifier("watch.openGames")

@@ -13,6 +13,16 @@ final class WatchSmallScreenUITests: XCTestCase {
 
     override func tearDownWithError() throws { app.terminate() }
 
+    func testLargeTextShootingStartPauseFinishReplayAndSavedBest() {
+        app.terminate(); app.launchArguments = ["--watch-ui-large-text"]; app.launch()
+        testShootingStartPauseFinishReplayAndSavedBest()
+    }
+
+    func testLargeTextStairsControlsTimeoutResultAndReplay() {
+        app.terminate(); app.launchArguments = ["--watch-ui-large-text"]; app.launch()
+        testStairsControlsTimeoutResultAndReplay()
+    }
+
     func testDateSelectionReturnsToCalendar() {
         openStreak()
         chooseMonth(year: 2026, month: 2)
@@ -108,7 +118,9 @@ final class WatchSmallScreenUITests: XCTestCase {
         XCTAssertFalse(app.buttons["game.stairsLeft"].isEnabled)
         XCTAssertFalse(app.buttons["game.stairsRight"].isEnabled)
         capture("40mm-stairs-paused-controls")
-        let next = app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH %@", "다음 계단 ")).firstMatch.label
+        let canvas = app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH %@", "다음 계단 ")).firstMatch
+        XCTAssertGreaterThanOrEqual(canvas.frame.height, 40, "Keep the next stairs and pet visible with large text")
+        let next = canvas.label
         app.buttons["game.resume"].tap()
         app.buttons[next.contains("왼쪽") ? "game.stairsLeft" : "game.stairsRight"].tap()
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "1계단")).firstMatch.exists)

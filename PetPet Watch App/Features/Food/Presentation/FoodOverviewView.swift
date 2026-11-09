@@ -12,8 +12,8 @@ struct FoodOverviewView: View {
             Text("먹이").font(.headline)
             if let progress = viewModel.progress {
                 HStack(spacing: 16) {
-                    foodCount("우유", image: "milk_normal1", quantity: progress.quantity(of: 1), compact: compact)
-                    foodCount("사과", image: "apple_normal1", quantity: progress.quantity(of: 2), compact: compact)
+                    foodCount("우유", image: "milk_normal1", quantity: progress.quantity(of: 1), compact: compact, showImage: !compact || progress.quantity(of: 3) == 0)
+                    foodCount("사과", image: "apple_normal1", quantity: progress.quantity(of: 2), compact: compact, showImage: !compact || progress.quantity(of: 3) == 0)
                 }
                 if progress.quantity(of: 3) > 0 {
                     Text("고기 \(WatchNumber.compact(progress.quantity(of: 3)))개").font(.caption2)
@@ -35,10 +35,10 @@ struct FoodOverviewView: View {
         }
     }
 
-    private func foodCount(_ name: String, image: String, quantity: Int64, compact: Bool) -> some View {
+    private func foodCount(_ name: String, image: String, quantity: Int64, compact: Bool, showImage: Bool) -> some View {
         VStack(spacing: 4) {
-            if !compact { Image(image).resizable().interpolation(.none)
-                .scaledToFit().frame(width: 32, height: 32).accessibilityHidden(true) }
+            if showImage { Image(image).resizable().interpolation(.none)
+                .scaledToFit().frame(width: compact ? 24 : 32, height: compact ? 24 : 32).accessibilityHidden(true) }
             Text("\(name) \(WatchNumber.compact(quantity))").font(.caption2).monospacedDigit()
                 .accessibilityLabel("\(name) \(quantity)개")
         }
