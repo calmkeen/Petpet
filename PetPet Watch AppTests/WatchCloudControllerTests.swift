@@ -32,6 +32,63 @@ final class WatchCloudControllerTests: XCTestCase {
         XCTAssertEqual(transport.files.count, 1)
     }
 
+    func testLogoutReleasesWaitingBackupAndReloginCanRetry() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let (controller, transport) = try await setup(directory)
+        await controller.requestBackup()
+        transport.onCloudControl?(try CloudWire.encodeControl(.account(nil)))
+        await controller.finishWork()
+        XCTAssertFalse(controller.isBusy)
+        XCTAssertNil(controller.message)
+        transport.onCloudControl?(try CloudWire.encodeControl(.account(CloudAccount(id: "7", displayName: "Test"))))
+        await controller.finishWork()
+        await controller.requestBackup()
+        XCTAssertEqual(transport.files.count, 2)
+    }
+
+    func testNicknameUpdateKeepsCurrentBackupBusy() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let (controller, transport) = try await setup(directory)
+        await controller.requestBackup()
+        transport.onCloudControl?(try CloudWire.encodeControl(.account(CloudAccount(id: "7", displayName: "Renamed"))))
+        await controller.finishWork()
+        XCTAssertTrue(controller.isBusy)
+        await controller.requestBackup()
+        XCTAssertEqual(transport.files.count, 1)
+    }
+
+    func testLateReceiptAfterLogoutStillAppliesOnce() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let (controller, transport) = try await setup(directory)
+        await controller.requestBackup()
+        guard case let .backup(export) = try CloudWire.decodeFile(Data(contentsOf: transport.files[0])) else { return XCTFail() }
+        transport.onCloudControl?(try CloudWire.encodeControl(.account(nil)))
+        await controller.finishWork()
+        let receipt = CloudBackupReceipt(export: export, completedAt: Date())
+        for _ in 0..<2 { transport.onCloudControl?(try CloudWire.encodeControl(.backupSucceeded(receipt))); await controller.finishWork() }
+        XCTAssertNil(controller.account); XCTAssertFalse(controller.isBusy)
+        let progress = try await FileGameRepository(directory: directory).load()
+        XCTAssertEqual(progress.quantity(of: 2), 1, "A valid queued receipt must survive logout and reward only once")
+    }
+
+    func testOldFailureCannotUnlockNewBackupAfterRelogin() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let (controller, transport) = try await setup(directory)
+        await controller.requestBackup()
+        guard case let .backup(old) = try CloudWire.decodeFile(Data(contentsOf: transport.files[0])) else { return XCTFail() }
+        transport.onCloudControl?(try CloudWire.encodeControl(.account(nil)))
+        await controller.finishWork()
+        transport.onCloudControl?(try CloudWire.encodeControl(.account(CloudAccount(id: "7", displayName: "Test"))))
+        await controller.finishWork(); await controller.requestBackup()
+        transport.onCloudControl?(try CloudWire.encodeControl(.failed(operationID: old.operationID, reason: BackendError.network.rawDescription)))
+        await controller.finishWork()
+        XCTAssertEqual(transport.files.count, 2); XCTAssertTrue(controller.isBusy)
+    }
+
     private func setup(_ directory: URL) async throws -> (WatchCloudController, WatchBackupProbe) {
         let game = FileGameRepository(directory: directory)
         let transport = WatchBackupProbe()

@@ -71,8 +71,10 @@ final class WatchCloudController: ObservableObject {
             activeOperation = operationID
             isBusy = true; message = "아이폰으로 백업 기록을 보내고 있어요."
             await home.flush()
+            guard self.account?.id == account.id, activeOperation == operationID else { throw BackendError.sessionChanged }
             guard !home.state.hasStorageError else { throw BackendError.storage }
             let export = try await game.prepareBackup(operationID: operationID, accountID: account.id)
+            guard self.account?.id == account.id, activeOperation == operationID else { throw BackendError.sessionChanged }
             let data = try encodeFile(.backup(export))
             let outbox = directory.appendingPathComponent("CloudOutbox", isDirectory: true)
             try FileManager.default.createDirectory(at: outbox, withIntermediateDirectories: true)
@@ -82,7 +84,7 @@ final class WatchCloudController: ObservableObject {
             message = "아이폰의 서버 백업 완료를 기다리고 있어요."
         } catch {
             try? await game.cancelBackup(operationID: operationID)
-            fail(error as? BackendError ?? .storage)
+            if activeOperation == operationID { fail(error as? BackendError ?? .storage) }
             try? transport.enqueueCloudControl(encodeControl(.failed(operationID: operationID,
                 reason: (error as? BackendError ?? .storage).rawDescription)))
         }
@@ -93,6 +95,11 @@ final class WatchCloudController: ObservableObject {
         do {
             switch try CloudWire.decodeControl(data, environment: environment) {
             case let .account(account):
+                if self.account?.id != account?.id {
+                    activeOperation = nil
+                    isBusy = false
+                    message = nil
+                }
                 self.account = account
                 nicknameRelay.setAccount(account)
                 if !isBusy { message = nil }
