@@ -27,7 +27,7 @@ final class WatchGameFlowUITests: XCTestCase {
         let best = Int(app.staticTexts["game.bestScore"].label.filter(\.isNumber)) ?? 0
         assertSubmitted()
         capture("games-shooting-submitted")
-        reveal(app.buttons["game.replay"]); app.buttons["game.replay"].tap()
+        reveal(app.buttons["game.replay"], down: false); app.buttons["game.replay"].tap()
         XCTAssertTrue(app.buttons["game.finish"].waitForExistence(timeout: 4))
         finishIfPlaying()
         XCTAssertGreaterThanOrEqual(Int(app.staticTexts["game.bestScore"].label.filter(\.isNumber)) ?? -1, best)
@@ -53,7 +53,7 @@ final class WatchGameFlowUITests: XCTestCase {
         reveal(ranking); ranking.tap()
         reveal(app.staticTexts["game.rankName.900000001"])
         XCTAssertTrue(app.staticTexts["game.rankScore.900000001"].exists)
-        reveal(app.buttons["game.refreshRanking"]); app.buttons["game.refreshRanking"].tap()
+        reveal(app.buttons["game.refreshRanking"], down: false); app.buttons["game.refreshRanking"].tap()
         reveal(app.staticTexts["game.rankName.900000001"])
         capture("games-stairs-ranking-reloaded")
     }
@@ -62,7 +62,7 @@ final class WatchGameFlowUITests: XCTestCase {
         openLibrary()
         reveal(app.buttons["game.openRanking.starStair"]); app.buttons["game.openRanking.starStair"].tap()
         reveal(app.staticTexts["game.rankName.900000001"])
-        reveal(app.buttons["game.refreshRanking"])
+        reveal(app.buttons["game.refreshRanking"], down: false)
         let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in self.app.buttons["game.refreshRanking"].exists && self.app.buttons["game.refreshRanking"].isEnabled }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 20), .completed)
         app.buttons["game.refreshRanking"].tap()
@@ -88,7 +88,9 @@ final class WatchGameFlowUITests: XCTestCase {
     func test22ChatCancellationAndReturn() {
         openChat(); enterQuestion(Array(repeating: "cancel", count: 150).joined(separator: " "))
         reveal(app.buttons["chat.send"]); app.buttons["chat.send"].tap()
-        reveal(app.buttons["chat.cancel"]); app.buttons["chat.cancel"].tap()
+        XCTAssertTrue(app.buttons["chat.cancel"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["chat.cancel"].isHittable, "Cancellation must remain above the growing answer")
+        app.buttons["chat.cancel"].tap()
         reveal(app.staticTexts["chat.status"], down: false); waitForStatus("응답을 중단했어요")
         reveal(app.buttons["chat.send"], down: false); XCTAssertTrue(app.buttons["chat.send"].isEnabled)
         capture("games-chat-cancelled")
