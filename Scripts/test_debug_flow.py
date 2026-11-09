@@ -57,7 +57,7 @@ def write(path, value):
     temporary.replace(path)
 
 
-def xcode(args, side, action, label, test=None, companion=None):
+def xcode(args, side, action, label, test=None, companion=None, suite=None):
     scheme = "PetPet" if side == "phone" else "PetPet Watch App"
     platform = "iOS Simulator" if side == "phone" else "watchOS Simulator"
     cmd = ["xcodebuild", "-project", "PetPet.xcodeproj", "-scheme", scheme,
@@ -66,9 +66,10 @@ def xcode(args, side, action, label, test=None, companion=None):
            "CODE_SIGNING_ALLOWED=YES", "CODE_SIGN_IDENTITY=-"]
     stamp = dt.datetime.now().strftime("%H%M%S")
     log = args.artifacts / f"{label}-{stamp}.log"
+    result_bundle = args.artifacts / f"{label}-{stamp}.xcresult"
     if test:
-        target = "PetPetUITests/PhoneDebugFlowUITests" if side == "phone" else "PetPet Watch AppUITests/WatchDebugFlowUITests"
-        cmd += [f"-only-testing:{target}/{test}", "-resultBundlePath", str(args.artifacts / f"{label}-{stamp}.xcresult")]
+        target = suite or ("PetPetUITests/PhoneDebugFlowUITests" if side == "phone" else "PetPet Watch AppUITests/WatchDebugFlowUITests")
+        cmd += [f"-only-testing:{target}/{test}", "-resultBundlePath", str(result_bundle)]
     cmd.append(action)
     print(f"{label}: {action} ({side}); log={log}", flush=True)
     with log.open("w") as output:
@@ -93,6 +94,9 @@ def xcode(args, side, action, label, test=None, companion=None):
     if process.returncode:
         print("\n".join(log.read_text().splitlines()[-18:]), flush=True)
         raise SystemExit(f"{label} failed; see {log}")
+    if test:
+        summary = json.loads(command("xcrun", "xcresulttool", "get", "test-results", "summary", "--path", str(result_bundle), "--compact"))
+        assert summary["passedTests"] == 1 and summary["failedTests"] == 0, f"Expected one passing test: {result_bundle}"
 
 
 def seed_steps(args):

@@ -91,15 +91,16 @@ struct PhoneExtrasView: View {
             if development { Text("개발 모의 랭킹·AI 응답 · 외부 전송 없음").font(.caption).foregroundStyle(.orange) }
             Section("게임 랭킹") {
                 Picker("게임",selection:$game) { ForEach(MiniGame.allCases,id:\.self) { Text($0.title).tag($0) } }
+                    .accessibilityIdentifier("phone.rankGame")
                 if model.rankingBusy { ProgressView() }
                 if let ranking = model.ranking {
                     if ranking.entries.isEmpty { Text("등록된 기록이 없어요") }
                     ForEach(Array(ranking.entries.enumerated()),id:\.offset) { _,row in
                         HStack {
                             Text("\(row.rank)위").foregroundStyle(.secondary)
-                            Text(row.name); Spacer()
+                            Text(row.name).accessibilityIdentifier("phone.rankName.\(row.userID.map(String.init) ?? "place\(row.rank)")"); Spacer()
                             VStack(alignment:.trailing) {
-                                Text("\(row.score)\(game == .shooting ? "점" : "계단")")
+                                Text("\(row.score)\(game == .shooting ? "점" : "계단")").accessibilityIdentifier("phone.rankScore.\(row.userID.map(String.init) ?? "place\(row.rank)")")
                                 if game == .starStair { Text("콤보 \(row.maxCombo)").font(.caption).foregroundStyle(.secondary) }
                             }
                         }
