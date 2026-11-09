@@ -11,30 +11,37 @@ final class PetProgressViewModel: ObservableObject {
 
     private let repository: any PetProgressRepository
     private let claimRewards: ClaimStepRewards
+    private let waitForMoodRefresh: @MainActor () async throws -> Void
     private var isActive = false
+    private var activityGeneration = 0
     private var moodTask: Task<Void, Never>?
 
-    init(repository: any PetProgressRepository, history: any StepHistoryRepository) {
+    init(repository: any PetProgressRepository, history: any StepHistoryRepository,
+         waitForMoodRefresh: @escaping @MainActor () async throws -> Void = { try await Task.sleep(for: .seconds(600)) }) {
         self.repository = repository
+        self.waitForMoodRefresh = waitForMoodRefresh
         claimRewards = ClaimStepRewards(history: history, progress: repository)
     }
 
     func start() async {
         guard !isActive else { return }
         isActive = true
+        activityGeneration += 1
+        let generation = activityGeneration
         await perform(.visit)
-        guard isActive else { return }
-        moodTask = Task { [weak self] in
+        guard isActive, generation == activityGeneration else { return }
+        moodTask = Task { [weak self, waitForMoodRefresh] in
             while !Task.isCancelled {
-                do { try await Task.sleep(for: .seconds(600)) } catch { return }
-                guard let self else { return }
-                await self.perform(.refreshMood)
+                do { try await waitForMoodRefresh() } catch { return }
+                guard let self, !Task.isCancelled, self.isActive, self.activityGeneration == generation else { return }
+                await self.perform(.visit)
             }
         }
     }
 
     func stop() {
         isActive = false
+        activityGeneration += 1
         moodTask?.cancel()
         moodTask = nil
     }
