@@ -16,6 +16,7 @@ final class PhoneAuditUITests: XCTestCase {
         backToHome()
         signIn()
         app.buttons["phone.openExtras"].tap()
+        app.buttons["phone.showChat"].tap()
         let question = revealQuestionInput()
         question.tap()
         question.typeText("How is my pet?")

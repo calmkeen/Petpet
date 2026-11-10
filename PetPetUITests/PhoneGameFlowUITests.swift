@@ -28,8 +28,14 @@ final class PhoneGameFlowUITests: XCTestCase {
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "games-phone-watch-rankings"; shot.lifetime = .keepAlways; add(shot)
     }
 
+    func test41LargeDarkPhoneChatRepeatsAndCancels() {
+        app.terminate(); app.launchArguments = ["--phone-ui-large-text", "--phone-ui-dark"]; app.launch()
+        test40PhoneChatRepeatsAndCancels()
+    }
+
     func test40PhoneChatRepeatsAndCancels() {
         app.buttons["phone.openExtras"].tap()
+        app.buttons["phone.showChat"].tap()
         let question = app.buttons["chat.editQuestion"]
         reveal(question); question.tap()
         let editor = app.textViews["chat.question"]
@@ -37,7 +43,7 @@ final class PhoneGameFlowUITests: XCTestCase {
         app.buttons["chat.dismissKeyboard"].tap()
         for index in 0..<2 {
             reveal(app.buttons["chat.send"], down: index == 0); app.buttons["chat.send"].tap()
-            reveal(app.staticTexts["chat.status"]); waitForStatus("AI 응답 완료")
+            waitForStatus("AI 응답 완료"); reveal(app.staticTexts["chat.status"], down: false)
             reveal(app.staticTexts["chat.answer"])
             XCTAssertTrue(app.staticTexts["chat.answer"].label.contains("Hello phone"))
         }
@@ -47,12 +53,21 @@ final class PhoneGameFlowUITests: XCTestCase {
         app.buttons["chat.dismissKeyboard"].tap()
         XCTAssertLessThan(question.frame.height, app.windows.firstMatch.frame.height / 2, "A long question must leave space for the send button and reply")
         reveal(app.buttons["chat.send"]); app.buttons["chat.send"].tap()
-        reveal(app.buttons["chat.cancel"]); app.buttons["chat.cancel"].tap()
-        reveal(app.staticTexts["chat.status"]); waitForStatus("응답을 중단했어요")
+        let cancel = app.buttons["chat.cancel"]
+        let visible = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in
+            cancel.exists && cancel.isHittable && self.app.windows.firstMatch.frame.contains(cancel.frame)
+                && cancel.frame.minY >= self.app.buttons["phone.showChat"].frame.maxY
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [visible], timeout: 5), .completed, "The whole cancel button must appear without scrolling")
+        XCTAssertGreaterThanOrEqual(cancel.frame.height, 44)
+        let waiting = XCTAttachment(screenshot: app.screenshot()); waiting.name = "games-phone-chat-cancelling"; waiting.lifetime = .keepAlways; add(waiting)
+        cancel.tap()
+        waitForStatus("응답을 중단했어요"); reveal(app.staticTexts["chat.status"], down: false)
         if question.exists { XCTAssertLessThan(question.frame.height, app.windows.firstMatch.frame.height / 2) }
         let hierarchy = XCTAttachment(string: app.debugDescription); hierarchy.name = "games-phone-chat-layout"; hierarchy.lifetime = .keepAlways; add(hierarchy)
         let questionRow = app.cells.containing(.button, identifier: "chat.editQuestion").firstMatch
         if questionRow.exists { XCTAssertLessThan(questionRow.frame.height, app.windows.firstMatch.frame.height / 2, "The input preview row must stay bounded when streaming stops") }
+        reveal(app.buttons["chat.send"], down: false)
         XCTAssertTrue(app.buttons["chat.send"].isEnabled)
         let shot = XCTAttachment(screenshot: app.screenshot()); shot.name = "games-phone-chat-cancelled"; shot.lifetime = .keepAlways; add(shot)
     }
@@ -62,16 +77,21 @@ final class PhoneGameFlowUITests: XCTestCase {
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 20), .completed)
     }
     private func reveal(_ element: XCUIElement, down preferredDown: Bool = true) {
-        for _ in 0..<20 {
-            var down = preferredDown
+        var down = preferredDown
+        for _ in 0..<35 {
+            let screen = app.windows.firstMatch.frame
+            let top = app.buttons["phone.showChat"].exists ? app.buttons["phone.showChat"].frame.maxY + 8 : 64
+            let visible = CGRect(x: screen.minX, y: top, width: screen.width, height: screen.maxY - top).insetBy(dx: -1, dy: -1)
             if element.exists {
-                let frame = element.frame, screen = app.windows.firstMatch.frame
-                if element.isHittable && screen.insetBy(dx: -1, dy: -1).contains(frame) { return }
-                if !frame.isEmpty { down = frame.midY >= screen.midY }
+                let frame = element.frame
+                let longTextVisible = frame.height > visible.height && frame.intersection(visible).height > 100
+                    && frame.minX >= visible.minX && frame.maxX <= visible.maxX
+                if element.isHittable && (visible.contains(frame) || longTextVisible) { return }
+                if !frame.isEmpty { down = frame.minY >= visible.minY }
             }
-            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: down ? 0.8 : 0.3))
-                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: down ? 0.3 : 0.8)), withVelocity: .slow, thenHoldForDuration: 0.1)
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: down ? 0.76 : 0.52))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: down ? 0.52 : 0.76)), withVelocity: .slow, thenHoldForDuration: 0.1)
         }
-        XCTFail("Missing phone game/chat element: \(element)")
+        XCTFail("Missing phone game/chat element: \(element)\n\(app.debugDescription)")
     }
 }
