@@ -11,7 +11,8 @@ import PetPetCore
     @Published private(set) var rankingBusy = false
     @Published private(set) var chatting = false
     private let backend: BackendClient?
-    private var accountID: String?
+    @Published private(set) var accountID: String?
+    var isSignedIn: Bool { accountID != nil }
     private var rankTask: Task<Void,Never>?
     private var chatTask: Task<Void,Never>?
     private var rankRevision = UUID()
@@ -108,6 +109,10 @@ struct PhoneExtrasView: View {
             if pane == .rankings { model.load(game) }
         }
         .onChange(of: game) { _, value in if pane == .rankings { model.load(value) } }
+        .onChange(of: model.accountID) { _, _ in
+            questionFocused = false; editingQuestion = false; questionDraft = ""
+            if pane == .rankings { model.load(game) }
+        }
         .onDisappear { model.stop() }
         .onChange(of: phase) { _, value in
             if value == .background { model.stop() }
@@ -124,6 +129,10 @@ struct PhoneExtrasView: View {
 
     private var rankings: some View {
         List {
+            if !model.isSignedIn {
+                Text("홈의 계정·백업에서 로그인하면 랭킹을 확인할 수 있어요.")
+                    .font(.callout).accessibilityIdentifier("phone.rankingLoginNotice")
+            }
             Section("게임 선택") {
                 Picker("게임", selection: $game) {
                     ForEach(MiniGame.allCases, id: \.self) { Text($0.title).tag($0) }
@@ -149,9 +158,9 @@ struct PhoneExtrasView: View {
                         }.padding(.vertical, 4)
                     }
                 }
-                if let message = model.rankMessage { Text(message).font(.callout).foregroundStyle(.secondary) }
+                if let message = model.rankMessage, model.isSignedIn { Text(message).font(.callout).foregroundStyle(.secondary) }
                 Button("랭킹 새로고침") { model.load(game) }.buttonStyle(PhoneActionStyle())
-                    .disabled(model.rankingBusy).accessibilityIdentifier("phone.refreshRanking")
+                    .disabled(model.rankingBusy || !model.isSignedIn).accessibilityIdentifier("phone.refreshRanking")
             } header: { Text("TOP 10") } footer: { Text("게임은 Apple Watch에서 플레이할 수 있어요.") }
             if development { Text("Debug · 개발 모의 랭킹").font(.caption).foregroundStyle(.secondary) }
         }
@@ -160,6 +169,10 @@ struct PhoneExtrasView: View {
     private var conversation: some View {
         ScrollViewReader { scroll in
             List {
+                if !model.isSignedIn {
+                    Text("홈의 계정·백업에서 로그인하면 AI 대화를 사용할 수 있어요.")
+                        .font(.callout).accessibilityIdentifier("phone.chatLoginNotice")
+                }
                 Section {
                     Button { questionDraft = model.question; editingQuestion = true } label: {
                         VStack(alignment: .leading, spacing: 6) {
@@ -167,9 +180,9 @@ struct PhoneExtrasView: View {
                             Text(model.question.isEmpty ? "질문을 입력해 주세요" : model.question)
                                 .foregroundStyle(model.question.isEmpty ? .secondary : .primary).lineLimit(3)
                         }.padding(.vertical, 4)
-                    }.disabled(model.chatting).accessibilityIdentifier("chat.editQuestion")
+                    }.disabled(model.chatting || !model.isSignedIn).accessibilityIdentifier("chat.editQuestion")
                     Button("질문 보내기") { model.send() }.buttonStyle(PhoneActionStyle())
-                        .disabled(model.chatting || model.question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .disabled(model.chatting || !model.isSignedIn || model.question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                         .accessibilityIdentifier("chat.send")
                 } header: { Text("질문") } footer: { Text("키보드의 마이크로도 입력할 수 있어요. 내용을 확인한 뒤 보내 주세요.") }
                 Section("답변") {
