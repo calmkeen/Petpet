@@ -4,24 +4,26 @@ import PetPetCore
 struct PhoneStreakSection: View {
     @ObservedObject var model: PhoneStreakViewModel
     let accountID: String?
+    @ScaledMetric(relativeTo: .caption2) private var cellSize = 16
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Label("스트릭", systemImage: "calendar").font(.headline)
+        PhoneCard {
+            PhoneSectionTitle(title: "스트릭", icon: "calendar")
             if accountID == nil {
                 Text("로그인하고 워치 기록을 백업하면 여기서도 볼 수 있어요.").font(.footnote).foregroundStyle(.secondary)
             } else {
                 HStack {
-                    Text("연속 \(model.summary.currentDays)일").font(.largeTitle.bold())
+                    Text("연속 \(model.summary.currentDays)일").font(.title2.bold()).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("phone.currentStreak")
                     Spacer()
-                    if model.isLoading { ProgressView() }
-                    Button { Task { await model.refresh(accountID: accountID, force: true) } } label: { Image(systemName: "arrow.clockwise") }
+                    Button { Task { await model.refresh(accountID: accountID, force: true) } } label: {
+                        if model.isLoading { ProgressView() } else { Image(systemName: "arrow.clockwise") }
+                    }.buttonStyle(PhoneIconStyle()).accessibilityIdentifier("phone.refreshStreak")
                         .disabled(model.isLoading).accessibilityLabel("스트릭 새로고침")
                 }
                 HStack(alignment: .top, spacing: 8) {
                     VStack(spacing: 4) {
                         ForEach(Array(["일", "월", "화", "수", "목", "금", "토"].enumerated()), id: \.offset) { _, label in
-                            Text(label).font(.system(size: 10)).frame(width: 12, height: 12)
+                            Text(label).font(.caption2).frame(width: cellSize, height: cellSize)
                         }
                     }.padding(.vertical, 2).foregroundStyle(.secondary).accessibilityHidden(true)
                     ScrollViewReader { proxy in
@@ -32,10 +34,10 @@ struct PhoneStreakSection: View {
                                         ForEach(week.indices, id: \.self) { row in
                                             let key = week[row]
                                             RoundedRectangle(cornerRadius: 3).fill(color(key.map { StepIntensity(steps: model.summary.counts[$0] ?? 0) }))
-                                                .frame(width: 12, height: 12)
+                                                .frame(width: cellSize, height: cellSize)
                                         }
-                                        Text(monthLabel(week)).font(.system(size: 10)).foregroundStyle(.secondary)
-                                            .fixedSize().frame(width: 12, alignment: .leading).padding(.top, 6)
+                                        Text(monthLabel(week)).font(.caption2).foregroundStyle(.secondary)
+                                            .fixedSize().frame(width: cellSize, alignment: .leading).padding(.top, 6)
                                     }.id(column)
                                 }
                             }.padding(.vertical, 2)
@@ -44,17 +46,22 @@ struct PhoneStreakSection: View {
                         .onAppear { proxy.scrollTo(model.weeks.count - 1, anchor: .trailing) }
                     }
                 }
-                HStack(spacing: 5) {
-                    Text("0걸음")
-                    ForEach(0..<5) { colorIndex in RoundedRectangle(cornerRadius: 2).fill(color(StepIntensity(rawValue: colorIndex))).frame(width: 13, height: 10) }
-                    Text("10,000걸음 이상")
-                }.font(.caption2).foregroundStyle(.secondary)
+                VStack(spacing: 6) {
+                    HStack { Text("적음"); Spacer(); Text("많음") }.font(.caption2).foregroundStyle(.secondary)
+                    HStack(spacing: 5) {
+                        ForEach(0..<5) { index in
+                            RoundedRectangle(cornerRadius: 3).fill(color(StepIntensity(rawValue: index)))
+                                .frame(maxWidth: .infinity).frame(height: 10)
+                        }
+                    }.accessibilityHidden(true)
+                    Text("진한 파랑: 10,000걸음 이상").font(.caption).foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
                 Text("최근 365일 · 마지막 백업 기록일 기준으로 하루 1보 이상 이어진 일수예요.").font(.caption).foregroundStyle(.secondary)
                 if let error = model.error { Text(error).font(.caption).foregroundStyle(.orange) }
             }
         }
-        .padding(20).frame(maxWidth: .infinity, alignment: .leading)
-        .background(.background, in: RoundedRectangle(cornerRadius: 24))
+
     }
     private func monthLabel(_ week: [String?]) -> String {
         guard let first = week.compactMap({ $0 }).first(where: { $0.hasSuffix("-01") }),

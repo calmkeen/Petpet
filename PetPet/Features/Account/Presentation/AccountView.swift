@@ -8,16 +8,12 @@ struct AccountView: View {
 
     var body: some View {
         List {
-            if viewModel.configuration.isDevelopment {
-                Section {
-                    Label("Debug 테스트 모드", systemImage: "hammer.fill").font(.headline)
-                    Text("모의 계정과 백업은 이 아이폰 안에 저장돼요. Apple 인증과 운영 서버에는 연결하지 않아요.")
-                        .font(.footnote).foregroundStyle(.secondary)
-                }
-            }
             Section("계정") {
                 if let session = viewModel.session {
-                    Label(session.nickname ?? session.name ?? "내 계정", systemImage: "person.crop.circle.fill")
+                    Label {
+                        Text(session.nickname ?? session.name ?? "내 계정").fixedSize(horizontal: false, vertical: true)
+                            .accessibilityIdentifier("phone.accountName")
+                    } icon: { Image(systemName: "person.crop.circle.fill").foregroundStyle(PhoneDesign.accent) }
                         .font(.headline)
                     if let email = session.email { Text(email).font(.subheadline).foregroundStyle(.secondary) }
                     NavigationLink("닉네임 변경") { PhoneNicknameView(editor: viewModel.makeNicknameEditor()) }
@@ -31,7 +27,7 @@ struct AccountView: View {
                         Label("개발용 계정으로 로그인", systemImage: "person.badge.key")
                             .frame(maxWidth: .infinity).padding(.vertical, 8)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(PhoneActionStyle())
                     .disabled(!viewModel.canSignIn || viewModel.isSigningIn)
                     .accessibilityIdentifier("phone.developmentSignIn")
                     Text("로그인 없이도 걸음수·먹이·성장 기능을 사용할 수 있어요.")
@@ -53,9 +49,10 @@ struct AccountView: View {
             }
             Section {
                 Button { Task { await viewModel.backup() } } label: {
-                    Label(viewModel.configuration.isDevelopment ? "워치 기록 모의 백업" : "워치 기록 백업", systemImage: "icloud.and.arrow.up")
+                    Label("백업·보상 받기", systemImage: "icloud.and.arrow.up")
                 }
                 .disabled(viewModel.session == nil || viewModel.isBusy)
+                .buttonStyle(PhoneActionStyle())
                 .accessibilityIdentifier("phone.serverBackup")
                 if let date = viewModel.cloudState.lastBackupAt {
                     Text("최근 백업 \(date.formatted(date: .abbreviated, time: .shortened))")
@@ -68,9 +65,10 @@ struct AccountView: View {
             }
             Section {
                 Button { Task { await viewModel.prepareRestore() } } label: {
-                    Label(viewModel.configuration.isDevelopment ? "모의 백업 불러오기" : "서버 기록 불러오기", systemImage: "icloud.and.arrow.down")
+                    Label("백업 불러오기", systemImage: "icloud.and.arrow.down")
                 }
                 .disabled(viewModel.session == nil || viewModel.isBusy)
+                .buttonStyle(PhoneActionStyle())
                 .accessibilityIdentifier("phone.previewServerRestore")
             } header: { Text(viewModel.configuration.isDevelopment ? "개발용 복원" : "서버 복원") } footer: {
                 Text("저장된 기록을 먼저 확인한 뒤 복원할 수 있어요. 아이폰과 워치에서 PetPet을 열어 주세요.")
@@ -81,12 +79,21 @@ struct AccountView: View {
                     .accessibilityIdentifier("phone.cloudFeedback")
             }
             if viewModel.configuration.isDevelopment {
+                Section {
+                    Label("Debug 테스트 모드", systemImage: "hammer.fill").font(.headline)
+                    Text("모의 계정과 백업은 이 아이폰 안에 저장돼요. Apple 인증과 운영 서버에는 연결하지 않아요.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                }
+            }
+            if viewModel.configuration.isDevelopment {
                 Text("백업 위치: 이 아이폰의 개발용 저장소").font(.caption).foregroundStyle(.secondary)
             } else if let host = viewModel.configuration.baseURL?.host {
                 Text("연결 서버: \(host)").font(.caption).foregroundStyle(.secondary)
             }
         }
         .navigationTitle("계정과 백업")
+        .navigationBarTitleDisplayMode(.inline)
+        .tint(PhoneDesign.accent)
         .toolbar(.visible, for: .navigationBar)
         .task { await viewModel.start() }
         .sheet(isPresented: Binding(get: { viewModel.preview != nil }, set: { if !$0 { viewModel.cancelPreview() } })) {
@@ -107,7 +114,9 @@ struct AccountView: View {
                     LabeledContent("현재 워치", value: "Lv.\(preview.target.pet.level)")
                     LabeledContent(viewModel.configuration.isDevelopment ? "모의 백업 기록" : "서버 기록", value: "Lv.\(preview.state.pet.level)")
                     LabeledContent("경험치", value: "\(preview.state.pet.experience)")
-                    Text("공격 \(preview.state.pet.attack) · 방어 \(preview.state.pet.defense) · 체력 \(preview.state.pet.health)")
+                    LabeledContent("공격력", value: preview.state.pet.attack.formatted())
+                    LabeledContent("방어력", value: preview.state.pet.defense.formatted())
+                    LabeledContent("체력", value: preview.state.pet.health.formatted())
                 }
                 Section("걸음수 기록") { Text("\(preview.state.steps.count)일의 서버 기록") }
                 Section {
@@ -117,11 +126,14 @@ struct AccountView: View {
                             .foregroundStyle(.orange)
                     }
                     Button("이 기록으로 복원", role: .destructive) { Task { await viewModel.applyRestore() } }
+                        .buttonStyle(PhoneActionStyle())
                         .accessibilityIdentifier("phone.confirmServerRestore")
                 }
             }
             .navigationTitle("복원 전 확인")
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("취소") { viewModel.cancelPreview() } } }
+            .navigationBarTitleDisplayMode(.inline)
+            .tint(PhoneDesign.accent)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button { viewModel.cancelPreview() } label: { Image(systemName: "xmark") }.buttonStyle(PhoneIconStyle()).accessibilityLabel("취소").accessibilityIdentifier("phone.cancelServerRestore") } }
         }
     }
 }

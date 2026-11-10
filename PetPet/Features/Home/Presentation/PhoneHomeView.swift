@@ -8,60 +8,23 @@ struct PhoneHomeView: View {
     @ObservedObject var streakViewModel: PhoneStreakViewModel
     var extras: PhoneExtrasModel?
     @Environment(\.scenePhase) private var scenePhase
-    private let green = Color(red: 0.12, green: 0.42, blue: 0.32)
+    @Environment(\.dynamicTypeSize) private var textSize
+    @ScaledMetric(relativeTo: .largeTitle) private var stepFont = 48
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    HStack {
-                        Label("PetPet", systemImage: "pawprint.fill")
-                            .font(.largeTitle.bold()).foregroundStyle(green)
-                        Spacer()
-                        NavigationLink {
-                            PhoneWatchSetupView(viewModel: viewModel)
-                        } label: {
-                            Image(systemName: "applewatch").font(.title2).frame(width: 44, height: 44)
-                        }
-                        .foregroundStyle(green).accessibilityLabel("워치 연결·설치 안내")
-                        .accessibilityIdentifier("phone.openWatchSetup")
-                    }
-                    Text("함께 걷고, 함께 자라는 하루")
-                        .foregroundStyle(.secondary)
-                    if accountViewModel.configuration.isDevelopment {
-                        Label("Debug 테스트 모드", systemImage: "hammer.fill").font(.caption).foregroundStyle(.orange)
-                    }
-                    Label(viewModel.connectionText,
-                          systemImage: viewModel.state.connection.isReachable ? "checkmark.circle.fill" : "clock")
-                        .font(.footnote).foregroundStyle(green)
-                    NavigationLink {
-                        AccountView(viewModel: accountViewModel)
-                    } label: {
-                        HStack {
-                            Label("계정 · 서버 백업", systemImage: "icloud")
-                            Spacer()
-                            Text(accountViewModel.session?.nickname ?? (accountViewModel.session == nil ? "로그인" : "연결됨"))
-                                .font(.caption).lineLimit(1).truncationMode(.tail).frame(maxWidth: 120, alignment: .trailing)
-                            Image(systemName: "chevron.right").font(.caption)
-                        }
-                        .foregroundStyle(green).padding(16)
-                        .background(.background, in: RoundedRectangle(cornerRadius: 18))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("phone.openAccount")
-                    if let extras {
-                        NavigationLink { PhoneExtrasView(model:extras,development:accountViewModel.configuration.isDevelopment) } label: {
-                            Label("게임 랭킹 · AI 대화",systemImage:"gamecontroller.fill").frame(maxWidth:.infinity,alignment:.leading).padding(16)
-                                .background(.background,in:RoundedRectangle(cornerRadius:18))
-                        }.buttonStyle(.plain).accessibilityIdentifier("phone.openExtras")
-                    }
+                    header
+                    connection
                     stepsCard
-                    PhoneStreakSection(model: streakViewModel, accountID: accountViewModel.session?.accountID)
+                    quickLinks
                     petCard
                     if let snapshot = viewModel.snapshot {
-                        card {
-                            Text("보유 먹이").font(.headline)
-                            HStack {
+                        PhoneCard {
+                            PhoneSectionTitle(title: "먹이", icon: "carrot.fill")
+                            let columns = Array(repeating: GridItem(.flexible(), alignment: .top), count: textSize.isAccessibilitySize ? 1 : 3)
+                            LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
                                 ForEach(FoodCatalog.all) { food in
                                     let quantity = snapshot.inventory.first { $0.foodID == food.id }?.quantity ?? 0
                                     VStack(spacing: 8) {
@@ -71,43 +34,28 @@ struct PhoneHomeView: View {
                                         } else {
                                             Image(systemName: "fork.knife").frame(width: 36, height: 36).accessibilityHidden(true)
                                         }
-                                        Text(food.name).foregroundStyle(.secondary)
-                                        Text("\(quantity)개").font(.title3.bold()).monospacedDigit().accessibilityIdentifier("phone.food.\(food.id)")
-                                    }
-                                    .frame(maxWidth: .infinity)
+                                        Text(food.name).font(.subheadline).foregroundStyle(.secondary)
+                                        Text("\(quantity)개").font(.title3.bold()).monospacedDigit()
+                                            .fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("phone.food.\(food.id)")
+                                    }.frame(maxWidth: .infinity)
                                 }
                             }
-                            .padding(.top, 6)
+                            Text("먹이 주기와 성장은 워치에서 함께해요.").font(.caption).foregroundStyle(.secondary)
                         }
                     }
-                    VStack(alignment: .leading, spacing: 12) {
-                        if let receivedAt = viewModel.state.cached?.receivedAt {
-                            Text("마지막 동기화 \(receivedAt.formatted(date: .abbreviated, time: .shortened))")
-                                .font(.caption).foregroundStyle(.secondary)
-                                .accessibilityIdentifier("phone.lastSyncedAt")
-                        }
-                        Text(viewModel.syncNote).font(.footnote).foregroundStyle(.secondary)
-                        Button {
-                            Task { await refreshAll() }
-                        } label: {
-                            HStack {
-                                if viewModel.isRefreshing { ProgressView().tint(.white) }
-                                Label("지금 동기화", systemImage: "arrow.triangle.2.circlepath")
-                            }
-                            .frame(maxWidth: .infinity).padding(.vertical, 6)
-                        }
-                        .buttonStyle(.borderedProminent).tint(green)
-                        .disabled(viewModel.isRefreshing)
-                        .accessibilityIdentifier("phone.refreshWatchData")
-                    }
+                    PhoneStreakSection(model: streakViewModel, accountID: accountViewModel.session?.accountID)
+                    Text(viewModel.syncNote).font(.footnote).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
                 }
-                .padding(20)
+                .padding(16)
             }
-            .background(Color(uiColor: .systemGroupedBackground))
+            .background(PhoneDesign.background)
             .clipped()
             .toolbar(.hidden, for: .navigationBar)
             .refreshable { await refreshAll() }
         }
+        .tint(PhoneDesign.accent)
         .task { await viewModel.start(); await viewModel.refreshServerPet(); await streakViewModel.refresh(accountID: accountViewModel.session?.accountID) }
         .onChange(of: accountViewModel.session?.accountID) { _, id in
             Task { await viewModel.refreshServerPet(force: true) }
@@ -128,6 +76,69 @@ struct PhoneHomeView: View {
         .onReceive(NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)) { _ in viewModel.refreshDate(); streakViewModel.refreshDate() }
     }
 
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                Label("PetPet", systemImage: "pawprint.fill").font(.title.bold()).foregroundStyle(PhoneDesign.accent)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+                NavigationLink { PhoneWatchSetupView(viewModel: viewModel) } label: { Image(systemName: "applewatch") }
+                    .buttonStyle(PhoneIconStyle()).accessibilityLabel("워치 연결·설치 안내")
+                    .accessibilityIdentifier("phone.openWatchSetup")
+            }
+            Text("함께 걷고, 함께 자라는 하루").font(.subheadline).foregroundStyle(.secondary)
+            if accountViewModel.configuration.isDevelopment {
+                Label("Debug 테스트 모드", systemImage: "hammer.fill").font(.caption).foregroundStyle(.orange)
+            }
+        }
+    }
+
+    private var connection: some View {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Label(viewModel.connectionText, systemImage: viewModel.state.connection.isReachable ? "checkmark.circle.fill" : "clock")
+                    .font(.subheadline).foregroundStyle(PhoneDesign.accent).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("phone.connectionStatus")
+                if let receivedAt = viewModel.state.cached?.receivedAt {
+                    Text("마지막 동기화 \(receivedAt.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("phone.lastSyncedAt")
+                }
+            }.frame(maxWidth: .infinity, alignment: .leading)
+            Button { Task { await refreshAll() } } label: {
+                if viewModel.isRefreshing { ProgressView() } else { Image(systemName: "arrow.triangle.2.circlepath") }
+            }
+            .buttonStyle(PhoneIconStyle()).disabled(viewModel.isRefreshing)
+            .accessibilityLabel("지금 동기화").accessibilityIdentifier("phone.refreshWatchData")
+        }
+    }
+
+    private var quickLinks: some View {
+        let layout = textSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 12)) : AnyLayout(HStackLayout(alignment: .top, spacing: 12))
+        return layout {
+            NavigationLink { AccountView(viewModel: accountViewModel) } label: {
+                shortcut("계정·백업", icon: "icloud", detail: accountViewModel.session?.nickname ?? (accountViewModel.session == nil ? "아이폰에서 로그인" : "연결됨"))
+            }.accessibilityIdentifier("phone.openAccount")
+            if let extras {
+                NavigationLink { PhoneExtrasView(model: extras, development: accountViewModel.configuration.isDevelopment) } label: {
+                    shortcut("게임·대화", icon: "gamecontroller.fill", detail: "랭킹 · AI 대화")
+                }.accessibilityIdentifier("phone.openExtras")
+            }
+        }.buttonStyle(.plain)
+    }
+
+    private func shortcut(_ title: String, icon: String, detail: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label(title, systemImage: icon).font(.headline).foregroundStyle(PhoneDesign.accent)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(2).truncationMode(.middle)
+                .accessibilityLabel(detail)
+        }
+        .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading).padding(14)
+        .background(PhoneDesign.surface, in: RoundedRectangle(cornerRadius: 20))
+        .contentShape(Rectangle())
+    }
+
     private func refreshAll() async {
         async let home: Void = viewModel.refresh()
         async let streak: Void = streakViewModel.refresh(accountID: accountViewModel.session?.accountID, force: true)
@@ -135,27 +146,26 @@ struct PhoneHomeView: View {
     }
 
     private var stepsCard: some View {
-        card {
-            HStack {
-                Label("오늘의 걸음", systemImage: "figure.walk")
-                    .font(.headline).foregroundStyle(green)
-                Spacer()
+        PhoneCard {
+            VStack(alignment: .leading, spacing: 6) {
+                PhoneSectionTitle(title: "오늘의 걸음", icon: "figure.walk")
                 Text(Date(), format: .dateTime.month().day()).font(.subheadline).foregroundStyle(.secondary)
             }
             HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(viewModel.stepCountText).font(.system(size: 48, weight: .bold, design: .rounded))
-                    .minimumScaleFactor(0.6).lineLimit(1).monospacedDigit()
+                Text(viewModel.stepCountText).font(.system(size: stepFont, weight: .bold, design: .rounded))
+                    .minimumScaleFactor(0.75).lineLimit(1).monospacedDigit()
                     .accessibilityIdentifier("phone.stepCount")
                 Text("걸음").font(.headline).foregroundStyle(.secondary)
             }
-            Text("Apple Watch에서 측정한 하루 걸음수")
-                .font(.caption).foregroundStyle(.secondary)
+            Text(viewModel.todaySteps == nil ? "워치에서 PetPet을 열면 오늘 기록을 받아요." : "Apple Watch에서 측정한 하루 걸음수")
+                .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("phone.stepStatus")
         }
     }
 
     private var petCard: some View {
-        card {
-            Text("나의 펫").font(.headline)
+        PhoneCard {
+            PhoneSectionTitle(title: "성장", icon: "chart.bar.fill")
             if let pet = viewModel.displayedPet {
                 Label(viewModel.isShowingServerPet ? "서버 백업 기록" : "워치 기록",
                       systemImage: viewModel.isShowingServerPet ? "icloud" : "applewatch")
@@ -166,27 +176,28 @@ struct PhoneHomeView: View {
                         Text("마지막 서버 조회 \(date.formatted(date: .abbreviated, time: .shortened))").font(.caption2).foregroundStyle(.secondary)
                     }
                 }
-                HStack(spacing: 20) {
+                let portraitLayout = textSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 16)) : AnyLayout(HStackLayout(spacing: 16))
+                portraitLayout {
                     PhonePetPortrait()
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Lv.\(pet.level)").font(.largeTitle.bold())
                             .accessibilityIdentifier("phone.petLevel")
-                        Text(moodText(pet.mood)).font(.subheadline).foregroundStyle(green)
-                        ProgressView(value: Double(pet.experience), total: Double(pet.level * 2)).tint(green)
+                        Text(moodText(pet.mood)).font(.subheadline).foregroundStyle(PhoneDesign.accent)
+                        ProgressView(value: Double(pet.experience), total: Double(pet.level * 2)).tint(.green)
                         Text("경험치 \(pet.experience) / \(pet.level * 2)")
                             .font(.caption).foregroundStyle(.secondary).monospacedDigit()
                             .accessibilityIdentifier("phone.petExperience")
                     }
                 }
-                HStack {
+                let columns = Array(repeating: GridItem(.flexible(), alignment: .top), count: textSize.isAccessibilitySize ? 1 : 3)
+                LazyVGrid(columns: columns, spacing: 16) {
                     statistic("공격력", value: pet.attack, id: "attack")
                     statistic("방어력", value: pet.defense, id: "defense")
                     statistic("체력", value: pet.health, id: "health")
                 }
                 Divider().padding(.vertical, 4)
-                HStack {
+                VStack(alignment: .leading, spacing: 8) {
                     Label("호감도 \(pet.affection)", systemImage: "heart.fill").foregroundStyle(.pink)
-                    Spacer()
                     if !viewModel.isShowingServerPet { Text("스탯 포인트 \(pet.statPoints)").foregroundStyle(.secondary) }
                 }
                 .font(.caption)
@@ -201,6 +212,7 @@ struct PhoneHomeView: View {
             if viewModel.snapshot == nil, let error = viewModel.serverPetError {
                 Text(error).font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("phone.serverPetFeedback")
                 Button("서버 펫 다시 불러오기") { Task { await viewModel.refreshServerPet(force: true) } }
+                    .buttonStyle(PhoneActionStyle())
                     .disabled(viewModel.isServerPetLoading).accessibilityIdentifier("phone.refreshServerPet")
             }
         }
@@ -209,15 +221,8 @@ struct PhoneHomeView: View {
     private func statistic(_ name: String, value: Int64, id: String) -> some View {
         VStack(spacing: 5) {
             Text(name).font(.caption).foregroundStyle(.secondary)
-            Text(value.formatted()).font(.headline).monospacedDigit().accessibilityIdentifier("phone.stat.\(id)")
+            Text(value.formatted()).font(.headline).monospacedDigit().fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("phone.stat.\(id)")
         }.frame(maxWidth: .infinity)
-    }
-
-    private func card<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        VStack(alignment: .leading, spacing: 14, content: content)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(20)
-            .background(.background, in: RoundedRectangle(cornerRadius: 24))
     }
 
     private func moodText(_ mood: PetMood) -> String {

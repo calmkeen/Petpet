@@ -10,6 +10,7 @@ struct PhoneWatchSetupView: View {
                     .accessibilityIdentifier("phone.watchSetupStatus")
                 Text(viewModel.syncNote).font(.footnote).foregroundStyle(.secondary)
                 Button("연결 상태 다시 확인") { Task { await viewModel.refresh() } }
+                    .buttonStyle(PhoneActionStyle())
                     .disabled(viewModel.isRefreshing).accessibilityIdentifier("phone.checkWatchConnection")
             }
             Section("처음 연결하기") {
@@ -18,7 +19,10 @@ struct PhoneWatchSetupView: View {
             }
             Section("워치에 PetPet 설치") {
                 Text("아이폰의 Watch 앱 → 나의 시계에서 ‘사용 가능한 앱’을 찾아 PetPet 옆의 ‘설치’를 눌러 주세요. ‘앱’ 메뉴가 보이면 먼저 들어가 주세요.")
-                Text("설치가 끝나면 아이폰과 워치에서 PetPet을 모두 열어 주세요. 개발 중에는 Xcode에서 양쪽에 같은 Debug 빌드를 설치해 주세요.")
+                Text("설치가 끝나면 아이폰과 워치에서 PetPet을 모두 열어 주세요.")
+                #if DEBUG
+                Text("개발 중에는 Xcode에서 양쪽에 같은 Debug 빌드를 설치해 주세요.").font(.caption).foregroundStyle(.secondary)
+                #endif
             }
             Section("동기화가 늦을 때") {
                 Text("아이폰과 워치를 가까이 두고 Bluetooth와 Wi-Fi를 켜 주세요. 워치의 잠금을 풀고 두 앱을 열어 둔 뒤 다시 확인해 주세요.")
@@ -30,6 +34,7 @@ struct PhoneWatchSetupView: View {
             }
         }
         .navigationTitle("워치 연결과 설치")
+        .navigationBarTitleDisplayMode(.inline).tint(PhoneDesign.accent)
         .toolbar(.visible, for: .navigationBar)
     }
 }
