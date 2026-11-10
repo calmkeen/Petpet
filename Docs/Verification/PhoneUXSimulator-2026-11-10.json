@@ -1,0 +1,1747 @@
+{
+  "date": "2026-11-10",
+  "xcode": "27.2 (27B52)",
+  "appSourceCommit": "b5acaa92971c17c5a3ab611f26ca0dae9cf0d91a",
+  "testSourceCommit": "fb5c0ccbc03c06b0e857875bd09db043b05ba48e",
+  "simulatorOnly": true,
+  "phoneScreenPoints": {
+    "width": 375,
+    "height": 667
+  },
+  "pairedPhone": "iPhone SE (3rd generation), iOS 18.0",
+  "pairedWatch": "Apple Watch SE (2nd generation) 40mm, watchOS 11.0",
+  "unpairedPhone": "iPhone SE (3rd generation), iOS 27.2 (24B8117)",
+  "uniquePassedTests": 15,
+  "failedTests": 0,
+  "skippedTests": 0,
+  "textSizes": [
+    "system large",
+    "system accessibility-extra-large (SwiftUI accessibility3)"
+  ],
+  "keyboardScope": "Actual onscreen software keyboard verified on iOS 27.2; iOS 18.0 supplied keyboard input but its keyboard frame was offscreen and is not counted as an overlap check.",
+  "builds": {
+    "debugSimulatorBuild": "passed",
+    "releaseSimulatorBuild": "passed",
+    "largeTextLaunchArgumentPresent": {
+      "Debug": true,
+      "Release": false
+    }
+  },
+  "primaryTargetMeasurements": 77,
+  "stages": [
+    {
+      "stage": 0,
+      "suite": "PhoneUXUITests",
+      "test": "test00HomeLight",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:47:15.082717+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-00-134646.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "phone.openWatchSetup",
+          "x": 315.0,
+          "y": 36.0,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "phone.refreshWatchData",
+          "x": 315.0,
+          "y": 150.5,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "phone.openAccount",
+          "x": 16.0,
+          "y": 418.0,
+          "width": 165.5,
+          "height": 88.0
+        },
+        {
+          "identifier": "phone.openExtras",
+          "x": 193.5,
+          "y": 418.0,
+          "width": 165.5,
+          "height": 88.0
+        },
+        {
+          "identifier": "phone.greetPet",
+          "x": 21.0,
+          "y": 306.0,
+          "width": 126.0,
+          "height": 126.0
+        },
+        {
+          "identifier": "phone.refreshStreak",
+          "x": 299.0,
+          "y": 597.5,
+          "width": 44.0,
+          "height": 44.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "phone.connectionStatus",
+          "x": 17.5,
+          "y": 154.25,
+          "width": 106.5,
+          "height": 18.0
+        },
+        {
+          "identifier": "phone.stepCount",
+          "x": 32.0,
+          "y": 294.0,
+          "width": 48.5,
+          "height": 57.5
+        },
+        {
+          "identifier": "phone.petLevel",
+          "x": 152.0,
+          "y": 318.25,
+          "width": 63.0,
+          "height": 41.0
+        },
+        {
+          "identifier": "phone.petExperience",
+          "x": 152.0,
+          "y": 405.25,
+          "width": 60.5,
+          "height": 14.5
+        },
+        {
+          "identifier": "phone.stat.attack",
+          "x": 70.41666666666666,
+          "y": 467.5,
+          "width": 21.5,
+          "height": 20.5
+        },
+        {
+          "identifier": "phone.stat.defense",
+          "x": 182.0,
+          "y": 467.5,
+          "width": 11.0,
+          "height": 20.5
+        },
+        {
+          "identifier": "phone.stat.health",
+          "x": 288.33333333333337,
+          "y": 467.5,
+          "width": 11.0,
+          "height": 20.5
+        },
+        {
+          "identifier": "phone.food.1",
+          "x": 66.16666666666666,
+          "y": 454.5,
+          "width": 30.0,
+          "height": 24.0
+        },
+        {
+          "identifier": "phone.food.2",
+          "x": 172.5,
+          "y": 454.5,
+          "width": 30.0,
+          "height": 24.0
+        },
+        {
+          "identifier": "phone.food.3",
+          "x": 278.83333333333337,
+          "y": 454.5,
+          "width": 30.0,
+          "height": 24.0
+        },
+        {
+          "identifier": "phone.currentStreak",
+          "x": 32.0,
+          "y": 606.25,
+          "width": 76.5,
+          "height": 26.5
+        }
+      ]
+    },
+    {
+      "stage": 1,
+      "suite": "PhoneUXUITests",
+      "test": "test01HomeLargeLight",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:47:54.585189+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "accessibility-extra-large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-01-134715.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "phone.openWatchSetup",
+          "x": 315.0,
+          "y": 43.5,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "phone.refreshWatchData",
+          "x": 315.0,
+          "y": 299.5,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "phone.openAccount",
+          "x": 16.0,
+          "y": 450.5,
+          "width": 343.0,
+          "height": 122.5
+        },
+        {
+          "identifier": "phone.openExtras",
+          "x": 16.0,
+          "y": 281.5,
+          "width": 343.0,
+          "height": 122.5
+        },
+        {
+          "identifier": "phone.greetPet",
+          "x": 21.0,
+          "y": 255.0,
+          "width": 126.0,
+          "height": 126.0
+        },
+        {
+          "identifier": "phone.refreshStreak",
+          "x": 299.0,
+          "y": 403.5,
+          "width": 44.0,
+          "height": 44.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "phone.connectionStatus",
+          "x": 19.0,
+          "y": 259.0,
+          "width": 242.0,
+          "height": 43.0
+        },
+        {
+          "identifier": "phone.stepCount",
+          "x": 32.0,
+          "y": 539.0,
+          "width": 72.0,
+          "height": 85.5
+        },
+        {
+          "identifier": "phone.petLevel",
+          "x": 32.0,
+          "y": 397.0,
+          "width": 95.0,
+          "height": 62.5
+        },
+        {
+          "identifier": "phone.petExperience",
+          "x": 32.0,
+          "y": 530.5,
+          "width": 153.0,
+          "height": 38.5
+        },
+        {
+          "identifier": "phone.stat.attack",
+          "x": 161.75,
+          "y": 325.0,
+          "width": 51.5,
+          "height": 48.0
+        },
+        {
+          "identifier": "phone.stat.defense",
+          "x": 174.5,
+          "y": 432.5,
+          "width": 26.0,
+          "height": 48.0
+        },
+        {
+          "identifier": "phone.stat.health",
+          "x": 174.5,
+          "y": 540.0,
+          "width": 26.0,
+          "height": 48.0
+        },
+        {
+          "identifier": "phone.food.1",
+          "x": 155.0,
+          "y": 419.5,
+          "width": 65.0,
+          "height": 51.5
+        },
+        {
+          "identifier": "phone.food.2",
+          "x": 155.0,
+          "y": 582.0,
+          "width": 65.0,
+          "height": 51.5
+        },
+        {
+          "identifier": "phone.food.3",
+          "x": 155.0,
+          "y": 441.0,
+          "width": 65.0,
+          "height": 51.5
+        },
+        {
+          "identifier": "phone.currentStreak",
+          "x": 32.0,
+          "y": 399.0,
+          "width": 152.5,
+          "height": 53.0
+        }
+      ]
+    },
+    {
+      "stage": 2,
+      "suite": "PhoneUXUITests",
+      "test": "test02HomeDark",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:48:21.191894+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-02-134755.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "phone.openWatchSetup",
+          "x": 315.0,
+          "y": 36.0,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "phone.refreshWatchData",
+          "x": 315.0,
+          "y": 150.5,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "phone.openAccount",
+          "x": 16.0,
+          "y": 418.0,
+          "width": 165.5,
+          "height": 88.0
+        },
+        {
+          "identifier": "phone.openExtras",
+          "x": 193.5,
+          "y": 418.0,
+          "width": 165.5,
+          "height": 88.0
+        },
+        {
+          "identifier": "phone.greetPet",
+          "x": 21.0,
+          "y": 306.0,
+          "width": 126.0,
+          "height": 126.0
+        },
+        {
+          "identifier": "phone.refreshStreak",
+          "x": 299.0,
+          "y": 597.5,
+          "width": 44.0,
+          "height": 44.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "phone.connectionStatus",
+          "x": 17.5,
+          "y": 154.25,
+          "width": 106.5,
+          "height": 18.0
+        },
+        {
+          "identifier": "phone.stepCount",
+          "x": 32.0,
+          "y": 294.0,
+          "width": 48.5,
+          "height": 57.5
+        },
+        {
+          "identifier": "phone.petLevel",
+          "x": 152.0,
+          "y": 318.25,
+          "width": 63.0,
+          "height": 41.0
+        },
+        {
+          "identifier": "phone.petExperience",
+          "x": 152.0,
+          "y": 405.25,
+          "width": 60.5,
+          "height": 14.5
+        },
+        {
+          "identifier": "phone.stat.attack",
+          "x": 70.41666666666666,
+          "y": 467.5,
+          "width": 21.5,
+          "height": 20.5
+        },
+        {
+          "identifier": "phone.stat.defense",
+          "x": 182.0,
+          "y": 467.5,
+          "width": 11.0,
+          "height": 20.5
+        },
+        {
+          "identifier": "phone.stat.health",
+          "x": 288.33333333333337,
+          "y": 467.5,
+          "width": 11.0,
+          "height": 20.5
+        },
+        {
+          "identifier": "phone.food.1",
+          "x": 66.16666666666666,
+          "y": 454.5,
+          "width": 30.0,
+          "height": 24.0
+        },
+        {
+          "identifier": "phone.food.2",
+          "x": 172.5,
+          "y": 454.5,
+          "width": 30.0,
+          "height": 24.0
+        },
+        {
+          "identifier": "phone.food.3",
+          "x": 278.83333333333337,
+          "y": 454.5,
+          "width": 30.0,
+          "height": 24.0
+        },
+        {
+          "identifier": "phone.currentStreak",
+          "x": 32.0,
+          "y": 606.25,
+          "width": 76.5,
+          "height": 26.5
+        }
+      ]
+    },
+    {
+      "stage": 3,
+      "suite": "PhoneUXUITests",
+      "test": "test03HomeLargeDark",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:49:00.797062+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "accessibility-extra-large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-03-134821.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "phone.openWatchSetup",
+          "x": 315.0,
+          "y": 43.5,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "phone.refreshWatchData",
+          "x": 315.0,
+          "y": 299.5,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "phone.openAccount",
+          "x": 16.0,
+          "y": 450.5,
+          "width": 343.0,
+          "height": 122.5
+        },
+        {
+          "identifier": "phone.openExtras",
+          "x": 16.0,
+          "y": 281.5,
+          "width": 343.0,
+          "height": 122.5
+        },
+        {
+          "identifier": "phone.greetPet",
+          "x": 21.0,
+          "y": 255.0,
+          "width": 126.0,
+          "height": 126.0
+        },
+        {
+          "identifier": "phone.refreshStreak",
+          "x": 299.0,
+          "y": 403.5,
+          "width": 44.0,
+          "height": 44.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "phone.connectionStatus",
+          "x": 19.0,
+          "y": 259.0,
+          "width": 242.0,
+          "height": 43.0
+        },
+        {
+          "identifier": "phone.stepCount",
+          "x": 32.0,
+          "y": 539.0,
+          "width": 72.0,
+          "height": 85.5
+        },
+        {
+          "identifier": "phone.petLevel",
+          "x": 32.0,
+          "y": 397.0,
+          "width": 95.0,
+          "height": 62.5
+        },
+        {
+          "identifier": "phone.petExperience",
+          "x": 32.0,
+          "y": 530.5,
+          "width": 153.0,
+          "height": 38.5
+        },
+        {
+          "identifier": "phone.stat.attack",
+          "x": 161.75,
+          "y": 325.0,
+          "width": 51.5,
+          "height": 48.0
+        },
+        {
+          "identifier": "phone.stat.defense",
+          "x": 174.5,
+          "y": 432.5,
+          "width": 26.0,
+          "height": 48.0
+        },
+        {
+          "identifier": "phone.stat.health",
+          "x": 174.5,
+          "y": 540.0,
+          "width": 26.0,
+          "height": 48.0
+        },
+        {
+          "identifier": "phone.food.1",
+          "x": 155.0,
+          "y": 419.5,
+          "width": 65.0,
+          "height": 51.5
+        },
+        {
+          "identifier": "phone.food.2",
+          "x": 155.0,
+          "y": 582.0,
+          "width": 65.0,
+          "height": 51.5
+        },
+        {
+          "identifier": "phone.food.3",
+          "x": 155.0,
+          "y": 441.0,
+          "width": 65.0,
+          "height": 51.5
+        },
+        {
+          "identifier": "phone.currentStreak",
+          "x": 32.0,
+          "y": 399.0,
+          "width": 152.5,
+          "height": 53.0
+        }
+      ]
+    },
+    {
+      "stage": 4,
+      "suite": "PhoneUXUITests",
+      "test": "test10DetailsLight",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:49:30.064542+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-04-134901.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "phone.checkWatchConnection",
+          "x": 16.0,
+          "y": 191.0,
+          "width": 343.0,
+          "height": 70.0
+        },
+        {
+          "identifier": "phone.editNickname",
+          "x": 16.0,
+          "y": 147.0,
+          "width": 343.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "nickname.input",
+          "x": 16.0,
+          "y": 203.5,
+          "width": 343.0,
+          "height": 66.0
+        },
+        {
+          "identifier": "nickname.dismissKeyboard",
+          "x": 315.0,
+          "y": 20.0,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "nickname.submit",
+          "x": 16.0,
+          "y": 313.5,
+          "width": 343.0,
+          "height": 70.0
+        },
+        {
+          "identifier": "phone.serverBackup",
+          "x": 16.0,
+          "y": 291.5,
+          "width": 343.0,
+          "height": 75.5
+        },
+        {
+          "identifier": "phone.previewServerRestore",
+          "x": 16.0,
+          "y": 500.0,
+          "width": 343.0,
+          "height": 76.5
+        },
+        {
+          "identifier": "phone.confirmServerRestore",
+          "x": 16.0,
+          "y": 577.0,
+          "width": 343.0,
+          "height": 70.0
+        },
+        {
+          "identifier": "phone.cancelServerRestore",
+          "x": 16.0,
+          "y": 46.0,
+          "width": 44.0,
+          "height": 44.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "phone.accountName",
+          "x": 16.0,
+          "y": 103.0,
+          "width": 343.0,
+          "height": 44.0
+        }
+      ]
+    },
+    {
+      "stage": 5,
+      "suite": "PhoneUXUITests",
+      "test": "test11DetailsLargeLight",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:50:10.086562+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "accessibility-extra-large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-05-134930.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "phone.checkWatchConnection",
+          "x": 16.0,
+          "y": 338.0,
+          "width": 343.0,
+          "height": 142.0
+        },
+        {
+          "identifier": "phone.editNickname",
+          "x": 16.0,
+          "y": 244.5,
+          "width": 343.0,
+          "height": 70.0
+        },
+        {
+          "identifier": "nickname.input",
+          "x": 16.0,
+          "y": 324.5,
+          "width": 343.0,
+          "height": 79.5
+        },
+        {
+          "identifier": "nickname.dismissKeyboard",
+          "x": 315.0,
+          "y": 20.0,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "nickname.submit",
+          "x": 16.0,
+          "y": 505.5,
+          "width": 343.0,
+          "height": 94.0
+        },
+        {
+          "identifier": "phone.serverBackup",
+          "x": 16.0,
+          "y": 464.5,
+          "width": 343.0,
+          "height": 142.0
+        },
+        {
+          "identifier": "phone.previewServerRestore",
+          "x": 16.0,
+          "y": 341.0,
+          "width": 343.0,
+          "height": 142.0
+        },
+        {
+          "identifier": "phone.confirmServerRestore",
+          "x": 16.0,
+          "y": 559.0,
+          "width": 343.0,
+          "height": 94.0
+        },
+        {
+          "identifier": "phone.cancelServerRestore",
+          "x": 16.0,
+          "y": 46.0,
+          "width": 44.0,
+          "height": 44.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "phone.accountName",
+          "x": 16.0,
+          "y": 126.5,
+          "width": 343.0,
+          "height": 118.0
+        }
+      ]
+    },
+    {
+      "stage": 6,
+      "suite": "PhoneUXUITests",
+      "test": "test12DetailsDark",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:50:42.594400+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-06-135010.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "phone.checkWatchConnection",
+          "x": 16.0,
+          "y": 191.0,
+          "width": 343.0,
+          "height": 70.0
+        },
+        {
+          "identifier": "phone.editNickname",
+          "x": 16.0,
+          "y": 147.0,
+          "width": 343.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "nickname.input",
+          "x": 16.0,
+          "y": 203.5,
+          "width": 343.0,
+          "height": 66.0
+        },
+        {
+          "identifier": "nickname.dismissKeyboard",
+          "x": 315.0,
+          "y": 20.0,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "nickname.submit",
+          "x": 16.0,
+          "y": 313.5,
+          "width": 343.0,
+          "height": 70.0
+        },
+        {
+          "identifier": "phone.serverBackup",
+          "x": 16.0,
+          "y": 291.5,
+          "width": 343.0,
+          "height": 75.5
+        },
+        {
+          "identifier": "phone.previewServerRestore",
+          "x": 16.0,
+          "y": 500.0,
+          "width": 343.0,
+          "height": 76.5
+        },
+        {
+          "identifier": "phone.confirmServerRestore",
+          "x": 16.0,
+          "y": 577.0,
+          "width": 343.0,
+          "height": 70.0
+        },
+        {
+          "identifier": "phone.cancelServerRestore",
+          "x": 16.0,
+          "y": 46.0,
+          "width": 44.0,
+          "height": 44.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "phone.accountName",
+          "x": 16.0,
+          "y": 103.0,
+          "width": 343.0,
+          "height": 44.0
+        }
+      ]
+    },
+    {
+      "stage": 7,
+      "suite": "PhoneUXUITests",
+      "test": "test20RankingsLight",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:51:02.313797+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-07-135043.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "phone.showRankings",
+          "x": 16.0,
+          "y": 72.0,
+          "width": 165.5,
+          "height": 48.0
+        },
+        {
+          "identifier": "phone.showChat",
+          "x": 193.5,
+          "y": 72.0,
+          "width": 165.5,
+          "height": 48.0
+        },
+        {
+          "identifier": "phone.rankGame",
+          "x": 16.0,
+          "y": 167.0,
+          "width": 343.0,
+          "height": 66.0
+        },
+        {
+          "identifier": "phone.refreshRanking",
+          "x": 16.0,
+          "y": 481.5,
+          "width": 343.0,
+          "height": 70.0
+        },
+        {
+          "identifier": "chat.editQuestion",
+          "x": 16.0,
+          "y": 167.0,
+          "width": 343.0,
+          "height": 75.5
+        },
+        {
+          "identifier": "chat.send",
+          "x": 16.0,
+          "y": 242.5,
+          "width": 343.0,
+          "height": 70.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "phone.rankScore.900000001",
+          "x": 32.0,
+          "y": 580.5,
+          "width": 30.0,
+          "height": 24.0
+        },
+        {
+          "identifier": "phone.rankScore.900000001",
+          "x": 32.0,
+          "y": 420.0,
+          "width": 47.5,
+          "height": 24.0
+        },
+        {
+          "identifier": "phone.rankName.900000001",
+          "x": 60.5,
+          "y": 391.5,
+          "width": 148.5,
+          "height": 20.5
+        }
+      ]
+    },
+    {
+      "stage": 8,
+      "suite": "PhoneUXUITests",
+      "test": "test21RankingsLargeDark",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:51:34.855124+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "accessibility-extra-large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-08-135103.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "phone.showRankings",
+          "x": 16.0,
+          "y": 72.0,
+          "width": 165.5,
+          "height": 68.0
+        },
+        {
+          "identifier": "phone.showChat",
+          "x": 193.5,
+          "y": 72.0,
+          "width": 165.5,
+          "height": 68.0
+        },
+        {
+          "identifier": "phone.rankGame",
+          "x": 16.0,
+          "y": 210.5,
+          "width": 343.0,
+          "height": 84.0
+        },
+        {
+          "identifier": "phone.refreshRanking",
+          "x": 16.0,
+          "y": 557.5,
+          "width": 343.0,
+          "height": 94.0
+        },
+        {
+          "identifier": "chat.editQuestion",
+          "x": 16.0,
+          "y": 210.5,
+          "width": 343.0,
+          "height": 170.5
+        },
+        {
+          "identifier": "chat.send",
+          "x": 16.0,
+          "y": 381.0,
+          "width": 343.0,
+          "height": 94.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "phone.rankScore.900000001",
+          "x": 32.0,
+          "y": 605.5,
+          "width": 65.0,
+          "height": 51.5
+        },
+        {
+          "identifier": "phone.rankScore.900000001",
+          "x": 32.0,
+          "y": 444.5,
+          "width": 102.0,
+          "height": 51.5
+        },
+        {
+          "identifier": "phone.rankName.900000001",
+          "x": 89.5,
+          "y": 340.5,
+          "width": 244.0,
+          "height": 96.0
+        }
+      ]
+    },
+    {
+      "stage": 9,
+      "suite": "PhoneUXUITests",
+      "test": "test30QuestionDraftLimitAndCancel",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:52:31.817065+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "accessibility-extra-large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-09-135135.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "chat.question",
+          "x": 24.0,
+          "y": 120.0,
+          "width": 327.0,
+          "height": 471.5
+        },
+        {
+          "identifier": "chat.dismissKeyboard",
+          "x": 315.0,
+          "y": 46.0,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "chat.cancelEditing",
+          "x": 16.0,
+          "y": 46.0,
+          "width": 44.0,
+          "height": 44.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "chat.characterCount",
+          "x": 16.0,
+          "y": 611.5,
+          "width": 222.5,
+          "height": 39.5
+        }
+      ]
+    },
+    {
+      "stage": 10,
+      "suite": "PhoneGameFlowUITests",
+      "test": "test40PhoneChatRepeatsAndCancels",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:53:14.178252+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-10-135232.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [],
+      "texts": []
+    },
+    {
+      "stage": 11,
+      "suite": "PhoneGameFlowUITests",
+      "test": "test41LargeDarkPhoneChatRepeatsAndCancels",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:54:13.516897+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "accessibility-extra-large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-11-135314.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [],
+      "texts": []
+    },
+    {
+      "stage": 12,
+      "suite": "PhoneUXUITests",
+      "test": "test50LargeLoginAndReconnect",
+      "passed": true,
+      "phoneSimulator": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+      "watchSimulator": "23172719-AC2C-4DAD-8FEB-8808093BD761",
+      "verifiedAt": "2026-11-10T04:59:10.018749+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "accessibility-extra-large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-12-135834.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "96462AE4-4876-4635-A70E-EE0DBC2FCA05",
+        "deviceName": "PetPet Verified Flow iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "phone.signOut",
+          "x": 16.0,
+          "y": 314.5,
+          "width": 343.0,
+          "height": 70.0
+        },
+        {
+          "identifier": "phone.developmentSignIn",
+          "x": 16.0,
+          "y": 126.5,
+          "width": 343.0,
+          "height": 158.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "phone.chatLoginNotice",
+          "x": 16.0,
+          "y": 183.0,
+          "width": 343.0,
+          "height": 205.5
+        },
+        {
+          "identifier": "phone.petLevel",
+          "x": 32.0,
+          "y": 397.0,
+          "width": 95.0,
+          "height": 62.5
+        }
+      ]
+    },
+    {
+      "stage": 13,
+      "suite": "PhoneUXUITests",
+      "test": "test60UnpairedLargeDark",
+      "passed": true,
+      "phoneSimulator": "E18E7FF8-2121-4EE4-9F0F-1ECFAFC1FD1B",
+      "watchSimulator": null,
+      "verifiedAt": "2026-11-10T05:00:17.599408+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "accessibility-extra-large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-13-135911.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "E18E7FF8-2121-4EE4-9F0F-1ECFAFC1FD1B",
+        "deviceName": "PetPet UI SE 27",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "24B8117",
+        "osVersion": "27.2",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "phone.openWatchSetup",
+          "x": 315.0,
+          "y": 43.5,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "phone.checkWatchConnection",
+          "x": 16.0,
+          "y": 465.5,
+          "width": 343.0,
+          "height": 150.0
+        },
+        {
+          "identifier": "phone.developmentSignIn",
+          "x": 16.0,
+          "y": 142.0,
+          "width": 343.0,
+          "height": 166.0
+        },
+        {
+          "identifier": "phone.serverBackup",
+          "x": 16.0,
+          "y": 239.5,
+          "width": 343.0,
+          "height": 150.0
+        },
+        {
+          "identifier": "phone.previewServerRestore",
+          "x": 16.0,
+          "y": 359.5,
+          "width": 343.0,
+          "height": 150.0
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "phone.connectionStatus",
+          "x": 19.0,
+          "y": 260.0,
+          "width": 282.5,
+          "height": 86.0
+        }
+      ]
+    },
+    {
+      "stage": 14,
+      "suite": "PhoneUXUITests",
+      "test": "test70LargeSoftwareKeyboardLayout",
+      "passed": true,
+      "phoneSimulator": "E18E7FF8-2121-4EE4-9F0F-1ECFAFC1FD1B",
+      "watchSimulator": null,
+      "verifiedAt": "2026-11-10T05:13:14.414209+00:00",
+      "uiSettings": {
+        "originalContentSize": "large",
+        "testContentSize": "accessibility-extra-large",
+        "restored": true
+      },
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "resultBundle": "/private/tmp/petpet-phone-ux/phone-ux-14-141222.xcresult",
+      "runtime": {
+        "architecture": "arm64",
+        "deviceId": "E18E7FF8-2121-4EE4-9F0F-1ECFAFC1FD1B",
+        "deviceName": "PetPet UI SE 27",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "24B8117",
+        "osVersion": "27.2",
+        "platform": "iOS Simulator"
+      },
+      "targets": [
+        {
+          "identifier": "chat.question",
+          "x": 24.0,
+          "y": 114.0,
+          "width": 327.0,
+          "height": 217.5
+        },
+        {
+          "identifier": "chat.cancelEditing",
+          "x": 20.0,
+          "y": 36.0,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "chat.dismissKeyboard",
+          "x": 311.0,
+          "y": 36.0,
+          "width": 44.0,
+          "height": 44.0
+        },
+        {
+          "identifier": "chat.question",
+          "x": 24.0,
+          "y": 114.0,
+          "width": 327.0,
+          "height": 217.5
+        }
+      ],
+      "texts": [
+        {
+          "identifier": "chat.characterCount",
+          "x": 16.0,
+          "y": 351.5,
+          "width": 161.0,
+          "height": 39.5
+        }
+      ],
+      "visibleSoftwareKeyboard": {
+        "x": 0.0,
+        "y": 451.0,
+        "width": 375.0,
+        "height": 216.0
+      }
+    }
+  ],
+  "finalState": {
+    "phoneSnapshotMatchesWatch": true,
+    "petStatsAndFoodUnchanged": true,
+    "existingStepsPreserved": true,
+    "backupsAndRestoresUnchanged": true,
+    "nicknameUnchangedAndSynced": true,
+    "nickname": "FinalWatch217069",
+    "pet": {
+      "mood": "HAPPY",
+      "level": 2,
+      "attack": 50,
+      "affection": 0,
+      "health": 9,
+      "lastFedAt": 815896370.407832,
+      "statPoints": 0,
+      "experience": 2,
+      "defense": 0,
+      "id": 1
+    },
+    "inventory": [
+      {
+        "id": 1,
+        "quantity": 2,
+        "foodID": 1
+      },
+      {
+        "quantity": 2,
+        "id": 2,
+        "foodID": 2
+      }
+    ],
+    "steps": {
+      "2026-11-08": 4321,
+      "2026-11-09": 0,
+      "2026-11-07": 2000
+    },
+    "appliedBackups": 5,
+    "pendingBackups": 0,
+    "nativeTextSizeRestored": {
+      "96462AE4-4876-4635-A70E-EE0DBC2FCA05": "large",
+      "E18E7FF8-2121-4EE4-9F0F-1ECFAFC1FD1B": "large"
+    },
+    "simulatorKeyboardPreferenceRestored": true,
+    "appliedRestores": 1
+  },
+  "screenshots": [
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-dark-account.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-dark-food.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-dark-nickname.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-dark-pet.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-dark-restore.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-dark-setup.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-dark-shortcuts.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-dark-steps.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-dark-streak.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-dark-chat-cancelled.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-dark-chat-cancelling.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-dark-chat.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-dark-food.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-dark-pet.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-dark-shooting-ranking.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-dark-shortcuts.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-dark-stairs-ranking.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-dark-steps.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-dark-streak.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-keyboard-focused.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-keyboard-input.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-light-account.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-light-food.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-light-nickname.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-light-pet.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-light-restore.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-light-setup.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-light-shortcuts.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-light-steps.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-light-streak.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-login-guidance.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-large-login.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-account.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-chat-cancelled.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-chat-cancelling.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-chat.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-food.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-nickname.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-pet.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-restore.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-setup.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-shooting-ranking.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-shortcuts.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-stairs-ranking.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-steps.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-light-streak.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-question-limit.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-reconnected.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-unpaired-large-account.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-unpaired-large-home.png",
+      "width": 750,
+      "height": 1334
+    },
+    {
+      "path": "Docs/Screenshots/PhoneUX/phone-ux-unpaired-large-setup.png",
+      "width": 750,
+      "height": 1334
+    }
+  ]
+}
