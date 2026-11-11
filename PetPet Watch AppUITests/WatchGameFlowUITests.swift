@@ -3,7 +3,10 @@ import XCTest
 @MainActor
 final class WatchGameFlowUITests: XCTestCase {
     private var app: XCUIApplication!
-    override func setUpWithError() throws { continueAfterFailure = false; app = XCUIApplication(); app.launch() }
+    override func setUpWithError() throws {
+        continueAfterFailure = false; app = XCUIApplication(); app.launch()
+        dismissOptionalDictationSharingIfRequested(timeout: 1)
+    }
     override func tearDownWithError() throws { app.terminate() }
 
     func test10ShootingResultSubmitsAndReplayKeepsBest() {
@@ -140,12 +143,7 @@ final class WatchGameFlowUITests: XCTestCase {
     private func enterQuestion(_ text: String) {
         let question = app.descendants(matching: .any).matching(identifier: "chat.question").firstMatch
         reveal(question); question.tap()
-        let system = XCUIApplication(bundleIdentifier: "com.apple.Carousel")
-        let decline = system.buttons["지금 안 함"]
-        if decline.exists {
-            for _ in 0..<8 { if decline.isHittable { break }; system.swipeUp(velocity: .slow) }
-            decline.tap()
-        }
+        dismissOptionalDictationSharingIfRequested(timeout: 4)
         // The 40mm simulator opens dictation automatically. Stop its microphone
         // session before XCTest injects text so a dictation failure cannot lock Done.
         let dictation = app.buttons["Stop dictation"]
@@ -166,6 +164,21 @@ final class WatchGameFlowUITests: XCTestCase {
         let host = app.descendants(matching: .any).matching(identifier: "TextInputHost").firstMatch
         let returned = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in !host.exists }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [returned], timeout: 5), .completed, "System text editor must close before querying app controls")
+    }
+    private func dismissOptionalDictationSharingIfRequested(timeout: TimeInterval) {
+        let system = XCUIApplication(bundleIdentifier: "com.apple.Carousel")
+        let title = system.staticTexts.matching(NSPredicate(
+            format: "label CONTAINS[c] %@ AND (label CONTAINS %@ OR label CONTAINS[c] %@)",
+            "Siri", "받아쓰기", "dictation")).firstMatch
+        guard title.waitForExistence(timeout: timeout) else { return }
+        let decline = system.buttons.matching(NSPredicate(format: "label IN %@", ["지금 안 함", "Not Now"])).firstMatch
+        XCTAssertTrue(decline.waitForExistence(timeout: 3))
+        for _ in 0..<8 { if decline.isHittable { break }; system.swipeUp(velocity: .slow) }
+        XCTAssertTrue(decline.isHittable)
+        decline.tap()
+        let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in !title.exists }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 3), .completed)
+        print("WATCH_OPTIONAL_DICTATION_SHARING_DECLINED")
     }
     private func waitForStatus(_ text: String) {
         let done = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in self.app.staticTexts["chat.status"].exists && self.app.staticTexts["chat.status"].label == text }, object: nil)
