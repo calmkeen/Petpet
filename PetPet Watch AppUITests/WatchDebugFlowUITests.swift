@@ -35,12 +35,14 @@ final class WatchDebugFlowUITests: XCTestCase {
         capture("flow-watch-two-feeds")
         openStatistics()
         XCTAssertEqual(app.staticTexts["watch.petLevel"].label, "Lv.2")
+        reveal(app.staticTexts["watch.statPoints"])
         XCTAssertEqual(app.staticTexts["watch.statPoints"].label, "스탯 포인트 2")
         let health = app.buttons["watch.allocate.health"]
         reveal(health); health.tap()
         XCTAssertTrue(wait { self.app.staticTexts["watch.stat.health"].label == "9" })
-        XCTAssertEqual(app.staticTexts["watch.statPoints"].label, "스탯 포인트 1")
         capture("flow-watch-level-up-and-health")
+        reveal(app.staticTexts["watch.statPoints"], down: false)
+        XCTAssertEqual(app.staticTexts["watch.statPoints"].label, "스탯 포인트 1")
         app.terminate(); app.launch()
         openStatistics()
         XCTAssertEqual(app.staticTexts["watch.petLevel"].label, "Lv.2")
@@ -54,6 +56,7 @@ final class WatchDebugFlowUITests: XCTestCase {
         let attack = app.buttons["watch.allocate.attack"]
         reveal(attack); attack.tap()
         XCTAssertTrue(wait { self.app.staticTexts["watch.stat.attack"].label == "51" })
+        reveal(app.staticTexts["watch.statPoints"], down: false)
         XCTAssertEqual(app.staticTexts["watch.statPoints"].label, "스탯 포인트 0")
         capture("flow-watch-changed-after-backup")
     }
@@ -110,9 +113,9 @@ final class WatchDebugFlowUITests: XCTestCase {
         reveal(feed); feed.tap()
         XCTAssertTrue(wait { self.app.staticTexts["watch.foodQuantity.1"].label == "우유 \(quantity - 1)개" })
     }
-    private func reveal(_ element: XCUIElement) {
+    private func reveal(_ element: XCUIElement, down preferredDown: Bool = true) {
+        var down = preferredDown
         for _ in 0..<24 {
-            var down = true
             if element.exists {
                 let frame = element.frame
                 let screen = app.windows.firstMatch.frame

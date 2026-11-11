@@ -56,6 +56,7 @@ final class PhoneDebugFlowUITests: XCTestCase {
 
     func test05ReconnectRestoreOlderPetAndLogout() {
         assertHome(level: 2, experience: 1, milk: 4)
+        reveal(app.staticTexts["phone.stat.attack"], down: false)
         XCTAssertEqual(app.staticTexts["phone.stat.attack"].label, "51")
         openAccountFromScrolledHome()
         previewRestore()
@@ -67,8 +68,11 @@ final class PhoneDebugFlowUITests: XCTestCase {
         capture("flow-restore-applied")
         home()
         assertHome(level: 2, experience: 0, milk: 4)
+        reveal(app.staticTexts["phone.stat.attack"], down: false)
         XCTAssertEqual(app.staticTexts["phone.stat.attack"].label, "50")
+        reveal(app.staticTexts["phone.stat.health"])
         XCTAssertEqual(app.staticTexts["phone.stat.health"].label, "9")
+        reveal(app.staticTexts["스탯 포인트 0"])
         XCTAssertTrue(app.staticTexts["스탯 포인트 0"].exists)
         capture("flow-restored-pet-kept-inventory")
         openAccountFromScrolledHome()
@@ -100,12 +104,14 @@ final class PhoneDebugFlowUITests: XCTestCase {
 
     private func assertHome(level: Int, experience: Int, milk: Int) {
         let steps = app.staticTexts["phone.stepCount"]
-        reveal(steps)
+        reveal(steps, down: false)
         XCTAssertTrue(wait(timeout: 30) { steps.label.filter(\.isNumber) == "4321" }, steps.label)
         let pet = app.staticTexts["phone.petLevel"]
         reveal(pet)
         XCTAssertTrue(wait { pet.label == "Lv.\(level)" }, pet.label)
+        reveal(app.staticTexts["phone.petExperience"])
         XCTAssertTrue(wait { self.app.staticTexts["phone.petExperience"].label == "경험치 \(experience) / \(level * 2)" })
+        reveal(app.staticTexts["phone.petSource"], down: false)
         XCTAssertTrue(app.staticTexts["phone.petSource"].label.contains("워치 기록"))
         let food = app.staticTexts["phone.food.1"]
         reveal(food)
@@ -114,7 +120,7 @@ final class PhoneDebugFlowUITests: XCTestCase {
     private func openAccount() { app.buttons["phone.openAccount"].tap() }
     private func openAccountFromScrolledHome() {
         let button = app.buttons["phone.openAccount"]
-        for _ in 0..<12 { if button.isHittable { break }; app.swipeDown() }
+        reveal(button, down: false)
         XCTAssertTrue(button.isHittable); button.tap()
     }
     private func home() {
@@ -134,8 +140,20 @@ final class PhoneDebugFlowUITests: XCTestCase {
         reveal(button); button.tap()
         XCTAssertTrue(app.navigationBars["복원 전 확인"].waitForExistence(timeout: 20))
     }
-    private func reveal(_ element: XCUIElement) {
-        for _ in 0..<15 { if element.exists && element.isHittable { return }; app.swipeUp() }
+    private func reveal(_ element: XCUIElement, down preferredDown: Bool = true) {
+        var down = preferredDown
+        for _ in 0..<30 {
+            let screen = app.windows.firstMatch.frame
+            let top = app.navigationBars.firstMatch.exists ? app.navigationBars.firstMatch.frame.maxY : screen.minY + 20
+            let visible = CGRect(x: screen.minX, y: top, width: screen.width, height: screen.maxY - top).insetBy(dx: -1, dy: -1)
+            if element.exists {
+                let frame = element.frame
+                if element.isHittable && !frame.isEmpty && visible.contains(frame) { return }
+                if !frame.isEmpty { down = frame.minY >= visible.minY }
+            }
+            app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: down ? 0.76 : 0.52))
+                .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: down ? 0.52 : 0.76)), withVelocity: .slow, thenHoldForDuration: 0.1)
+        }
         XCTFail("Missing flow control: \(element)")
     }
     private func wait(timeout: TimeInterval = 12, _ condition: @escaping () -> Bool) -> Bool {
