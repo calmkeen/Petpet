@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-12",
+  "simulatorsOnly": true,
+  "account": "Debug local mock",
+  "watch": {
+    "name": "PetPet Standalone 40mm",
+    "udid": "239DFD2B-8250-409E-9B90-FF960B5BA636",
+    "runtime": "watchOS 11.0",
+    "paired": false
+  },
+  "core": {
+    "passed": 191,
+    "failed": 0,
+    "standaloneCases": 8
+  },
+  "watchModels": {
+    "passed": 9,
+    "failed": 0
+  },
+  "ui": {
+    "loginBackupRestore": "passed",
+    "nicknameAndRelaunch": "passed",
+    "ranking": "passed",
+    "ai": "passed; final sentence visible inside 40mm screen",
+    "passedCases": 3,
+    "results": {
+      "main": "/private/tmp/petpet-standalone-native-final.xcresult",
+      "aiRerun": "/private/tmp/petpet-standalone-ai-complete.xcresult"
+    },
+    "fullAnswerLastRunVisible": true
+  },
+  "release": {
+    "iPhoneSimulatorBuild": "passed",
+    "watchSimulatorBuild": "passed",
+    "mockBackendSymbolsAbsent": true,
+    "mockLoginSymbolsAbsent": true
+  },
+  "productionAppleLoginTested": false,
+  "physicalDevicesUsed": false,
+  "notes": [
+    "Mock server stores are device-local, not a shared cloud.",
+    "Initial fresh-simulator UI run was blocked by Motion permission; XCTest handles the prompt.",
+    "The initial AI UI case timed out in the OS text editor. Waiting for the input-method transition and using SoloWalk passed the isolated rerun; no app input bypass was added.",
+    "40mm long-answer truncation fixed with bounded text runs in a full-answer ScrollView; final UI asserts the last run is visible and fully inside the screen."
+  ]
+}

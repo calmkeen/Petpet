@@ -3,7 +3,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
-/// The iPhone is the sole owner of server credentials. Parallel requests share
+/// Each authenticated host owns its credentials locally. Parallel requests share
 /// refresh work; logout/account changes invalidate every in-flight result.
 public actor BackendClient {
     private let baseURL: URL

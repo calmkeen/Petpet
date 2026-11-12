@@ -55,6 +55,7 @@ struct WatchHomeView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 Task {
+                    await cloudViewModel.start()
                     await petViewModel.start()
                     await viewModel.start()
                 }

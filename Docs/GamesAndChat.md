@@ -4,7 +4,7 @@ Android `Chaeros/StepMate`의 `main` 커밋 `4e2b5e54902efd9630dc5fe7595ca0fb265
 
 ## 사용 경로
 
-- 워치 크라운 페이지: 홈 → 성장 → 먹이 → 스트릭 → **펫과 놀기** → **펫과 대화** → 계정과 백업.
+- 워치 크라운 페이지: 홈 → 펫 관리 → **펫과 놀기** → 스트릭 → **펫과 대화**. 계정·백업은 스트릭 상세에서 연다.
 - **펫과 놀기 → 게임 선택**에서 두 게임과 각 TOP 10을 연다. 시작 화면에 저장된 최고 기록을 표시한다.
 - 슈팅은 크라운·좌우 드래그, 별계단은 크라운·방향 버튼으로 조작한다.
 - 상단 버튼으로 일시정지하거나 종료한다. 종료를 확인하면 현재 기록으로 결과·랭킹을 연다. 화면 비활성화·저휘도에서는 멈추고 사용자가 계속하기를 눌러 재개한다.
@@ -55,13 +55,13 @@ SpriteKit 노드를 재사용하고 원본 뒤돌아 달리기 6프레임, 운�
 | `/api/v1/star-stair-game/rank/position` | POST 동일 본문 |
 | `/api/v1/star-stair-game/rank/top10` | GET |
 
-기존 `BackendClient`의 인증·공유 refresh·계정 epoch 검사를 재사용한다. 워치는 토큰 없이 `WatchFeatureClient → WatchConnectivityTransport → PhoneFeatureCoordinator`를 통해 아이폰에 요청한다. 요청 ID·계정·개발 환경을 확인하고 응답은 60KB로 제한한다. 양쪽 계정 변경 시 진행 작업과 이전 랭킹을 정리한다. refresh 실패로 인증이 사라지면 아이폰 계정 화면과 워치 상태에도 반영한다.
+기존 `BackendClient`의 인증·공유 refresh·계정 epoch 검사를 재사용한다. 아이폰 연동 모드는 `WatchFeatureClient → WatchConnectivityTransport → PhoneFeatureCoordinator`를 사용한다. 워치 단독 모드는 `WatchFeatureRouter → WatchStandaloneService`가 워치 전용 Keychain 세션과 공용 BackendClient로 직접 HTTPS/SSE를 수행한다. 채팅 작업은 시작한 경로를 유지하며 경로 변경 시 중복 전송하지 않는다. 요청 ID·계정·개발 환경을 확인하고 응답은 60KB로 제한한다. 양쪽 계정 변경 시 진행 작업과 이전 랭킹을 정리한다. refresh 실패로 인증이 사라지면 아이폰 계정 화면과 워치 상태에도 반영한다.
 
 ## 음성·AI 스트리밍
 
 워치의 마이크 버튼은 WatchKit의 시스템 텍스트 입력 UI를 호출한다. 시스템이 받아쓰기·키보드를 제공하며 앱이 녹음 파일을 만들거나 상시 마이크를 구독하지 않는다. 아이폰에서도 키보드의 받아쓰기를 사용할 수 있다.
 
-Android와 같은 `POST /api/v1/ai/chat/stream`, JSON `{ "question": "..." }`, Bearer 인증, `Accept: text/event-stream`을 사용한다. iPhone URLSession이 SSE를 읽고 워치는 0.3초마다 누적 텍스트를 요청한다. `metadata/context/token/done/error`, 여러 줄 data, 주석, 마지막 빈 줄 없는 종료를 처리한다. 질문은 2,000자/8KB, 답변은 UTF-8 24KB, 요청 전체 시간은 120초로 제한한다.
+Android와 같은 `POST /api/v1/ai/chat/stream`, JSON `{ "question": "..." }`, Bearer 인증, `Accept: text/event-stream`을 사용한다. 선택한 호스트의 URLSession이 SSE를 읽는다. 단독 모드의 누적 텍스트 조회는 워치 메모리 내부에서 처리하며 WatchConnectivity를 호출하지 않는다. `metadata/context/token/done/error`, 여러 줄 data, 주석, 마지막 빈 줄 없는 종료를 처리한다. 질문은 2,000자/8KB, 답변은 UTF-8 24KB, 요청 전체 시간은 120초로 제한한다.
 
 네이티브 URLSession 경로는 바이트 단위로 SSE 빈 줄·CRLF/LF/CR을 보존하고 UTF-8이 완성된 줄에서만 디코딩한다. 잘못된 MIME·UTF-8·32KB 초과 줄을 거절하며 종료 시 네트워크 작업을 취소한다. 로컬 URLProtocol로 분할된 한글·이모지와 실제 이벤트 전달을 검증한다. 완료 작업을 동시 요청 제한에 포함하지 않고 워치가 수신을 마치면 정리한다. 취소가 시작보다 먼저 도착하거나 이전 작업의 응답이 늦어져도 새 작업을 변경하지 않는다.
 

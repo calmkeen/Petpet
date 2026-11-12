@@ -2,9 +2,9 @@
 
 ## 현재 완료 범위
 
-워치 홈, 하루 걸음수, 먹이·성장·스탯·호감도, iPhone 표시용 동기화를 구현했다. iPhone에는 Apple 로그인·Keychain 세션과 StepMate 백업·복원 클라이언트를 연결했으며, 워치는 서버 성공 확인 뒤 보상을 지급한다. Apple 인증 서버 추가와 capability 프로파일 설정·실제 계정 검증이 남아 있다. [설정과 검증 범위](AccountAndBackup.md).
+워치 홈, 하루 걸음수, 먹이·성장·스탯·호감도, iPhone 표시용 동기화를 구현했다. iPhone과 워치에는 Apple 로그인·각 기기의 Keychain 세션과 StepMate 백업·복원 클라이언트를 연결했으며, 워치는 서버 성공 확인 뒤 보상을 지급한다. Apple 인증 서버 추가와 capability 프로파일 설정·실제 계정 검증이 남아 있다. [설정과 검증 범위](AccountAndBackup.md).
 
-기본 Debug는 모의 로그인과 아이폰 내부 영구 모의 백엔드를 사용하며, 무료 Personal Team으로 기기에 설치한다. 게임·수신 캐시·백업·Keychain을 Release와 분리하고, 기존 워치 상태를 개발용 공간에 한 번 복사한다. [개발 모드](DebugTesting.md).
+기본 Debug는 모의 로그인과 각 호스트 기기 내부의 영구 모의 백엔드를 사용하며, 무료 Personal Team으로 기기에 설치한다. 게임·수신 캐시·백업·Keychain을 Release와 분리하고, 기존 워치 상태를 개발용 공간에 한 번 복사한다. [개발 모드](DebugTesting.md).
 
 워치의 월별 로컬 스트릭과 아이폰의 서버 기록 히트맵, 양쪽 닉네임 편집기를 구현했다. `StepStreak`와 `NicknameEditor`는 공용 규칙을, `PhoneProfileCoordinator`·`WatchNicknameRelay`는 인증 API와 워치 요청의 경계를 담당한다. [규칙과 검증](StreakAndNickname.md).
 
@@ -32,6 +32,7 @@ PetPet Watch App/               watchOS 앱 타깃
   Features/Character/Presentation/ 네이티브 캐릭터 반응
   Features/Games/Presentation/   게임 선택·SpriteKit 슈팅·별계단·랭킹
   Features/Chat/Presentation/    시스템 입력·AI 대화
+  Infrastructure/Account/       워치 Apple 인증·Keychain·단독 호스트 조립
   Infrastructure/Motion/        CoreMotion 어댑터
   Infrastructure/Connectivity/ 워치 변경 감지와 전송 조립
   Preview Content/              센서를 사용하지 않는 미리보기
@@ -74,7 +75,7 @@ flowchart LR
 - `DailyStepTracker`는 저장값 복원, 자정부터의 누적 집계, 최근 기록 복구, 중복/지연 콜백, 날짜 변경을 처리한다. 센서·저장 오류는 화면까지 전달한다.
 - 플랫폼 SDK는 `Infrastructure/<Capability>`에 둔다. 공용 Foundation 파일 저장은 `PetPetCore/Data/Local`에서 Domain 계약을 구현한다. SDK 전용 저장소와 서버 구현은 기능별 `Data`에 배치한다. 화면에서 직접 `URLSession`이나 파일에 접근하지 않는다.
 - `PhoneAppModel`과 `WatchAppModel`이 앱 시작 시 의존성과 단일 WCSession을 조립한다. 백그라운드 전송도 화면 생성에 의존하지 않는다.
-- iPhone의 `BackendClient`가 인증·공유 refresh·API 호출을, `KeychainSessionStore`가 토큰 저장을 담당한다. 서버 DTO와 토큰은 펫 모델이나 워치 전송에 섞지 않는다.
+- 선택한 호스트의 `BackendClient`가 인증·공유 refresh·API 호출을, iPhone `KeychainSessionStore` 또는 워치 `WatchKeychainSessionStore`가 각자 토큰 저장을 담당한다. 서버 DTO와 토큰은 펫 모델이나 워치 전송에 섞지 않는다.
 
 ## 현재 동작과 다음 변경의 경계
 
@@ -85,7 +86,7 @@ flowchart LR
 - iPhone은 실제 수신한 오늘 걸음수·펫 상태·보유 먹이와 마지막 동기화 시각을 표시한다. 최초 수신 전과 오늘 날짜의 기록이 없을 때는 `—`를 표시한다. 미리보기 데이터는 `Preview Content`에만 둔다. [동기화 정책](WatchSynchronization.md).
 - 워치 수신 기록이 없고 로그인되어 있으면 서버 펫을 읽기 전용으로 표시한다. `FileAccountPetCache`는 계정별 펫과 조회 시각만 저장하며 워치 복원·보상·먹이를 변경하지 않는다. 공통 BackendClient 인증 무효화 알림으로 계정 화면과 워치 상태를 갱신한다. [아이폰 검토](PhoneAudit-2026-11-08.md).
 - `PetProfile`, `PetMood`, `FoodDefinition`, `FoodInventoryItem`, `PetStatistic`, `UserProfile`, `DailyStepRecord`는 Android의 실제 모델을 참고한 공용 타입이다. 이들의 Codable 표현을 서버 요청 DTO로 바로 사용하지 않는다. 날짜 포맷과 JSON 키는 각 API 계약에 맞는 별도 DTO에서 변환한다.
-- `FileGameRepository`는 펫·먹이·걸음수·날짜별 지급 내역·복원을 하나의 트랜잭션으로 저장한다. 보상은 `PhoneCloudCoordinator`가 서버 성공을 기록하고 워치에 보낸 확인 메시지로만 지급한다. 이전 로컬 지급 헬퍼는 기존 파일 구현의 테스트·이관 참고용이며 실제 앱 화면에서 호출하지 않는다. [상세 규칙](FeedingAndGrowth.md).
+- `FileGameRepository`는 펫·먹이·걸음수·날짜별 지급 내역·복원을 하나의 트랜잭션으로 저장한다. 보상은 선택한 호스트가 서버 성공을 기록한 영수증을 적용할 때만 지급한다. 이전 로컬 지급 헬퍼는 기존 파일 구현의 테스트·이관 참고용이며 실제 앱 화면에서 호출하지 않는다. [상세 규칙](FeedingAndGrowth.md).
 - `StepHistoryRepository`는 날짜별/전체 기록 조회를 제공한다. 서버 백업은 전체 기록을 별도 파일로 내보내며 표시용 7일 캐시를 사용하지 않는다. 게임 규칙은 공용 엔진, 최고 기록은 별도 파일에 둔다. `PhoneFeatureCoordinator`가 인증된 랭킹·AI 요청을 수행하고 워치에 제한 크기 응답을 전송한다.
 - 빈 `GestureEvent`와 사용되지 않던 사용자·캐릭터 모델 초안은 정리했다. 캐릭터 기분과 애니메이션 상태는 각각 `PetMood`와 `CharacterActivity`로 구분한다.
 
@@ -108,3 +109,7 @@ xcodebuild -project PetPet.xcodeproj -scheme 'PetPet Watch App' -configuration R
 ```
 
 실기기에서는 동작 및 피트니스 권한 허용 후 오늘 걸음수 증가를 확인하고, 화면을 벗어나거나 앱을 재실행해도 오늘 값이 유지·복구되는지 확인한다. 날짜 전환은 새 날짜를 시작하고 이전 기록을 보존해야 한다. 권한 거부·센서 미지원·저장 실패는 안내 문구로 표시한다.
+
+## 워치 단독 서버 호스트 (2026-11-12)
+
+`WatchStandaloneService`가 워치 인증·백업·복원과 성공 저널을 소유한다. `WatchFeatureRouter`는 단독/아이폰 중계를 요청 전에 선택하고 채팅 경로를 고정한다. 기존 `BackendClient`와 `PhoneFeatureCoordinator`의 HTTP·refresh·SSE·취소/epoch 검사를 두 호스트에서 재사용한다. 워치 `WatchKeychainSessionStore`는 서버별 별도 service와 `AfterFirstUnlockThisDeviceOnly`를 사용한다. mode·계정 표시·영수증 파일에 자격 증명을 쓰지 않는다. `WKRunsIndependentlyOfCompanionApp=true`이며 iPhone 앱은 계속 companion으로 남는다. [단독 연결 상세](WatchStandalone-2026-11-12.md).

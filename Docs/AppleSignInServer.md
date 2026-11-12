@@ -57,7 +57,7 @@ iOS 클라이언트는 Apple 로그인으로 전환했다. **아래 Apple API는
 신규 `AppleIdTokenVerifierClient` / `AppleAuthService` / `AppleLoginRequest`를 추가한다.
 
 1. Apple JWKS `https://appleid.apple.com/auth/keys`의 신뢰할 수 있는 키로 JWT 서명을 검증한다. 검증 라이브러리에 허용 알고리즘을 고정하고, 알 수 없는 `kid`일 때 키 목록을 제한적으로 갱신한다. 단순 Base64 디코딩이나 `alg=none`을 인증으로 취급하지 않는다.
-2. `iss == https://appleid.apple.com`, `aud == com.calmkeen.PetPet`, `exp`, 합리적인 `iat`, 비어 있지 않은 `sub`를 검사한다. 네이티브 iOS의 client ID는 Bundle ID다.
+2. `iss == https://appleid.apple.com`, `aud`가 서버 allowlist의 `com.calmkeen.PetPet` 또는 `com.calmkeen.PetPet.watchkitapp`과 일치하는지, `exp`, 합리적인 `iat`, 비어 있지 않은 `sub`를 검사한다. 네이티브 iOS/watchOS의 client ID는 각 Bundle ID다. 본문에서 받은 임의 client ID를 신뢰하지 않고 검증된 aud로 code 교환의 client_id/client_secret.sub를 선택한다.
 3. JWT `nonce == lowercaseHex(SHA256(UTF8(rawNonce)))`를 검증한다. JWT의 `sub`와 본문의 `userIdentifier`도 비교한다.
 4. `https://appleid.apple.com/auth/token`에 `grant_type=authorization_code`, `client_id`, 서버에서 만든 `client_secret`, `code`를 보내 일회용 code를 교환한다. 교환 결과의 id_token도 검증하고 최초 토큰과 같은 `sub`·audience의 인증인지 확인한다. 이 절차를 생략하면 같은 identity token/body의 재사용을 차단할 수 없다.
 5. 검증 실패·만료·code 재사용에는 PetPet 세션을 발급하지 않는다. 성공한 nonce/code 증명은 한 번만 소비하도록 동시 요청과 재전송을 처리한다. Apple 교환 타임아웃을 성공으로 간주하지 않는다.
@@ -127,3 +127,11 @@ external_identities
 - 철회 알림·연결 충돌·일시적인 Apple 키 서버/토큰 교환 장애 처리. 원본 토큰·code·nonce가 로그에 없음.
 
 iOS는 모의 HTTP 응답으로 요청 형식·미구현 경로·refresh·세션 경합을 검증했다. 운영 서버에 이 변경을 적용하거나 실제 Apple 계정으로 end-to-end 검증한 상태는 아니다.
+
+## 워치 단독 로그인을 위한 서버·Apple 설정
+
+- watch App ID **`com.calmkeen.PetPet.watchkitapp`**에도 Sign in with Apple을 활성화하고 Release 프로파일을 갱신한다. iOS/watch 앱을 같은 primary App ID의 Sign in with Apple 그룹으로 설정하여 같은 Apple 사용자가 같은 내부 계정으로 연결되도록 구성한다. 실제 sub 동작을 staging에서 확인하고 다르면 명시적인 계정 연결 흐름을 사용한다.
+- 위 `/auth/apple`은 iPhone과 워치 네이티브 인증을 모두 수용해야 한다. JWT aud를 허용한 앱 ID로 제한하고 해당 aud의 code를 검증한다. `.p8`·client secret·Apple refresh token은 서버에만 둔다.
+- 각 기기는 **독립적인 PetPet 토큰 쌍**을 받는다. 한 사용자의 새 로그인이 다른 기기의 refresh token을 폐기하는 단일 토큰 저장 방식이라면 서버 세션을 기기별로 분리해야 동시 로그인이 유지된다. 회전·철회도 해당 세션 단위로 처리한다.
+- 백업·복원·닉네임·랭킹·AI API 계약은 기존 경로 그대로다. Apple 내부 사용자 토큰에도 동일 권한을 부여한다. 네트워크 실패 시 워치가 아이폰으로 같은 POST를 자동 재전송하지 않는다.
+- 이번 검증은 Debug 모의 계정과 시뮬레이터만 사용했다. 운영 Apple 로그인·서버 배포·실제 Wi-Fi/셀룰러 테스트는 수행하지 않았다.

@@ -117,7 +117,7 @@ final class WatchGameFlowUITests: XCTestCase {
         capture("games-logged-out-local-result")
         app.terminate(); app.launch(); openChat(); enterQuestion("Hello")
         reveal(app.buttons["chat.send"]); app.buttons["chat.send"].tap()
-        reveal(app.staticTexts["chat.status"]); waitForStatus("아이폰에서 로그인해 주세요")
+        reveal(app.staticTexts["chat.status"]); waitForStatus("계정에서 로그인해 주세요")
         XCTAssertFalse(app.staticTexts["chat.answer"].exists)
         capture("games-logged-out-chat-guard")
     }
@@ -149,7 +149,7 @@ final class WatchGameFlowUITests: XCTestCase {
         let dictation = app.buttons["Stop dictation"]
         if dictation.waitForExistence(timeout: 1) { dictation.tap() }
         let method = app.buttons["Change input method"]
-        if method.exists {
+        if method.waitForExistence(timeout: 3) {
             method.tap()
             let scribble = app.descendants(matching: .any).matching(NSPredicate(format: "label IN %@", ["Scribble", "손글씨 입력"])).firstMatch
             guard scribble.waitForExistence(timeout: 3) else { XCTFail("System input methods:\n\(app.debugDescription)"); return }
@@ -159,7 +159,7 @@ final class WatchGameFlowUITests: XCTestCase {
         app.typeText(text)
         let done = app.buttons.matching(NSPredicate(format: "label IN %@", ["완료", "Done"])).firstMatch
         let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in done.exists && done.isEnabled }, object: nil)
-        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 5), .completed, "System input must accept injected text before returning to the app")
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 12), .completed, "System input must accept injected text before returning to the app")
         done.tap()
         let host = app.descendants(matching: .any).matching(identifier: "TextInputHost").firstMatch
         let returned = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in !host.exists }, object: nil)

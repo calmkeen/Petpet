@@ -2,7 +2,7 @@
 
 기준은 Android [StepMate `4e2b5e5`](https://github.com/Chaeros/StepMate/tree/4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3)와 서버 [StepMate_SpringBoot `bcdcefbb`](https://github.com/Chaeros/StepMate_SpringBoot/tree/bcdcefbb226951785e09a82c30ab473ef77e39da)다. 서버 코드는 읽기 전용으로 확인했으며 변경하지 않았다.
 
-**기본 Debug 구성은 무료 계정용 모의 로그인·아이폰 내부 백업 모드다.** Apple 로그인 권한을 요청하지 않고 기존 데이터를 복사한 개발용 저장소를 사용한다. [개발용 실행·검증 안내](DebugTesting.md). 아래 실제 Apple 인증·운영 서버 설정은 Release 구성을 대상으로 한다.
+**기본 Debug 구성은 무료 계정용 모의 로그인·기기 내부 백업 모드다.** Apple 로그인 권한을 요청하지 않고 기존 데이터를 복사한 개발용 저장소를 사용한다. [개발용 실행·검증 안내](DebugTesting.md). 아래 실제 Apple 인증·운영 서버 설정은 Release 구성을 대상으로 한다.
 
 ## iOS 로그인 설정
 
@@ -10,11 +10,11 @@ iOS는 Apple 기본 `SignInWithAppleButton`과 AuthenticationServices를 사용�
 
 실제 로그인을 연결하려면 다음이 필요하다.
 
-1. Apple Developer Program 팀의 앱 ID **`com.calmkeen.PetPet`**에 Sign in with Apple을 활성화하고 서명 프로파일을 갱신한다. 프로젝트의 `PetPet.entitlements`와 iPhone 타깃 Debug/Release에 capability를 연결했다. 무료 Personal Team은 이 기능을 지원하지 않는다. [Apple 지원 표](https://developer.apple.com/help/account/reference/supported-capabilities-ios/).
+1. Apple Developer Program 팀의 앱 ID **`com.calmkeen.PetPet`**에 Sign in with Apple을 활성화하고 서명 프로파일을 갱신한다. Release는 iPhone의 `PetPet.entitlements`와 워치의 `PetPet-Watch.entitlements`에 capability를 연결했다. Debug에는 이 entitlement를 넣지 않는다. 무료 Personal Team은 이 기능을 지원하지 않는다. [Apple 지원 표](https://developer.apple.com/help/account/reference/supported-capabilities-ios/).
 2. 서버에 **`POST /api/v1/auth/apple`**과 Apple 증명 검증·공용 계정 조회를 추가한다. 이 경로는 이번에 정의한 계약이며 기존 서버에는 없다. [서버 변경 명세](AppleSignInServer.md)에 요청·응답과 수정 파일·이행 순서를 정리했다.
 3. 서버의 Apple Team ID·Key ID·`.p8` 키를 준비한다. 개인 키와 client secret은 서버에만 둔다. 앱은 Bundle ID를 사용하는 네이티브 인증이며 별도 Google OAuth 설정이 필요하지 않다.
 4. `PetPet-Info.plist`의 `PetPetAPIBaseURL`을 확인한다. 현재 기본값은 Android 문서의 `https://www.stepmatecp.com/`이며 운영 주소는 소유자 확인이 필요하다.
-5. 새 프로파일로 빌드한 iPhone의 **계정 · 서버 백업**에서 Apple로 로그인한다. 워치에는 계정 표시 정보만 전달한다.
+5. 새 프로파일로 빌드한 iPhone의 **계정 · 서버 백업**에서 Apple로 로그인한다. 아이폰 연동 모드의 워치에는 계정 표시 정보만 전달한다. 워치 단독 모드는 워치에서 별도로 로그인한다.
 
 인증 요청마다 별도의 nonce·state를 만들고, SHA256 nonce와 state를 Apple 요청에 넣는다. 콜백의 state·유효 시간을 확인한 뒤 identityToken·authorizationCode·rawNonce를 서버에 한 번 교환한다. 서버가 검증하고 내부 userId와 PetPet 토큰 쌍을 반환해야 로그인으로 저장한다. Apple API가 404/405/501이면 서버 연결이 아직 준비되지 않았다고 안내한다.
 
@@ -25,12 +25,14 @@ iOS는 Apple 기본 `SignInWithAppleButton`과 AuthenticationServices를 사용�
 ## 사용자 흐름
 
 - iPhone에서 로그인하면 계정 표시 정보만 워치로 전송한다. 로그인 자체가 기존 워치 기록을 자동으로 덮어쓰거나 업로드하지 않는다.
-- iPhone의 **워치 기록 백업**, 워치의 다섯 번째 Crown 계정 섹션 또는 먹이·스트릭 상세 화면의 **서버 백업·보상 받기**로 백업한다. 현재 기록을 로컬에 저장한 뒤 워치가 전체 보관 기록 중 미백업 날짜와 마지막 백업 날짜의 최신 합계를 추출한다. iPhone 홈의 최대 7일 캐시를 백업 원본으로 사용하지 않는다.
+- iPhone의 **워치 기록 백업**, 워치의 스트릭 상세 계정 화면 또는 먹이·스트릭 상세 화면의 **서버 백업·보상 받기**로 백업한다. 현재 기록을 로컬에 저장한 뒤 워치가 전체 보관 기록 중 미백업 날짜와 마지막 백업 날짜의 최신 합계를 추출한다. iPhone 홈의 최대 7일 캐시를 백업 원본으로 사용하지 않는다.
 - 서버 저장 성공을 iPhone에 먼저 기록하고 워치에 확인 메시지를 보낸다. 워치는 이 확인을 받은 뒤 해당 백업의 날짜·걸음수에 대해 우유와 사과를 지급한다. 실패한 백업과 센서 갱신에는 보상을 지급하지 않는다.
 - iPhone의 **서버 기록 불러오기**는 워치의 현재 상태와 서버 기록을 조회해 미리보기를 보여준다. 사용자가 **이 기록으로 복원**을 누른 경우에만 워치에 적용한다. 조회 이후 펫 상태가 바뀌면 복원을 거절하고 다시 조회하도록 안내한다.
 - 같은 계정의 걸음수는 날짜별 큰 값을 유지한다. 다른 계정으로 복원할 때는 이전 계정의 로컬 상태를 별도로 보관한다. 다른 계정의 기존 워치 상태를 바로 백업하는 동작은 거절한다.
 
-로그인과 HTTP 요청은 iPhone이 담당한다. 워치가 단독으로 셀룰러/Wi-Fi에 연결되어 있어도 iPhone을 거치지 않고 서버에 백업하지 않는다. 백업 파일과 확인 메시지는 WatchConnectivity가 적절한 시점에 전달하므로 완료가 지연될 수 있다. 복원 미리보기에는 두 앱을 열어 직접 연결할 수 있는 상태가 필요하다.
+워치 **계정 → 워치 단독 연결**에서 로그인하면 닉네임 중복 확인·변경, 백업·보상, 복원 미리보기·확정, 두 게임 랭킹·기록 제출, AI 대화를 워치 자체 세션으로 수행한다. Release에는 워치의 Wi-Fi/셀룰러 인터넷 연결과 Apple 인증 서버 설정이 필요하다. 계정·백업은 **스트릭 → 월별 걸음 기록 → 계정**, 먹이 화면에서도 연다. 단독 세션은 워치 전용 Keychain에 저장하고, iPhone 세션·refresh token을 복사하지 않는다.
+
+아이폰 연동 모드도 유지한다. 단독 모드 선택은 재실행·로그아웃·인증 만료 후에도 유지하며, 실패한 요청을 아이폰으로 재전송하지 않는다. 늦게 도착한 아이폰 계정·로그아웃은 단독 계정을 바꾸지 않는다. **아이폰 연동으로 전환**을 직접 선택해야 중계 경로로 돌아간다. 백업은 워치에도 서버 성공 영수증을 먼저 기록한 뒤 보상을 적용하며, 앱 재실행 시 미처리 영수증을 중복 지급 없이 복구한다. [단독 사용·검증](WatchStandalone-2026-11-12.md).
 
 ## 서버 계약
 
@@ -57,7 +59,7 @@ iOS는 Apple 기본 `SignInWithAppleButton`과 AuthenticationServices를 사용�
 
 | 위치 | 저장 내용 |
 |---|---|
-| iPhone Keychain | 서버 주소에 연결된 BackendSession. `AfterFirstUnlockThisDeviceOnly`, iCloud 동기화 안 함 |
+| iPhone / 워치 전용 Keychain | 서버 주소에 연결된 BackendSession. `AfterFirstUnlockThisDeviceOnly`, iCloud 동기화 안 함 |
 | Watch `Application Support/PetPet/game-state-v1.json` | 펫·먹이·걸음수·보상 내역·백업 대기·계정별 보관 상태를 하나로 원자적 저장 |
 | iPhone `cloud-receipts-v1.json` | 성공한 서버 백업, 워치 확인 여부, 송신 순번, 확인 전 복원 명령 |
 | 양쪽 `CloudInbox`, `CloudOutbox` | 전체 기록 전송용 파일. 처리 완료 후 수신 파일 삭제 |

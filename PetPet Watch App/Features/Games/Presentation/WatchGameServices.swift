@@ -31,7 +31,7 @@ import PetPetCore
             if let owner = self.scoreAccountID, let id, owner != id {
                 self.message = "계정이 바뀌었어요. 로컬 기록은 유지되며, 새 게임의 기록부터 랭킹에 올릴 수 있어요."
             } else {
-                self.message = id == nil ? "아이폰에서 로그인한 뒤 랭킹을 다시 확인해 주세요." : "계정이 바뀌었어요. 로컬 기록은 유지돼요. 랭킹을 다시 확인해 주세요."
+                self.message = id == nil ? "계정에서 로그인한 뒤 랭킹을 다시 확인해 주세요." : "계정이 바뀌었어요. 로컬 기록은 유지돼요. 랭킹을 다시 확인해 주세요."
             }
         }
     }
@@ -61,7 +61,7 @@ import PetPetCore
     func clear() { stop(); score = nil; scoreAccountID = nil; ranking = nil; message = nil }
     private func send(_ score: GameScore, revision: UUID) async { await fetch(.submit(score), revision: revision) }
     private func fetch(_ action: CompanionFeatureRequest.Action, revision: UUID) async {
-        guard let accountID = services.cloud.account?.id else { message = "로컬 기록은 유지돼요. 랭킹은 아이폰에서 로그인한 뒤 확인해 주세요."; return }
+        guard let accountID = services.cloud.account?.id else { message = "로컬 기록은 유지돼요. 랭킹은 계정에서 로그인한 뒤 확인해 주세요."; return }
         busy = true
         defer { if self.revision == revision { busy = false } }
         do {
