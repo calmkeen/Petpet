@@ -1,0 +1,258 @@
+{
+  "date": "2026-11-12",
+  "verifiedAt": "2026-11-12T07:54:20.274823+00:00",
+  "sourceCommit": "ed8e04962a927da2ab8a87649170707a03e7a237",
+  "simulatorOnly": true,
+  "xcode": "27.2 (27B52)",
+  "androidCommit": "4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3",
+  "coreTests": 183,
+  "watchModelTests": 10,
+  "acceptedUIExecutions": 5,
+  "results": [
+    {
+      "stage": "home-render-final",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-motion-profile-20261112/home-render-final-164915.xcresult"
+    },
+    {
+      "stage": "motion-final",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-motion-profile-20261112/motion-final-161359.xcresult"
+    },
+    {
+      "stage": "profile-normal",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-motion-profile-20261112/profile-normal-161503.xcresult"
+    },
+    {
+      "stage": "profile-large",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-motion-profile-20261112/profile-large-161612.xcresult"
+    },
+    {
+      "stage": "nickname-submit",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-motion-profile-20261112/nickname-submit-161812.xcresult"
+    }
+  ],
+  "debugBuild": true,
+  "releaseBuild": true,
+  "homeBefore": {
+    "displaySamples": 3,
+    "observedFrameNames": [
+      "stepmate_fox_greeting_v3_00",
+      "stepmate_fox_greeting_v3_15"
+    ],
+    "driver": "interpolated-textures",
+    "mode": "touching",
+    "requestedFrameCount": 16,
+    "capturedAt": 1794467631.9856029,
+    "interpolatedSamples": 2,
+    "distinctFrameCount": 2
+  },
+  "homeAfter": {
+    "capturedAt": 1794469781.161337,
+    "requestedFrameCount": 16,
+    "mode": "touching",
+    "driver": "interpolated-textures",
+    "distinctFrameCount": 16,
+    "displaySamples": 34,
+    "interpolatedSamples": 30,
+    "observedFrameNames": [
+      "stepmate_fox_greeting_v3_00",
+      "stepmate_fox_greeting_v3_01",
+      "stepmate_fox_greeting_v3_02",
+      "stepmate_fox_greeting_v3_03",
+      "stepmate_fox_greeting_v3_04",
+      "stepmate_fox_greeting_v3_05",
+      "stepmate_fox_greeting_v3_06",
+      "stepmate_fox_greeting_v3_07",
+      "stepmate_fox_greeting_v3_08",
+      "stepmate_fox_greeting_v3_09",
+      "stepmate_fox_greeting_v3_10",
+      "stepmate_fox_greeting_v3_11",
+      "stepmate_fox_greeting_v3_12",
+      "stepmate_fox_greeting_v3_13",
+      "stepmate_fox_greeting_v3_14",
+      "stepmate_fox_greeting_v3_15"
+    ]
+  },
+  "previewRunning": {
+    "mode": "running",
+    "requestedFrameCount": 16,
+    "driver": "interpolated-textures",
+    "observedFrameNames": [
+      "stepmate_fox_running_v3_00",
+      "stepmate_fox_running_v3_01",
+      "stepmate_fox_running_v3_02",
+      "stepmate_fox_running_v3_03",
+      "stepmate_fox_running_v3_04",
+      "stepmate_fox_running_v3_05",
+      "stepmate_fox_running_v3_06",
+      "stepmate_fox_running_v3_07",
+      "stepmate_fox_running_v3_08",
+      "stepmate_fox_running_v3_09",
+      "stepmate_fox_running_v3_10",
+      "stepmate_fox_running_v3_11",
+      "stepmate_fox_running_v3_12",
+      "stepmate_fox_running_v3_13",
+      "stepmate_fox_running_v3_14",
+      "stepmate_fox_running_v3_15",
+      "stepmate_fox_running_v3_00",
+      "stepmate_fox_running_v3_01",
+      "stepmate_fox_running_v3_02",
+      "stepmate_fox_running_v3_03",
+      "stepmate_fox_running_v3_04",
+      "stepmate_fox_running_v3_05",
+      "stepmate_fox_running_v3_06",
+      "stepmate_fox_running_v3_07",
+      "stepmate_fox_running_v3_08",
+      "stepmate_fox_running_v3_09",
+      "stepmate_fox_running_v3_10",
+      "stepmate_fox_running_v3_11",
+      "stepmate_fox_running_v3_12",
+      "stepmate_fox_running_v3_13",
+      "stepmate_fox_running_v3_14",
+      "stepmate_fox_running_v3_15",
+      "stepmate_fox_running_v3_00",
+      "stepmate_fox_running_v3_01",
+      "stepmate_fox_running_v3_02",
+      "stepmate_fox_running_v3_03",
+      "stepmate_fox_running_v3_04",
+      "stepmate_fox_running_v3_05",
+      "stepmate_fox_running_v3_06",
+      "stepmate_fox_running_v3_07",
+      "stepmate_fox_running_v3_08",
+      "stepmate_fox_running_v3_09",
+      "stepmate_fox_running_v3_10",
+      "stepmate_fox_running_v3_11",
+      "stepmate_fox_running_v3_12",
+      "stepmate_fox_running_v3_13",
+      "stepmate_fox_running_v3_14",
+      "stepmate_fox_running_v3_15"
+    ],
+    "capturedAt": 1794467685.0704908,
+    "interpolatedSamples": 96,
+    "displaySamples": 96,
+    "distinctFrameCount": 16
+  },
+  "previewGreeting": {
+    "mode": "touching",
+    "requestedFrameCount": 16,
+    "driver": "interpolated-textures",
+    "observedFrameNames": [
+      "stepmate_fox_greeting_v3_00",
+      "stepmate_fox_greeting_v3_01",
+      "stepmate_fox_greeting_v3_02",
+      "stepmate_fox_greeting_v3_03",
+      "stepmate_fox_greeting_v3_04",
+      "stepmate_fox_greeting_v3_05",
+      "stepmate_fox_greeting_v3_06",
+      "stepmate_fox_greeting_v3_07",
+      "stepmate_fox_greeting_v3_08",
+      "stepmate_fox_greeting_v3_09",
+      "stepmate_fox_greeting_v3_10",
+      "stepmate_fox_greeting_v3_11",
+      "stepmate_fox_greeting_v3_12",
+      "stepmate_fox_greeting_v3_13",
+      "stepmate_fox_greeting_v3_14",
+      "stepmate_fox_greeting_v3_15"
+    ],
+    "capturedAt": 1794467686.206608,
+    "interpolatedSamples": 31,
+    "displaySamples": 35,
+    "distinctFrameCount": 16
+  },
+  "nickname": {
+    "watch": "FinalWatch468002",
+    "phoneMockBackend": "FinalWatch468002",
+    "persistedAfterRelaunch": true,
+    "productionServerWasNotMutated": true
+  },
+  "preserved": {
+    "pet": true,
+    "food": true,
+    "stepHistory": true,
+    "rewardClaims": true,
+    "backupRestoreIDSets": true,
+    "accountOwner": true
+  },
+  "touchCount": {
+    "before": 4,
+    "after": 7,
+    "realUITouches": 3,
+    "visibleCounterRemoved": true
+  },
+  "coverage": "Home actual rendering, both motion previews, normal/large 40mm nickname access and real watch text-entry/change/relaunch through paired phone mock backend. Other Android feature families were source-compared with the existing audits, not all replayed through UI.",
+  "limitations": [
+    "Operational Apple sign-in/server integration was not exercised.",
+    "Server operations still use the iPhone gateway; standalone watch-server parity is not implemented.",
+    "Simulator rendering samples do not establish physical-device displayed FPS."
+  ],
+  "screenshots": [
+    "Docs/Screenshots/MotionNickname/motion-running.png",
+    "Docs/Screenshots/MotionNickname/final-watch-nickname-after-relaunch.png",
+    "Docs/Screenshots/MotionNickname/profile-shortcut.png",
+    "Docs/Screenshots/MotionNickname/final-watch-nickname-updated.png",
+    "Docs/Screenshots/MotionNickname/profile-shortcut-large.png",
+    "Docs/Screenshots/MotionNickname/motion-greeting.png",
+    "Docs/Screenshots/MotionNickname/motion-home-without-count.png",
+    "Docs/Screenshots/MotionNickname/profile-editor.png",
+    "Docs/Screenshots/MotionNickname/profile-editor-large.png"
+  ]
+}
