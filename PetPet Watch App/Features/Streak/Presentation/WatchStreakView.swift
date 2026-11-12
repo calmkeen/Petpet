@@ -11,7 +11,12 @@ struct WatchStreakOverview: View {
                 .font(.headline)
             Text("연속 \(model.summary.currentDays)일").font(.title2.bold())
                 .lineLimit(1).accessibilityIdentifier("watch.currentStreak")
-            if !compact { Text("오늘부터 하루 1보 이상").font(.caption2).foregroundStyle(.secondary) }
+            if !compact {
+                Text(cloud.account?.displayName ?? "아이폰에서 로그인")
+                    .font(.caption2).lineLimit(1).truncationMode(.middle)
+                    .accessibilityLabel(cloud.account?.displayName ?? "아이폰에서 로그인해 주세요")
+                    .accessibilityIdentifier("watch.accountName")
+            }
             NavigationLink("월별 걸음 기록") { WatchStreakView(model: model, cloud: cloud) }
                 .buttonStyle(WatchActionStyle())
                 .accessibilityIdentifier("watch.openStreak")
@@ -85,6 +90,8 @@ struct WatchStreakView: View {
                 NavigationLink("닉네임 변경") { WatchNicknameView(editor: cloud.makeNicknameEditor()) }
                     .buttonStyle(WatchActionStyle()).disabled(cloud.account == nil).accessibilityIdentifier("watch.streakNickname")
                 if cloud.account == nil { Text("닉네임 변경·백업은 아이폰에서 로그인한 뒤 사용할 수 있어요.").font(.caption2).foregroundStyle(.secondary) }
+                NavigationLink("계정·백업") { WatchCloudView(viewModel: cloud) }
+                    .buttonStyle(WatchActionStyle()).accessibilityIdentifier("watch.openAccount")
             }.padding(.horizontal, 10).padding(.bottom, 18)
         }
         .navigationTitle("스트릭")

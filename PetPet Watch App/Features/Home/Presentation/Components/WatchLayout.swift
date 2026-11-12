@@ -1,4 +1,15 @@
 import SwiftUI
+import PetPetCore
+
+enum WatchAppearance {
+    static func period(at date: Date) -> PetDaylightPeriod {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--watch-ui-night") { return .night }
+        if ProcessInfo.processInfo.arguments.contains("--watch-ui-day") { return .day }
+        #endif
+        return PetDaylightPeriod(date: date)
+    }
+}
 
 /// Overview pages never scroll: the Crown belongs to the section pager.
 /// Drop secondary detail before squeezing text or the primary action.

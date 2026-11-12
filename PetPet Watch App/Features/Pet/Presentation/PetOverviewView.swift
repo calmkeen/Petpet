@@ -1,34 +1,73 @@
 import SwiftUI
 import PetPetCore
 
+/// Group food and stat editing under the status page, matching Android's flow.
+/// Editing lists open on the navigation stack so the Crown can scroll them.
 struct PetOverviewView: View {
     @ObservedObject var viewModel: PetProgressViewModel
+    @ObservedObject var stepViewModel: WatchHomeViewModel
+    @ObservedObject var cloudViewModel: WatchCloudController
 
     var body: some View {
-        WatchOverviewLayout { compact in
-          VStack(spacing: 4) {
-            Text("성장").font(.headline)
+        TimelineView(.periodic(from: .now, by: 60)) { context in
+            ZStack {
+                GeometryReader { geometry in
+                    Image(WatchAppearance.period(at: context.date).backgroundImageName)
+                        .resizable().scaledToFill()
+                        .frame(width: geometry.size.width, height: geometry.size.height).clipped()
+                }.ignoresSafeArea()
+                WatchOverviewLayout { compact in summary(compact: compact) }
+            }
+        }
+    }
+
+    private func summary(compact: Bool) -> some View {
+        VStack(spacing: 6) {
             if let progress = viewModel.progress {
-                Text("Lv.\(WatchNumber.compact(progress.pet.level))").accessibilityLabel("레벨 \(progress.pet.level)").font(.title2.bold()).lineLimit(1)
-                ProgressView(value: Double(progress.pet.experience), total: Double(progress.experienceRequired))
-                    .tint(.green)
-                if !compact { Text("XP \(WatchNumber.compact(progress.pet.experience)) / \(WatchNumber.compact(progress.experienceRequired))")
-                    .accessibilityLabel("경험치 \(progress.pet.experience) / \(progress.experienceRequired)")
-                    .font(.caption2).monospacedDigit() }
-                if !compact { Text("공격 \(progress.pet.attack) · 방어 \(progress.pet.defense) · 체력 \(progress.pet.health)")
-                    .font(.caption2).lineLimit(2) }
-                Text("스탯 포인트 \(WatchNumber.compact(progress.pet.statPoints))")
-                        .accessibilityLabel("스탯 포인트 \(progress.pet.statPoints)")
-                    .font(.caption).foregroundStyle(.yellow)
-            }
-            NavigationLink {
-                PetStatisticsView(viewModel: viewModel)
-            } label: {
-                Label("스탯 관리", systemImage: "chart.bar.fill")
-            }
-            .buttonStyle(WatchActionStyle())
-            .accessibilityIdentifier("watch.managePetStatistics")
+                HStack(spacing: 6) {
+                    portrait(progress, compact: compact)
+                    statistics(progress.pet)
+                }
+            } else { ProgressView("펫 불러오는 중") }
+            careActions
         }
+    }
+
+    private func portrait(_ progress: PetProgress, compact: Bool) -> some View {
+        VStack(spacing: 2) {
+            Image("stepmate_fox_idle").resizable().scaledToFit()
+                .frame(width: compact ? 42 : 52, height: compact ? 54 : 66)
+                .accessibilityHidden(true)
+            Text("Lv.\(WatchNumber.compact(progress.pet.level))").font(.caption2.bold())
+            ProgressView(value: Double(progress.pet.experience), total: Double(progress.experienceRequired)).tint(.blue)
+            Text("\(progress.pet.experience) / \(progress.experienceRequired)")
+                .font(.caption2).lineLimit(1).minimumScaleFactor(0.6)
+        }.frame(maxWidth: .infinity)
+            .foregroundStyle(.white).shadow(color: .black.opacity(0.7), radius: 1)
+    }
+
+    private func statistics(_ pet: PetProfile) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text("상태: \(pet.mood.shortName)")
+            Text("애정: \(WatchNumber.compact(pet.affection))")
+            Text("공격: \(WatchNumber.compact(pet.attack))")
+            Text("방어: \(WatchNumber.compact(pet.defense))")
+            Text("체력: \(WatchNumber.compact(pet.health))")
         }
+        .font(.caption2).lineLimit(1).minimumScaleFactor(0.7)
+        .padding(5).foregroundStyle(.white)
+        .background(.black.opacity(0.85), in: RoundedRectangle(cornerRadius: 8))
+        .overlay { RoundedRectangle(cornerRadius: 8).stroke(.white.opacity(0.8), lineWidth: 1) }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var careActions: some View {
+        HStack(spacing: 6) {
+            NavigationLink("먹이") {
+                FoodInventoryView(viewModel: viewModel, stepViewModel: stepViewModel, cloudViewModel: cloudViewModel)
+            }.accessibilityIdentifier("watch.manageFoodInventory")
+            NavigationLink("스탯") { PetStatisticsView(viewModel: viewModel) }
+                .accessibilityIdentifier("watch.managePetStatistics")
+        }.buttonStyle(WatchActionStyle(color: .black, backgroundOpacity: 0.75))
     }
 }

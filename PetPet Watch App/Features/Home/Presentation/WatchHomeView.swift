@@ -16,24 +16,20 @@ struct WatchHomeView: View {
     @State private var selectedSection: WatchSection = .home
 
     private enum WatchSection: Hashable {
-        case home, statistics, food, streak, games, chat, cloud
+        case home, statistics, games, streak, chat
     }
 
     var body: some View {
         NavigationStack {
             TabView(selection: $selectedSection) {
                 home.tag(WatchSection.home)
-                PetOverviewView(viewModel: petViewModel)
+                PetOverviewView(viewModel: petViewModel, stepViewModel: viewModel, cloudViewModel: cloudViewModel)
                     .tag(WatchSection.statistics)
-                FoodOverviewView(viewModel: petViewModel, stepViewModel: viewModel, cloudViewModel: cloudViewModel)
-                    .tag(WatchSection.food)
-                WatchStreakOverview(model: streakViewModel, cloud: cloudViewModel).tag(WatchSection.streak)
                 if let games {
                     WatchGameOverview(services:games,pet:petViewModel).tag(WatchSection.games)
-                    WatchChatOverview(services:games).tag(WatchSection.chat)
                 }
-                WatchCloudOverview(viewModel: cloudViewModel)
-                .tag(WatchSection.cloud)
+                WatchStreakOverview(model: streakViewModel, cloud: cloudViewModel).tag(WatchSection.streak)
+                if let games { WatchChatOverview(services: games).tag(WatchSection.chat) }
             }
             // Keep pages short so the Crown always changes sections. Long
             // lists open on the navigation stack and receive Crown scrolling.
@@ -74,22 +70,15 @@ struct WatchHomeView: View {
 
     private var home: some View {
         TimelineView(.periodic(from: Date(timeIntervalSince1970: floor(Date().timeIntervalSince1970 / 60) * 60), by: 60)) { context in
-            let period = PetDaylightPeriod(date: context.date)
+            let period = WatchAppearance.period(at: context.date)
             GeometryReader { geometry in
                 ZStack {
                     Image(period.backgroundImageName)
                         .resizable().scaledToFill()
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .clipped()
-                    ViewThatFits(in: .vertical) {
-                        homeContents(period: period, canvas: geometry.size, hint: true)
-                        homeContents(period: period, canvas: geometry.size, hint: false)
-                    }
-                    .foregroundStyle(period.usesLightText ? .white : .black)
-                    .padding(.horizontal, 10)
-                    .padding(.top, 32)
-                    .padding(.bottom, 4)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    homeContents(period: period, canvas: geometry.size)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }.coordinateSpace(name: "pet.home")
             }
         }
@@ -100,56 +89,76 @@ struct WatchHomeView: View {
         } message: { Text(viewModel.errorMessage ?? "걸음수를 다시 불러와 주세요.") }
     }
 
-    private func homeContents(period: PetDaylightPeriod, canvas: CGSize, hint: Bool) -> some View {
-        VStack(spacing: 4) {
-            HStack(alignment: .center, spacing: 4) {
-                VStack(spacing: 0) {
-                    Button {
-                        guard character.handleTouch() else { return }
-                        Task { await petViewModel.touch() }
-                    } label: {
-                        WatchPetSpriteView(state: character.state, backgroundImageName: period.backgroundImageName,
-                                           backgroundCanvas: canvas, backgroundCoordinateSpace: "pet.home")
-                            .frame(width: 64, height: 64)
-                    }
-                    .buttonStyle(.plain).contentShape(Rectangle())
-                    .disabled(petViewModel.isBusy || petViewModel.progress == nil)
-                    .accessibilityLabel("펫 쓰다듬기").accessibilityIdentifier("watch.petTouch")
-                    if let progress = petViewModel.progress {
-                        Text("Lv.\(WatchNumber.compact(progress.pet.level))").font(.caption2.bold()).lineLimit(1).accessibilityLabel("레벨 \(progress.pet.level)")
-                        Text(progress.pet.mood.shortName).font(.caption2).lineLimit(1)
-                            .accessibilityLabel(progress.pet.mood.displayName)
-                    }
+    private func homeContents(period: PetDaylightPeriod, canvas: CGSize) -> some View {
+        // Android/Figma: wallpaper, a central pet and steps beneath it. The
+        // watchOS clock stays in its system position; the Crown owns paging.
+        let petWidth = min(canvas.width * 0.60, canvas.height * 0.53)
+        let petHeight = petWidth * 336 / 256
+        let touchWidth = max(44, canvas.width - 88)
+        let textColor: Color = period.usesLightText ? .white : .black
+        return ZStack {
+            Button {
+                guard character.handleTouch() else { return }
+                Task { await petViewModel.touch() }
+            } label: {
+                WatchPetSpriteView(state: character.state, backgroundImageName: period.backgroundImageName,
+                                   backgroundCanvas: canvas, backgroundCoordinateSpace: "pet.home")
+                    .frame(width: petWidth, height: petHeight)
+                    .frame(width: touchWidth, height: petHeight)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .disabled(petViewModel.isBusy || petViewModel.progress == nil)
+            .accessibilityLabel("펫 쓰다듬기")
+            .accessibilityHint("크라운이나 양옆 화살표로 화면을 바꿀 수 있어요")
+            .accessibilityIdentifier("watch.petTouch")
+            .position(x: canvas.width / 2, y: canvas.height * 0.51)
+
+            HStack(spacing: 0) {
+                pageArrow("chevron.left", label: "이전 화면, 음성과 AI", id: "watch.previousPage") {
+                    withAnimation { selectedSection = .chat }
                 }
-                VStack(spacing: 0) {
-                    Text("오늘").font(.caption2)
-                    Text(WatchNumber.compact(Int64(viewModel.state.stepCount)))
-                        .font(.title2.bold()).monospacedDigit().lineLimit(1).minimumScaleFactor(0.7)
-                        .accessibilityLabel("오늘 \(viewModel.state.stepCount.formatted())걸음")
-                        .accessibilityIdentifier("watch.stepCount")
+                Spacer(minLength: 0)
+                pageArrow("chevron.right", label: "다음 화면, 상태", id: "watch.openPetStatistics") {
+                    withAnimation { selectedSection = .statistics }
+                }
+            }
+            .frame(width: canvas.width)
+            .position(x: canvas.width / 2, y: canvas.height * 0.51)
+
+            HStack(spacing: 0) {
+                Group {
                     if viewModel.errorMessage != nil {
-                        Button { showingStepError = true } label: { Text("확인").font(.caption2) }
-                            .buttonStyle(WatchActionStyle(color: .black, backgroundOpacity: 0.7))
+                        Button { showingStepError = true } label: {
+                            Image(systemName: "exclamationmark.circle")
+                                .frame(width: 44, height: 44).contentShape(Rectangle())
+                        }
+                            .buttonStyle(.plain).foregroundStyle(textColor)
                             .accessibilityLabel("걸음수 권한 안내 및 다시 시도")
                             .accessibilityIdentifier("watch.retrySteps")
-                    } else if viewModel.state.isLoading {
-                        ProgressView().accessibilityLabel("걸음수 불러오는 중")
-                    } else {
-                        Text("걸음").font(.caption2)
-                    }
-                }.frame(maxWidth: .infinity)
+                    } else { Color.clear.accessibilityHidden(true) }
+                }.frame(width: 44, height: 44)
+                Text("\(WatchNumber.compact(Int64(viewModel.state.stepCount))) 걸음")
+                    .font(.caption2.bold()).monospacedDigit().lineLimit(1).minimumScaleFactor(0.65)
+                    .foregroundStyle(textColor)
+                    .accessibilityLabel("오늘 \(viewModel.state.stepCount.formatted())걸음")
+                    .accessibilityIdentifier("watch.stepCount")
+                    .frame(maxWidth: .infinity)
+                Color.clear.frame(width: 44, height: 44).accessibilityHidden(true)
             }
-            HStack(spacing: 6) {
-                Button { withAnimation { selectedSection = .statistics } } label: { Text("성장") }
-                    .accessibilityIdentifier("watch.openPetStatistics")
-                Button { withAnimation { selectedSection = .food } } label: { Text("먹이") }
-                    .accessibilityIdentifier("watch.openFoodInventory")
-            }
-            .buttonStyle(WatchActionStyle(color: .black, backgroundOpacity: 0.7))
-            if hint { Text("크라운으로 이동").font(.caption2) }
+            .frame(width: canvas.width, height: 44)
+            .position(x: canvas.width / 2, y: canvas.height - 24)
         }
-        .fixedSize(horizontal: false, vertical: true)
+    }
 
+    private func pageArrow(_ symbol: String, label: String, id: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol).font(.title3.bold()).foregroundStyle(.white)
+                .shadow(color: .black, radius: 1.5)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain).accessibilityLabel(label).accessibilityIdentifier(id)
     }
 
     private var characterIsVisible: Bool { selectedSection == .home && scenePhase == .active && !luminanceReduced }
