@@ -14,6 +14,8 @@ struct WatchHomeView: View {
     @StateObject private var character = CharacterActivityViewModel()
     @State private var showingStepError = false
     @State private var selectedSection: WatchSection = .home
+    @State private var touchFeedback: String?
+    @State private var feedbackTask: Task<Void, Never>?
 
     private enum WatchSection: Hashable {
         case home, statistics, games, streak, chat
@@ -98,8 +100,16 @@ struct WatchHomeView: View {
         let textColor: Color = period.usesLightText ? .white : .black
         return ZStack {
             Button {
-                guard character.handleTouch() else { return }
-                Task { await petViewModel.touch() }
+                guard character.canTouch else { return }
+                Task {
+                    // Animate and confirm only a touch that reached storage.
+                    if await petViewModel.touch() {
+                        character.handleTouch()
+                        showTouchFeedback(petViewModel.message)
+                    } else if petViewModel.errorMessage != nil {
+                        showTouchFeedback("저장 실패 · 다시 눌러 주세요")
+                    }
+                }
             } label: {
                 WatchPetSpriteView(state: character.state, backgroundImageName: period.backgroundImageName,
                                    backgroundCanvas: canvas, backgroundCoordinateSpace: "pet.home")
@@ -108,9 +118,10 @@ struct WatchHomeView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .disabled(petViewModel.isBusy || petViewModel.progress == nil)
+            .disabled(petViewModel.isBusy || petViewModel.progress == nil || !character.canTouch)
             .accessibilityLabel("펫 쓰다듬기")
-            .accessibilityHint("크라운이나 양옆 화살표로 화면을 바꿀 수 있어요")
+            .accessibilityValue("쓰다듬기 \(petViewModel.progress?.touchCount ?? 0)/50, 애정도 \(petViewModel.progress?.pet.affection ?? 0)")
+            .accessibilityHint("인사가 끝난 뒤 다시 눌러 주세요. 50회마다 애정도가 1 올라요")
             .accessibilityIdentifier("watch.petTouch")
             .position(x: canvas.width / 2, y: canvas.height * 0.51)
 
@@ -148,6 +159,27 @@ struct WatchHomeView: View {
             }
             .frame(width: canvas.width, height: 44)
             .position(x: canvas.width / 2, y: canvas.height - 24)
+
+            if let touchFeedback {
+                Text(touchFeedback)
+                    .font(.caption2.bold()).foregroundStyle(.white)
+                    .lineLimit(1).minimumScaleFactor(0.65)
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(.black.opacity(0.8), in: Capsule())
+                    .frame(maxWidth: canvas.width - 20)
+                    .position(x: canvas.width / 2, y: canvas.height - 54)
+                    .allowsHitTesting(false)
+                    .accessibilityIdentifier("watch.touchFeedback")
+            }
+        }
+    }
+
+    private func showTouchFeedback(_ text: String?) {
+        feedbackTask?.cancel()
+        touchFeedback = text
+        feedbackTask = Task {
+            do { try await Task.sleep(for: .seconds(2)) } catch { return }
+            touchFeedback = nil
         }
     }
 
@@ -164,6 +196,7 @@ struct WatchHomeView: View {
     private var characterIsVisible: Bool { selectedSection == .home && scenePhase == .active && !luminanceReduced }
 
     private func stop() {
+        feedbackTask?.cancel(); feedbackTask = nil; touchFeedback = nil
         viewModel.stop()
         petViewModel.stop()
         character.stop()

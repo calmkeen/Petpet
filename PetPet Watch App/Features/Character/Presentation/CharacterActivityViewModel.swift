@@ -7,6 +7,10 @@ final class CharacterActivityViewModel: ObservableObject {
     @Published private(set) var state = PetAnimationState()
     private var completion: Task<Void, Never>?
 
+    var canTouch: Bool {
+        state.isActive && state.activity != .running && state.activity != .touching
+    }
+
     func setActive(_ value: Bool, steps: DailyStepState) {
         state.setActive(value, at: Date())
         state.observe(steps, at: Date())
@@ -17,6 +21,7 @@ final class CharacterActivityViewModel: ObservableObject {
         state.observe(steps, at: Date())
         if deadline != state.expiresAt { scheduleCompletion() }
     }
+    @discardableResult
     func handleTouch() -> Bool {
         guard state.touch(at: Date()) else { return false }
         scheduleCompletion()

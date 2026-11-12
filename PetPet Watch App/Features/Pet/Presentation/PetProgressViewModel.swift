@@ -66,11 +66,13 @@ final class PetProgressViewModel: ObservableObject {
         await perform(.allocate(statistic)) { _ in "능력치가 1 올랐어요." }
     }
 
-    func touch() async {
-        let oldAffection = progress?.pet.affection
-        await perform(.touch) { change in
-            change.progress.pet.affection != oldAffection ? "호감도 +1!" : nil
+    @discardableResult
+    func touch() async -> Bool {
+        let saved = await perform(.touch) { change in
+            change.progress.touchCount == 0
+                ? "애정도 +1!" : "쓰다듬기 \(change.progress.touchCount)/50"
         }
+        return saved != nil
     }
 
     func claim(for record: DailyStepRecord) async {
@@ -88,11 +90,12 @@ final class PetProgressViewModel: ObservableObject {
         } catch { show(error) }
     }
 
+    @discardableResult
     private func perform(
         _ action: PetProgressAction,
         feedback: ((PetProgressChange) -> String?)? = nil
-    ) async {
-        guard !isBusy else { return }
+    ) async -> PetProgressChange? {
+        guard !isBusy else { return nil }
         isBusy = true
         defer { isBusy = false }
         do {
@@ -100,7 +103,9 @@ final class PetProgressViewModel: ObservableObject {
             progress = change.progress
             errorMessage = nil
             if let feedback { message = feedback(change) }
+            return change
         } catch { show(error) }
+        return nil
     }
 
     private func show(_ error: Error) {

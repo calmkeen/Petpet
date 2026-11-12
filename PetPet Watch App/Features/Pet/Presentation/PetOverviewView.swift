@@ -50,6 +50,8 @@ struct PetOverviewView: View {
         VStack(alignment: .leading, spacing: 1) {
             Text("상태: \(pet.mood.shortName)")
             Text("애정: \(WatchNumber.compact(pet.affection))")
+                .accessibilityLabel("애정도 \(pet.affection)")
+                .accessibilityIdentifier("watch.affection")
             Text("공격: \(WatchNumber.compact(pet.attack))")
             Text("방어: \(WatchNumber.compact(pet.defense))")
             Text("체력: \(WatchNumber.compact(pet.health))")
