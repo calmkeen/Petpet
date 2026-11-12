@@ -4,7 +4,7 @@ import XCTest
 final class WatchPetTouchUITests: XCTestCase {
     func test00SingleTouch() {
         continueAfterFailure = false
-        let app = XCUIApplication(); app.launchArguments = ["--watch-ui-large-text"]; app.launch()
+        let app = XCUIApplication(); app.launchArguments = ["--watch-ui-large-text", "--watch-ui-hold-touch-feedback"]; app.launch()
         let pet = app.buttons["watch.petTouch"]
         XCTAssertTrue(pet.waitForExistence(timeout: 10))
         ready(pet)

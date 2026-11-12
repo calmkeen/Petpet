@@ -57,6 +57,14 @@ struct WatchStatisticButtonStyle: ButtonStyle {
     }
 }
 
+/// The disabled state gates repeated greetings, but must not fade the pet's
+/// wallpaper-composited animation as the standard plain button style does.
+struct WatchPetTouchStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+    }
+}
+
 /// Abbreviations are for overviews only; detail screens and VoiceOver retain exact values.
 enum WatchNumber {
     static func compact(_ value: Int64) -> String {

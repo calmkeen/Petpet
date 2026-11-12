@@ -117,7 +117,7 @@ struct WatchHomeView: View {
                     .frame(width: touchWidth, height: petHeight)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(WatchPetTouchStyle())
             .disabled(petViewModel.isBusy || petViewModel.progress == nil || !character.canTouch)
             .accessibilityLabel("펫 쓰다듬기")
             .accessibilityValue("쓰다듬기 \(petViewModel.progress?.touchCount ?? 0)/50, 애정도 \(petViewModel.progress?.pet.affection ?? 0)")
@@ -177,6 +177,11 @@ struct WatchHomeView: View {
     private func showTouchFeedback(_ text: String?) {
         feedbackTask?.cancel()
         touchFeedback = text
+        #if DEBUG
+        // Layout inspection only: leave the real saved value on screen long
+        // enough for XCTest snapshots, without changing touch/game rules.
+        if ProcessInfo.processInfo.arguments.contains("--watch-ui-hold-touch-feedback") { return }
+        #endif
         feedbackTask = Task {
             do { try await Task.sleep(for: .seconds(2)) } catch { return }
             touchFeedback = nil
