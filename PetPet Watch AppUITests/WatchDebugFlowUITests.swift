@@ -93,16 +93,14 @@ final class WatchDebugFlowUITests: XCTestCase {
 
     private func openFood() {
         app.terminate(); app.launch()
-        XCTAssertTrue(app.buttons["watch.openPetStatistics"].waitForExistence(timeout: 10))
-        app.buttons["watch.openPetStatistics"].tap()
+        openWatchPetCare(app)
         XCTAssertTrue(app.buttons["watch.manageFoodInventory"].waitForExistence(timeout: 5))
         app.buttons["watch.manageFoodInventory"].tap()
         XCTAssertTrue(app.staticTexts["watch.foodQuantity.1"].waitForExistence(timeout: 5))
     }
     private func openStatistics() {
         app.terminate(); app.launch()
-        XCTAssertTrue(app.buttons["watch.openPetStatistics"].waitForExistence(timeout: 10))
-        app.buttons["watch.openPetStatistics"].tap()
+        openWatchPetCare(app)
         XCTAssertTrue(app.buttons["watch.managePetStatistics"].waitForExistence(timeout: 5))
         app.buttons["watch.managePetStatistics"].tap()
         XCTAssertTrue(app.staticTexts["watch.petLevel"].waitForExistence(timeout: 5))

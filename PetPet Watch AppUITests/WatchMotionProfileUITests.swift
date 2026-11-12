@@ -34,7 +34,7 @@ final class WatchMotionProfileUITests: XCTestCase {
         if large { app.launchArguments = ["--watch-ui-large-text"] }
         app.launch()
         XCTAssertTrue(app.buttons["watch.petTouch"].waitForExistence(timeout: 10))
-        let pages = ["watch.openPetStatistics", "watch.managePetStatistics", "watch.openGames", "watch.openStreak", "watch.openChat"]
+        let pages = ["watch.petTouch", "watch.managePetStatistics", "watch.openGames", "watch.openStreak", "watch.openChat"]
         for _ in 0..<12 {
             if app.buttons["watch.openNickname"].exists && app.buttons["watch.openNickname"].isHittable { break }
             let current = pages.firstIndex { app.buttons[$0].exists && app.buttons[$0].isHittable } ?? 0

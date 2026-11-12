@@ -23,7 +23,7 @@ final class WatchUXUITests: XCTestCase {
         let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in self.app.buttons["watch.petTouch"].isEnabled }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 10), .completed)
         let pages: [(String, String)] = [
-            ("home", "watch.openPetStatistics"),
+            ("home", "watch.petTouch"),
             ("status", "watch.managePetStatistics"),
             ("games", "watch.openGames"),
             ("streak", "watch.openStreak"),
@@ -36,7 +36,8 @@ final class WatchUXUITests: XCTestCase {
             checkTarget(action, minimum: 44, top: 30)
             if name == "home" {
                 checkTarget(app.buttons["watch.petTouch"], minimum: 44, top: 30)
-                checkTarget(app.buttons["watch.previousPage"], minimum: 44, top: 30)
+                XCTAssertFalse(app.buttons["watch.previousPage"].exists)
+                XCTAssertFalse(app.buttons["watch.openPetStatistics"].exists)
                 let retry = app.buttons["watch.retrySteps"]
                 if retry.exists {
                     checkTarget(retry, minimum: 44, top: 30)
@@ -49,8 +50,7 @@ final class WatchUXUITests: XCTestCase {
         }
     }
     private func checkDetails(prefix: String) {
-        XCTAssertTrue(app.buttons["watch.openPetStatistics"].waitForExistence(timeout: 10))
-        app.buttons["watch.openPetStatistics"].tap()
+        openWatchPetCare(app)
         XCTAssertTrue(app.buttons["watch.managePetStatistics"].waitForExistence(timeout: 3))
         app.buttons["watch.managePetStatistics"].tap()
         for key in ["attack", "defense", "health"] {
@@ -59,7 +59,7 @@ final class WatchUXUITests: XCTestCase {
         }
         capture("ux-\(prefix)-statistics")
         app.terminate(); app.launch()
-        app.buttons["watch.openPetStatistics"].tap(); app.buttons["watch.manageFoodInventory"].tap()
+        openWatchPetCare(app); app.buttons["watch.manageFoodInventory"].tap()
         reveal(app.buttons["watch.feedFood.1"]); checkTarget(app.buttons["watch.feedFood.1"], minimum: 44)
         capture("ux-\(prefix)-food-detail")
         reveal(app.buttons["watch.claimStepRewards"], enabled: false)
@@ -84,7 +84,7 @@ final class WatchUXUITests: XCTestCase {
     }
     private func crownTo(_ id: String) {
         let element = app.buttons[id]
-        let pages = ["watch.openPetStatistics", "watch.managePetStatistics", "watch.openGames", "watch.openStreak", "watch.openChat"]
+        let pages = ["watch.petTouch", "watch.managePetStatistics", "watch.openGames", "watch.openStreak", "watch.openChat"]
         let destination = pages.firstIndex(of: id)
         var previous: Int?
         var stalled = 0
