@@ -101,7 +101,13 @@ struct WatchChatView: View {
             Section("답변") {
                 Text(model.progress.status).font(.caption2).foregroundStyle(model.progress.failed ? .orange : .secondary).accessibilityIdentifier("chat.status").id("chat.response")
                 if model.busy { Button("응답 중단") { model.stop() }.accessibilityIdentifier("chat.cancel").id("chat.cancellation"); ProgressView() }
-                if !model.progress.text.isEmpty { Text(model.progress.text).font(.caption).fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("chat.answer") }
+                if !model.progress.text.isEmpty {
+                    Text(model.progress.text).font(.caption).lineLimit(4).accessibilityIdentifier("chat.answer")
+                    if !model.busy {
+                        NavigationLink("답변 전체 보기") { WatchChatAnswerView(text: model.progress.text) }
+                            .accessibilityIdentifier("chat.openFullAnswer")
+                    }
+                }
             }
             Text(cloud.connectionNote).font(.caption2).foregroundStyle(.secondary)
         }.navigationTitle("AI 대화")
@@ -116,5 +122,39 @@ struct WatchChatView: View {
             .onChange(of:phase) { _,value in if value == .background { model.stop() } }
             .onChange(of:cloud.account?.id) { _,_ in model.stop(clear:true) }
       }
+    }
+}
+
+/// watchOS List rows cap their height. Read the completed answer outside a row
+/// so even a long response remains scrollable all the way to its final line.
+private struct WatchChatAnswerView: View {
+    let text: String
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(textRuns.enumerated()), id: \.offset) { index, run in
+                    Text(run).font(.caption).lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .accessibilityIdentifier("chat.fullAnswer.\(index)")
+                }
+            }.padding(.horizontal, 8).padding(.bottom, 12)
+        }.navigationTitle("AI 답변")
+    }
+    // watchOS also limits individual text labels. Bound each visible label,
+    // preserving every character and preferring whitespace between runs.
+    private var textRuns: [String] {
+        var remaining = text[...]
+        var result: [String] = []
+        while !remaining.isEmpty {
+            var end = remaining.index(remaining.startIndex, offsetBy: 48, limitedBy: remaining.endIndex) ?? remaining.endIndex
+            if end != remaining.endIndex,
+               let space = remaining[..<end].lastIndex(where: { $0.isWhitespace }),
+               remaining.distance(from: remaining.startIndex, to: space) >= 24 {
+                end = remaining.index(after: space)
+            }
+            result.append(String(remaining[..<end])); remaining = remaining[end...]
+        }
+        return result
     }
 }
