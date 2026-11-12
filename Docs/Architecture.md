@@ -68,7 +68,7 @@ flowchart LR
 
 - View는 화면과 사용자 입력을 담당한다. 센서·네트워크·저장소에 직접 접근하지 않는다.
 - ViewModel은 `@MainActor`에서 화면 상태를 발행한다. 센서 구현은 생성자로 주입한다.
-- 워치 루트는 `NavigationStack` 안의 `TabView(.verticalPage)`다. 크라운으로 홈·성장·먹이·스트릭·게임·대화·계정 요약 섹션을 전환하며, 상세 목록은 스택에 연다. 루트의 추적 수명은 섹션·상세 화면 이동과 분리한다. [Apple의 크라운 페이지 전환 지침](https://developer.apple.com/videos/play/wwdc2023/10031/?time=347)을 따른다.
+- 워치 루트는 `NavigationStack` 안의 `TabView(.verticalPage)`다. Android의 메인 정보 구조에 맞춰 크라운으로 홈·상태·게임·스트릭·음성의 5개 페이지를 전환한다. 홈은 전체 배경과 중앙 펫·걸음수로 구성하고, 먹이·스탯 편집은 상태 화면에서, 계정·백업은 스트릭 상세에서 스택에 연다. 루트의 추적 수명은 섹션·상세 화면 이동과 분리한다. [Apple의 크라운 페이지 전환 지침](https://developer.apple.com/videos/play/wwdc2023/10031/?time=347)을 따른다. 원본 비교와 watchOS 차이는 [워치 홈 구성 검토](WatchHomeParity-2026-11-12.md)에 기록한다.
 - `PetPetCore`는 SwiftUI, CoreMotion, WatchConnectivity에 의존하지 않는다. iPhone과 Watch 타깃이 같은 로컬 Swift Package를 참조한다.
 - 같은 패키지의 별도 제품 `PetPetConnectivity`만 WatchConnectivity를 가져온다. 앱마다 WCSession 소유자는 한 개이며, SDK의 백그라운드 콜백을 MainActor로 넘긴다. `PhoneSnapshotReceiver`와 `WatchSnapshotPublisher`는 SDK 대신 주입 가능한 `SnapshotTransport` 계약을 사용한다.
 - `DailyStepTracker`는 저장값 복원, 자정부터의 누적 집계, 최근 기록 복구, 중복/지연 콜백, 날짜 변경을 처리한다. 센서·저장 오류는 화면까지 전달한다.

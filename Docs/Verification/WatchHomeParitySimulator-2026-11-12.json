@@ -1,0 +1,1111 @@
+{
+  "date": "2026-11-12",
+  "verifiedAt": "2026-11-12T05:11:39.232959+00:00",
+  "xcode": "27.2 (27B52)",
+  "simulatorOnly": true,
+  "appSourceCommit": "c406e83dc2cab8da91eba02bd03724df614fda04",
+  "verificationSourceCommit": "b3bac0ed0e5ee7a238d9c969e8f668f4df5d07d2",
+  "scope": "Watch home composition and five-page grouping; read-only navigation and 40mm normal/large-text controls. Not a rerun of all gameplay or production authentication.",
+  "androidCommit": "4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3",
+  "figma": {
+    "file": "93gFgiYFvhiyTo4DfyyD6q",
+    "homeNode": "166:3",
+    "statusNode": "166:6",
+    "homeFrameDesignUnits": [
+      311,
+      311
+    ],
+    "homeReferenceImagePixels": [
+      438,
+      438
+    ],
+    "sourceType": "Raster reference frames plus flow annotations; no individual editable control layers",
+    "referencedImagesUsedAsAppAssets": false
+  },
+  "passedUIExecutions": 9,
+  "failedAcceptedUIExecutions": 0,
+  "skippedUIExecutions": 0,
+  "results": [
+    {
+      "stage": 0,
+      "suite": "WatchHomeParityUITests",
+      "test": "test00DayHome",
+      "passed": true,
+      "verifiedAt": "2026-11-12T04:38:50.479219+00:00",
+      "watchSimulator": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+      "phoneSimulator": "62CC3FF5-FBE5-44D0-93A6-A10DA462ED7E",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-home-parity-20261112/parity-00-133706.xcresult",
+      "measuredTargets": [
+        {
+          "identifier": "watch.petTouch",
+          "framePoints": [
+            44.0,
+            36.5,
+            74.0,
+            128.0
+          ]
+        },
+        {
+          "identifier": "watch.previousPage",
+          "framePoints": [
+            0.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openPetStatistics",
+          "framePoints": [
+            118.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        }
+      ],
+      "crownDiagnostics": []
+    },
+    {
+      "stage": 1,
+      "suite": "WatchHomeParityUITests",
+      "test": "test01NightHome",
+      "passed": true,
+      "verifiedAt": "2026-11-12T04:40:29.544066+00:00",
+      "watchSimulator": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+      "phoneSimulator": "62CC3FF5-FBE5-44D0-93A6-A10DA462ED7E",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-home-parity-20261112/parity-01-133854.xcresult",
+      "measuredTargets": [
+        {
+          "identifier": "watch.petTouch",
+          "framePoints": [
+            44.0,
+            36.5,
+            74.0,
+            128.0
+          ]
+        },
+        {
+          "identifier": "watch.previousPage",
+          "framePoints": [
+            0.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openPetStatistics",
+          "framePoints": [
+            118.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        }
+      ],
+      "crownDiagnostics": []
+    },
+    {
+      "stage": 2,
+      "suite": "WatchHomeParityUITests",
+      "test": "test02LargeDayHome",
+      "passed": true,
+      "verifiedAt": "2026-11-12T04:41:41.821513+00:00",
+      "watchSimulator": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+      "phoneSimulator": "62CC3FF5-FBE5-44D0-93A6-A10DA462ED7E",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-home-parity-20261112/parity-02-134037.xcresult",
+      "measuredTargets": [
+        {
+          "identifier": "watch.petTouch",
+          "framePoints": [
+            44.0,
+            36.5,
+            74.0,
+            128.0
+          ]
+        },
+        {
+          "identifier": "watch.previousPage",
+          "framePoints": [
+            0.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openPetStatistics",
+          "framePoints": [
+            118.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        }
+      ],
+      "crownDiagnostics": []
+    },
+    {
+      "stage": 3,
+      "suite": "WatchHomeParityUITests",
+      "test": "test03LargeNightHome",
+      "passed": true,
+      "verifiedAt": "2026-11-12T04:42:31.168252+00:00",
+      "watchSimulator": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+      "phoneSimulator": "62CC3FF5-FBE5-44D0-93A6-A10DA462ED7E",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-home-parity-20261112/parity-03-134143.xcresult",
+      "measuredTargets": [
+        {
+          "identifier": "watch.petTouch",
+          "framePoints": [
+            44.0,
+            36.5,
+            74.0,
+            128.0
+          ]
+        },
+        {
+          "identifier": "watch.previousPage",
+          "framePoints": [
+            0.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openPetStatistics",
+          "framePoints": [
+            118.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        }
+      ],
+      "crownDiagnostics": []
+    },
+    {
+      "stage": 4,
+      "suite": "WatchHomeParityUITests",
+      "test": "test10FivePagesAndCareDestinations",
+      "passed": true,
+      "verifiedAt": "2026-11-12T04:46:08.556392+00:00",
+      "watchSimulator": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+      "phoneSimulator": "62CC3FF5-FBE5-44D0-93A6-A10DA462ED7E",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-home-parity-20261112/parity-04-134233.xcresult",
+      "measuredTargets": [
+        {
+          "identifier": "watch.manageFoodInventory",
+          "framePoints": [
+            14.0,
+            139.0,
+            64.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.managePetStatistics",
+          "framePoints": [
+            84.0,
+            139.0,
+            64.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.feedFood.1",
+          "framePoints": [
+            9.5,
+            112.0,
+            143.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openGames",
+          "framePoints": [
+            14.0,
+            125.0,
+            134.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "game.openStairs",
+          "framePoints": [
+            2.0,
+            113.0,
+            158.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openStreak",
+          "framePoints": [
+            14.0,
+            127.5,
+            134.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openAccount",
+          "framePoints": [
+            12.0,
+            141.0,
+            138.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openChat",
+          "framePoints": [
+            14.0,
+            117.0,
+            134.0,
+            44.0
+          ]
+        }
+      ],
+      "crownDiagnostics": []
+    },
+    {
+      "stage": 5,
+      "suite": "WatchUXUITests",
+      "test": "test00OverviewPages",
+      "passed": true,
+      "verifiedAt": "2026-11-12T04:57:47.165643+00:00",
+      "watchSimulator": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+      "phoneSimulator": "62CC3FF5-FBE5-44D0-93A6-A10DA462ED7E",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-home-parity-20261112/parity-05-135607.xcresult",
+      "measuredTargets": [
+        {
+          "identifier": "watch.openPetStatistics",
+          "framePoints": [
+            118.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.petTouch",
+          "framePoints": [
+            44.0,
+            36.5,
+            74.0,
+            128.0
+          ]
+        },
+        {
+          "identifier": "watch.previousPage",
+          "framePoints": [
+            0.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.retrySteps",
+          "framePoints": [
+            0.0,
+            151.0,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.managePetStatistics",
+          "framePoints": [
+            84.0,
+            139.0,
+            64.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openGames",
+          "framePoints": [
+            14.0,
+            125.0,
+            134.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openStreak",
+          "framePoints": [
+            14.0,
+            127.5,
+            134.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openChat",
+          "framePoints": [
+            14.0,
+            117.0,
+            134.0,
+            44.0
+          ]
+        }
+      ],
+      "crownDiagnostics": [
+        "UX_CROWN target=watch.managePetStatistics current=0 rotation=0.25",
+        "UX_CROWN target=watch.managePetStatistics current=0 rotation=0.4",
+        "UX_CROWN target=watch.managePetStatistics current=0 rotation=0.5",
+        "UX_CROWN target=watch.openGames current=1 rotation=0.25",
+        "UX_CROWN target=watch.openGames current=1 rotation=0.4",
+        "UX_CROWN target=watch.openGames current=1 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.5",
+        "UX_CROWN target=watch.openChat current=3 rotation=0.25",
+        "UX_CROWN target=watch.openChat current=3 rotation=0.4",
+        "UX_CROWN target=watch.openChat current=3 rotation=0.5"
+      ]
+    },
+    {
+      "stage": 6,
+      "suite": "WatchUXUITests",
+      "test": "test01LargeTextOverviewPages",
+      "passed": true,
+      "verifiedAt": "2026-11-12T04:59:38.970719+00:00",
+      "watchSimulator": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+      "phoneSimulator": "62CC3FF5-FBE5-44D0-93A6-A10DA462ED7E",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-home-parity-20261112/parity-06-135748.xcresult",
+      "measuredTargets": [
+        {
+          "identifier": "watch.openPetStatistics",
+          "framePoints": [
+            118.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.petTouch",
+          "framePoints": [
+            44.0,
+            36.5,
+            74.0,
+            128.0
+          ]
+        },
+        {
+          "identifier": "watch.previousPage",
+          "framePoints": [
+            0.0,
+            78.5,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.retrySteps",
+          "framePoints": [
+            0.0,
+            151.0,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.managePetStatistics",
+          "framePoints": [
+            84.0,
+            142.5,
+            64.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openGames",
+          "framePoints": [
+            14.0,
+            127.0,
+            134.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openStreak",
+          "framePoints": [
+            14.0,
+            120.0,
+            134.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.openChat",
+          "framePoints": [
+            14.0,
+            121.0,
+            134.0,
+            44.0
+          ]
+        }
+      ],
+      "crownDiagnostics": [
+        "UX_CROWN target=watch.managePetStatistics current=0 rotation=0.25",
+        "UX_CROWN target=watch.managePetStatistics current=0 rotation=0.4",
+        "UX_CROWN target=watch.managePetStatistics current=0 rotation=0.5",
+        "UX_CROWN target=watch.openGames current=1 rotation=0.25",
+        "UX_CROWN target=watch.openGames current=1 rotation=0.4",
+        "UX_CROWN target=watch.openGames current=1 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.5",
+        "UX_CROWN target=watch.openChat current=3 rotation=0.25",
+        "UX_CROWN target=watch.openChat current=3 rotation=0.4",
+        "UX_CROWN target=watch.openChat current=3 rotation=0.5"
+      ]
+    },
+    {
+      "stage": 7,
+      "suite": "WatchUXUITests",
+      "test": "test10DetailControls",
+      "passed": true,
+      "verifiedAt": "2026-11-12T05:06:43.903977+00:00",
+      "watchSimulator": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+      "phoneSimulator": "62CC3FF5-FBE5-44D0-93A6-A10DA462ED7E",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-home-parity-20261112/parity-07-140322.xcresult",
+      "measuredTargets": [
+        {
+          "identifier": "watch.allocate.attack",
+          "framePoints": [
+            108.5,
+            99.0,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.allocate.defense",
+          "framePoints": [
+            108.5,
+            100.5,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.allocate.health",
+          "framePoints": [
+            108.5,
+            93.0,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.feedFood.1",
+          "framePoints": [
+            9.5,
+            112.0,
+            143.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.claimStepRewards",
+          "framePoints": [
+            2.0,
+            133.5,
+            158.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.chooseMonth",
+          "framePoints": [
+            12.0,
+            79.0,
+            138.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.previousMonth",
+          "framePoints": [
+            12.0,
+            135.0,
+            66.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.nextMonth",
+          "framePoints": [
+            84.0,
+            135.0,
+            66.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.editNickname",
+          "framePoints": [
+            2.0,
+            113.0,
+            158.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "nickname.submit",
+          "framePoints": [
+            2.0,
+            116.5,
+            158.0,
+            44.0
+          ]
+        }
+      ],
+      "crownDiagnostics": [
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.5"
+      ]
+    },
+    {
+      "stage": 8,
+      "suite": "WatchUXUITests",
+      "test": "test11LargeTextDetailControls",
+      "passed": true,
+      "verifiedAt": "2026-11-12T05:09:45.911652+00:00",
+      "watchSimulator": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+      "phoneSimulator": "62CC3FF5-FBE5-44D0-93A6-A10DA462ED7E",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-home-parity-20261112/parity-08-140644.xcresult",
+      "measuredTargets": [
+        {
+          "identifier": "watch.allocate.attack",
+          "framePoints": [
+            108.5,
+            113.5,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.allocate.defense",
+          "framePoints": [
+            108.5,
+            109.0,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.allocate.health",
+          "framePoints": [
+            108.5,
+            104.5,
+            44.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.feedFood.1",
+          "framePoints": [
+            9.5,
+            118.0,
+            143.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.claimStepRewards",
+          "framePoints": [
+            2.0,
+            97.5,
+            158.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.chooseMonth",
+          "framePoints": [
+            12.0,
+            82.5,
+            138.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.previousMonth",
+          "framePoints": [
+            12.0,
+            138.5,
+            66.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.nextMonth",
+          "framePoints": [
+            84.0,
+            138.5,
+            66.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "watch.editNickname",
+          "framePoints": [
+            2.0,
+            115.5,
+            158.0,
+            44.0
+          ]
+        },
+        {
+          "identifier": "nickname.submit",
+          "framePoints": [
+            2.0,
+            127.0,
+            158.0,
+            44.0
+          ]
+        }
+      ],
+      "crownDiagnostics": [
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=0 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=1 rotation=0.5",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.25",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.4",
+        "UX_CROWN target=watch.openStreak current=2 rotation=0.5"
+      ]
+    }
+  ],
+  "debugSimulatorBuild": true,
+  "releaseSimulatorBuild": true,
+  "presentationArguments": {
+    "Debug": {
+      "--watch-ui-day": true,
+      "--watch-ui-night": true
+    },
+    "Release": {
+      "--watch-ui-day": false,
+      "--watch-ui-night": false
+    }
+  },
+  "probeDiagnostics": [
+    {
+      "log": "parity-05-134612.log",
+      "disposition": "Failed: fixed forward Crown delta skipped the requested page"
+    },
+    {
+      "log": "parity-05-135134.log",
+      "disposition": "Stopped: fixed 0.25 delta did not advance a page"
+    },
+    {
+      "resolution": "Adaptive rotation checks the visible page and reverses after overshoot. Accepted overview runs reached all five pages via the Crown."
+    },
+    {
+      "log": "parity-07-135940.log",
+      "disposition": "Failed: a list-edge transition rendered a 44pt action at 43.915pt"
+    },
+    {
+      "resolution": "Scroll the action into the list interior before checking its size. Keep the strict 44pt minimum; no assertion tolerance was lowered."
+    }
+  ],
+  "finalState": {
+    "verifiedAt": "2026-11-12T05:11:16.561031+00:00",
+    "passed": true,
+    "pet": {
+      "defense": 0,
+      "health": 9,
+      "level": 2,
+      "mood": "HUNGRY",
+      "statPoints": 0,
+      "lastFedAt": 816065734.241919,
+      "experience": 1,
+      "affection": 0,
+      "id": 1,
+      "attack": 50
+    },
+    "inventory": [
+      {
+        "foodID": 1,
+        "quantity": 3,
+        "id": 1
+      },
+      {
+        "quantity": 1,
+        "id": 2,
+        "foodID": 2
+      }
+    ],
+    "steps": {
+      "2026-11-11": 4321,
+      "2026-11-10": 2000
+    },
+    "touchCount": 0,
+    "backupCount": 3,
+    "restoreCount": 1,
+    "pendingCount": 0,
+    "accountUnchanged": true,
+    "gameplayValuesUnchanged": true,
+    "originalStepsUnchanged": true,
+    "phoneSnapshotMatchesWatch": true,
+    "moodBefore": "HAPPY",
+    "moodAfter": "HUNGRY",
+    "lastFedAtUTC": "2026-11-11T04:55:34.241919+00:00",
+    "hoursSinceLastFeeding": 24.261755308888887,
+    "note": "Only lastActiveAt, a zero-step current date and the real 24-hour hunger rule may change during read-only navigation."
+  },
+  "screenshots": [
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/figma-home-reference.png",
+      "width": 438,
+      "height": 438,
+      "origin": "Figma reference; documentation only"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/parity-account-detail.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/parity-day-large-home.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/parity-day-normal-home.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/parity-food-detail.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/parity-games-page.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/parity-night-large-home.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/parity-night-normal-home.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/parity-stat-detail.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/parity-status-page.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/parity-streak-page.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/parity-voice-page.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-large-calendar.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-large-chat.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-large-food-detail.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-large-games.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-large-home.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-large-nickname.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-large-rewards.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-large-statistics.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-large-status.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-large-step-guidance.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-large-streak.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-normal-calendar.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-normal-chat.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-normal-food-detail.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-normal-games.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-normal-home.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-normal-nickname.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-normal-rewards.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-normal-statistics.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-normal-status.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-normal-step-guidance.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    },
+    {
+      "path": "Docs/Screenshots/WatchHomeParity/ux-normal-streak.png",
+      "width": 324,
+      "height": 394,
+      "origin": "Native XCTest screenshot"
+    }
+  ],
+  "preservedOSDifferences": [
+    "Native system clock position",
+    "Native vertical Crown page indicator",
+    "44pt actions and navigation lists for food/stat editing"
+  ]
+}
