@@ -4,7 +4,7 @@ extension BackendError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .configurationMissing, .invalidServerURL: "계정 연결 설정이 아직 완료되지 않았어요."
-        case .authenticationRequired: "아이폰에서 Apple로 로그인해 주세요."
+        case .authenticationRequired: "계정에서 다시 로그인해 주세요."
         case .invalidAppleCredential: "Apple 로그인 응답을 확인하지 못했어요. 다시 로그인해 주세요."
         case .appleLoginUnavailable: "서버의 Apple 로그인 연결이 아직 준비되지 않았어요."
         case .noBackup: "저장된 백업이 없어요. 먼저 워치 기록을 백업해 주세요."

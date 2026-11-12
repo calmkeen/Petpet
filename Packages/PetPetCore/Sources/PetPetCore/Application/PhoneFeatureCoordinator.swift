@@ -1,6 +1,7 @@
 import Foundation
 
-/// Tokens stay on the phone. The watch polls bounded text snapshots while URLSession streams.
+/// Streams on the credential-owning host. A local or companion transport polls
+/// bounded snapshots; credentials never enter the request/reply envelopes.
 @MainActor public final class PhoneFeatureCoordinator {
     public var onSessionInvalidated: (() async -> Void)?
     private struct ChatJob {
