@@ -34,6 +34,8 @@ iOS는 Apple 기본 `SignInWithAppleButton`과 AuthenticationServices를 사용�
 
 ## 서버 계약
 
+공개 문서는 [StepMate Swagger](https://www.stepmatecp.com/swagger-ui/index.html#/)와 [OpenAPI JSON](https://www.stepmatecp.com/v3/api-docs)이다. 2026-11-12 명세를 확인했다. 백업 요청·펫 조회 응답에 `affection`이 포함되며, 쓰다듬기마다 호출하는 API나 중간 `touchCount` 필드는 없다. 로컬 터치로 올린 애정도를 기존 백업에 담는 구조를 유지한다. 공개 명세에는 Google 인증·refresh가 있고 Apple 인증 경로는 아직 기재되어 있지 않다. 아래 Apple 경로는 서버에 추가해야 하는 계약이다.
+
 | 동작 | 요청 |
 |---|---|
 | Apple 로그인 — 새 서버 계약 | `POST /api/v1/auth/apple`, identityToken·authorizationCode·rawNonce·userIdentifier·선택적 name |

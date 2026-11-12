@@ -1,0 +1,384 @@
+{
+  "date": "2026-11-12",
+  "verifiedAt": "2026-11-12T05:46:07.520106+00:00",
+  "simulatorOnly": true,
+  "sourceCommit": "54cadaa2cc4cf73a9c2a99c857968fbf2589296f",
+  "xcode": "27.2 (27B52)",
+  "debugBuild": true,
+  "releaseBuild": true,
+  "scope": "Persisted touch feedback, animation readiness, 50-touch affection boundary, relaunch, detail count and paired phone affection snapshot. No production API writes.",
+  "modelTests": {
+    "passedTests": 4,
+    "failedTests": 0,
+    "skippedTests": 0,
+    "device": {
+      "architecture": "arm64",
+      "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+      "deviceName": "PetPet Final Verified Nov11 Watch",
+      "modelName": "Apple Watch SE",
+      "osBuildNumber": "22R349",
+      "osVersion": "11.0",
+      "platform": "watchOS Simulator"
+    },
+    "resultBundle": "/private/tmp/petpet-touch-20261112/touch-models-final.xcresult"
+  },
+  "acceptedUITests": [
+    {
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-touch-20261112/touch-large-feedback-held-144053.xcresult"
+    },
+    {
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-touch-20261112/touch-detail-142427.xcresult"
+    },
+    {
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "A9079E67-24A1-43C4-A431-48DAAB3E59C8",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-touch-20261112/touch-fifty-final-142511.xcresult"
+    }
+  ],
+  "nativeSavedTouchesInAcceptedBoundaryRun": [
+    {
+      "index": 1,
+      "count": 3,
+      "affection": 1
+    },
+    {
+      "index": 2,
+      "count": 4,
+      "affection": 1
+    },
+    {
+      "index": 3,
+      "count": 5,
+      "affection": 1
+    },
+    {
+      "index": 4,
+      "count": 6,
+      "affection": 1
+    },
+    {
+      "index": 5,
+      "count": 7,
+      "affection": 1
+    },
+    {
+      "index": 6,
+      "count": 8,
+      "affection": 1
+    },
+    {
+      "index": 7,
+      "count": 9,
+      "affection": 1
+    },
+    {
+      "index": 8,
+      "count": 10,
+      "affection": 1
+    },
+    {
+      "index": 9,
+      "count": 11,
+      "affection": 1
+    },
+    {
+      "index": 10,
+      "count": 12,
+      "affection": 1
+    },
+    {
+      "index": 11,
+      "count": 13,
+      "affection": 1
+    },
+    {
+      "index": 12,
+      "count": 14,
+      "affection": 1
+    },
+    {
+      "index": 13,
+      "count": 15,
+      "affection": 1
+    },
+    {
+      "index": 14,
+      "count": 16,
+      "affection": 1
+    },
+    {
+      "index": 15,
+      "count": 17,
+      "affection": 1
+    },
+    {
+      "index": 16,
+      "count": 18,
+      "affection": 1
+    },
+    {
+      "index": 17,
+      "count": 19,
+      "affection": 1
+    },
+    {
+      "index": 18,
+      "count": 20,
+      "affection": 1
+    },
+    {
+      "index": 19,
+      "count": 21,
+      "affection": 1
+    },
+    {
+      "index": 20,
+      "count": 22,
+      "affection": 1
+    },
+    {
+      "index": 21,
+      "count": 23,
+      "affection": 1
+    },
+    {
+      "index": 22,
+      "count": 24,
+      "affection": 1
+    },
+    {
+      "index": 23,
+      "count": 25,
+      "affection": 1
+    },
+    {
+      "index": 24,
+      "count": 26,
+      "affection": 1
+    },
+    {
+      "index": 25,
+      "count": 27,
+      "affection": 1
+    },
+    {
+      "index": 26,
+      "count": 28,
+      "affection": 1
+    },
+    {
+      "index": 27,
+      "count": 29,
+      "affection": 1
+    },
+    {
+      "index": 28,
+      "count": 30,
+      "affection": 1
+    },
+    {
+      "index": 29,
+      "count": 31,
+      "affection": 1
+    },
+    {
+      "index": 30,
+      "count": 32,
+      "affection": 1
+    },
+    {
+      "index": 31,
+      "count": 33,
+      "affection": 1
+    },
+    {
+      "index": 32,
+      "count": 34,
+      "affection": 1
+    },
+    {
+      "index": 33,
+      "count": 35,
+      "affection": 1
+    },
+    {
+      "index": 34,
+      "count": 36,
+      "affection": 1
+    },
+    {
+      "index": 35,
+      "count": 37,
+      "affection": 1
+    },
+    {
+      "index": 36,
+      "count": 38,
+      "affection": 1
+    },
+    {
+      "index": 37,
+      "count": 39,
+      "affection": 1
+    },
+    {
+      "index": 38,
+      "count": 40,
+      "affection": 1
+    },
+    {
+      "index": 39,
+      "count": 41,
+      "affection": 1
+    },
+    {
+      "index": 40,
+      "count": 42,
+      "affection": 1
+    },
+    {
+      "index": 41,
+      "count": 43,
+      "affection": 1
+    },
+    {
+      "index": 42,
+      "count": 44,
+      "affection": 1
+    },
+    {
+      "index": 43,
+      "count": 45,
+      "affection": 1
+    },
+    {
+      "index": 44,
+      "count": 46,
+      "affection": 1
+    },
+    {
+      "index": 45,
+      "count": 47,
+      "affection": 1
+    },
+    {
+      "index": 46,
+      "count": 48,
+      "affection": 1
+    },
+    {
+      "index": 47,
+      "count": 49,
+      "affection": 1
+    },
+    {
+      "index": 48,
+      "count": 0,
+      "affection": 2
+    },
+    {
+      "index": 49,
+      "count": 1,
+      "affection": 2
+    },
+    {
+      "index": 50,
+      "count": 2,
+      "affection": 2
+    }
+  ],
+  "before": {
+    "touchCount": 2,
+    "affection": 1
+  },
+  "afterBoundaryRun": {
+    "touchCount": 2,
+    "affection": 2
+  },
+  "after": {
+    "touchCount": 4,
+    "affection": 2
+  },
+  "beforeAppearanceCheck": {
+    "touchCount": 3,
+    "affection": 2
+  },
+  "finalAppearanceCheck": "One further saved touch with large text. A custom ButtonStyle keeps the pet opaque while the disabled state blocks repeated greetings. Debug holds the real feedback for layout inspection only; the normal 2-second expiry and game rules are unchanged.",
+  "holdFeedbackArgument": {
+    "Debug": true,
+    "Release": false
+  },
+  "preserved": {
+    "otherPetFields": true,
+    "inventory": true,
+    "rewardClaims": true,
+    "stepHistory": true,
+    "backupAndRestoreIDSets": true,
+    "accountOwner": true,
+    "pendingOperations": true
+  },
+  "phoneSnapshotMatchesWatch": true,
+  "reproduction": {
+    "singleTapBeforeFix": "Stored count 0 → 1; the count was invisible and animation-gated input had no readiness indication.",
+    "firstBoundaryProbe": "All 50 saved values and the affection increment passed; a later whole-list swipe skipped the detail row and failed its final assertion.",
+    "probeResult": "/private/tmp/petpet-touch-20261112/touch-fifty-141854.xcresult",
+    "resolution": "Use short overlapping drags for the read-only detail check, separate it from the 50-touch journey and rerun both successfully."
+  },
+  "visualProbe": {
+    "result": "/private/tmp/petpet-touch-20261112/touch-large-feedback-final-143628.xcresult",
+    "outcome": "The ephemeral label expired between existence and frame queries. Hold only the visual feedback in Debug layout inspection and rerun; no saved values are injected."
+  },
+  "publishedAPI": {
+    "swaggerURL": "https://www.stepmatecp.com/swagger-ui/index.html#/",
+    "schemaURL": "https://www.stepmatecp.com/v3/api-docs",
+    "sha256": "261522fc22db9353ce1c634cdecad2e3d0f8277510b9bcf41c93d3f254fd48c5",
+    "title": "StepMate API",
+    "version": "v1",
+    "affectionInBackup": true,
+    "affectionInMateResponse": true,
+    "touchCountInBackup": false,
+    "appleAuthRouteDocumented": false,
+    "productionRequestsPerformed": [
+      "GET /v3/api-docs"
+    ]
+  },
+  "screenshots": [
+    "Docs/Screenshots/PetTouch/pet-touch-large-feedback.png",
+    "Docs/Screenshots/PetTouch/pet-touch-saved-count-detail.png",
+    "Docs/Screenshots/PetTouch/pet-touch-status-after-relaunch.png"
+  ]
+}
