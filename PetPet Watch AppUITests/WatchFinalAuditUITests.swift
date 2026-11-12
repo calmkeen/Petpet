@@ -34,7 +34,8 @@ final class WatchFinalAuditUITests: XCTestCase {
     }
 
     func test20WatchNicknameChangeSurvivesRelaunch() {
-        crownTo(app.buttons["백업 관리"]); app.buttons["백업 관리"].tap()
+        crownTo("watch.openStreak"); app.buttons["watch.openStreak"].tap()
+        reveal(app.buttons["watch.openAccount"]); app.buttons["watch.openAccount"].tap()
         reveal(app.buttons["watch.editNickname"]); app.buttons["watch.editNickname"].tap()
         let input = app.descendants(matching: .any).matching(identifier: "nickname.input").firstMatch
         reveal(input); input.tap()
@@ -64,21 +65,31 @@ final class WatchFinalAuditUITests: XCTestCase {
         capture("final-watch-nickname-updated")
         app.terminate(); app.launch()
         let account = app.staticTexts["watch.accountName"]
-        crownTo(account); XCTAssertEqual(account.label, name)
+        crownTo("watch.openStreak"); XCTAssertEqual(account.label, name)
         capture("final-watch-nickname-after-relaunch")
     }
 
     private func openFood() {
-        XCTAssertTrue(app.buttons["watch.openFoodInventory"].waitForExistence(timeout: 10))
-        app.buttons["watch.openFoodInventory"].tap()
+        XCTAssertTrue(app.buttons["watch.openPetStatistics"].waitForExistence(timeout: 10))
+        app.buttons["watch.openPetStatistics"].tap()
         XCTAssertTrue(app.buttons["watch.manageFoodInventory"].waitForExistence(timeout: 5))
         app.buttons["watch.manageFoodInventory"].tap()
         XCTAssertTrue(app.staticTexts["watch.foodQuantity.1"].waitForExistence(timeout: 5))
     }
-    private func crownTo(_ element: XCUIElement) {
-        for _ in 0..<12 {
+    private func crownTo(_ id: String) {
+        let element = app.buttons[id]
+        let pages = ["watch.openPetStatistics", "watch.managePetStatistics", "watch.openGames", "watch.openStreak", "watch.openChat"]
+        let destination = pages.firstIndex(of: id)
+        var previous: Int?
+        var stalled = 0
+        for _ in 0..<20 {
             if element.exists && element.isHittable { return }
-            XCUIDevice.shared.rotateDigitalCrown(delta: 0.6)
+            let current = pages.firstIndex { app.buttons[$0].exists && app.buttons[$0].isHittable }
+            stalled = current == previous ? stalled + 1 : 0
+            previous = current
+            let down = destination == nil || current == nil || destination! > current!
+            let magnitude = [0.25, 0.4, 0.5, 0.6][min(stalled, 3)]
+            XCUIDevice.shared.rotateDigitalCrown(delta: down ? magnitude : -magnitude)
         }
         XCTFail("Missing root page: \(element)")
     }

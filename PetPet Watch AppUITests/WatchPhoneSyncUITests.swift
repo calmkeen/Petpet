@@ -5,8 +5,8 @@ final class WatchPhoneSyncUITests: XCTestCase {
     func testFeedMilkAndReadSyncedNickname() {
         continueAfterFailure = false
         let app = XCUIApplication(); app.launch()
-        XCTAssertTrue(app.buttons["watch.openFoodInventory"].waitForExistence(timeout: 8))
-        app.buttons["watch.openFoodInventory"].tap()
+        XCTAssertTrue(app.buttons["watch.openPetStatistics"].waitForExistence(timeout: 8))
+        app.buttons["watch.openPetStatistics"].tap()
         XCTAssertTrue(app.buttons["watch.manageFoodInventory"].waitForExistence(timeout: 5))
         app.buttons["watch.manageFoodInventory"].tap()
         let quantity = app.staticTexts["watch.foodQuantity.1"]

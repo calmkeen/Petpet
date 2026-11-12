@@ -22,22 +22,21 @@ final class WatchUXUITests: XCTestCase {
         XCTAssertTrue(app.buttons["watch.petTouch"].waitForExistence(timeout: 10))
         let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in self.app.buttons["watch.petTouch"].isEnabled }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 10), .completed)
-        let pages: [(String, XCUIElement)] = [
-            ("home", app.buttons["watch.openPetStatistics"]),
-            ("growth", app.buttons["watch.managePetStatistics"]),
-            ("food", app.buttons["watch.manageFoodInventory"]),
-            ("streak", app.buttons["watch.openStreak"]),
-            ("games", app.buttons["watch.openGames"]),
-            ("chat", app.buttons["watch.openChat"]),
-            ("account", app.buttons["백업 관리"]),
+        let pages: [(String, String)] = [
+            ("home", "watch.openPetStatistics"),
+            ("status", "watch.managePetStatistics"),
+            ("games", "watch.openGames"),
+            ("streak", "watch.openStreak"),
+            ("chat", "watch.openChat"),
         ]
-        for (name, action) in pages {
-            crownTo(action)
+        for (name, id) in pages {
+            let action = app.buttons[id]
+            crownTo(id)
             capture("ux-\(prefix)-\(name)")
             checkTarget(action, minimum: 44, top: 30)
             if name == "home" {
                 checkTarget(app.buttons["watch.petTouch"], minimum: 44, top: 30)
-                checkTarget(app.buttons["watch.openFoodInventory"], minimum: 44, top: 30)
+                checkTarget(app.buttons["watch.previousPage"], minimum: 44, top: 30)
                 let retry = app.buttons["watch.retrySteps"]
                 if retry.exists {
                     checkTarget(retry, minimum: 44, top: 30)
@@ -60,14 +59,14 @@ final class WatchUXUITests: XCTestCase {
         }
         capture("ux-\(prefix)-statistics")
         app.terminate(); app.launch()
-        app.buttons["watch.openFoodInventory"].tap(); app.buttons["watch.manageFoodInventory"].tap()
+        app.buttons["watch.openPetStatistics"].tap(); app.buttons["watch.manageFoodInventory"].tap()
         reveal(app.buttons["watch.feedFood.1"]); checkTarget(app.buttons["watch.feedFood.1"], minimum: 44)
         capture("ux-\(prefix)-food-detail")
         reveal(app.buttons["watch.claimStepRewards"], enabled: false)
         checkTarget(app.buttons["watch.claimStepRewards"], minimum: 44, enabled: false)
         capture("ux-\(prefix)-rewards")
         app.terminate(); app.launch()
-        crownTo(app.buttons["watch.openStreak"]); app.buttons["watch.openStreak"].tap()
+        crownTo("watch.openStreak"); app.buttons["watch.openStreak"].tap()
         let month = app.buttons["watch.chooseMonth"]
         reveal(month); checkTarget(month, minimum: 44)
         XCTAssertGreaterThanOrEqual(month.frame.width, 100, "The year/month needs a full readable heading on 40mm")
@@ -75,17 +74,32 @@ final class WatchUXUITests: XCTestCase {
         checkTarget(app.buttons["watch.nextMonth"], minimum: 44)
         capture("ux-\(prefix)-calendar")
         app.terminate(); app.launch()
-        crownTo(app.buttons["백업 관리"]); app.buttons["백업 관리"].tap()
+        crownTo("watch.openStreak"); app.buttons["watch.openStreak"].tap()
+        reveal(app.buttons["watch.openAccount"]); app.buttons["watch.openAccount"].tap()
         reveal(app.buttons["watch.editNickname"]); checkTarget(app.buttons["watch.editNickname"], minimum: 44)
         app.buttons["watch.editNickname"].tap()
         reveal(app.buttons["nickname.submit"], enabled: false)
         checkTarget(app.buttons["nickname.submit"], minimum: 44, enabled: false)
         capture("ux-\(prefix)-nickname")
     }
-    private func crownTo(_ element: XCUIElement) {
-        for _ in 0..<12 {
+    private func crownTo(_ id: String) {
+        let element = app.buttons[id]
+        let pages = ["watch.openPetStatistics", "watch.managePetStatistics", "watch.openGames", "watch.openStreak", "watch.openChat"]
+        let destination = pages.firstIndex(of: id)
+        var previous: Int?
+        var stalled = 0
+        for _ in 0..<20 {
             if element.exists && element.isHittable { return }
-            XCUIDevice.shared.rotateDigitalCrown(delta: 0.6)
+            let current = pages.firstIndex { id in
+                let button = app.buttons[id]
+                return button.exists && button.isHittable
+            }
+            stalled = current == previous ? stalled + 1 : 0
+            previous = current
+            let down = destination == nil || current == nil || destination! > current!
+            let magnitude = [0.25, 0.4, 0.5, 0.6][min(stalled, 3)]
+            print("UX_CROWN target=\(id) current=\(current.map(String.init) ?? "unknown") rotation=\(down ? magnitude : -magnitude)")
+            XCUIDevice.shared.rotateDigitalCrown(delta: down ? magnitude : -magnitude)
         }
         XCTFail("Missing page: \(element)")
     }
