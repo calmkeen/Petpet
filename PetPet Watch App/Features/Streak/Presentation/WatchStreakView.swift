@@ -28,7 +28,7 @@ struct WatchStreakOverview: View {
             }
             .buttonStyle(WatchActionStyle(color: .gray))
             .accessibilityLabel(cloud.account == nil ? "로그인과 계정" : "닉네임 변경")
-            .accessibilityValue(cloud.account?.displayName ?? "아이폰에서 로그인해 주세요")
+            .accessibilityValue(cloud.account?.displayName ?? "워치 또는 아이폰에서 로그인해 주세요")
             .accessibilityIdentifier("watch.openNickname")
         }
         }
@@ -99,7 +99,7 @@ struct WatchStreakView: View {
                     .accessibilityLabel("현재 닉네임 \(cloud.account?.displayName ?? "미설정")")
                 NavigationLink("닉네임 변경") { WatchNicknameView(editor: cloud.makeNicknameEditor()) }
                     .buttonStyle(WatchActionStyle()).disabled(cloud.account == nil).accessibilityIdentifier("watch.streakNickname")
-                if cloud.account == nil { Text("닉네임 변경·백업은 아이폰에서 로그인한 뒤 사용할 수 있어요.").font(.caption2).foregroundStyle(.secondary) }
+                if cloud.account == nil { Text("닉네임 변경·백업은 계정에서 로그인한 뒤 사용할 수 있어요.").font(.caption2).foregroundStyle(.secondary) }
                 NavigationLink("계정·백업") { WatchCloudView(viewModel: cloud) }
                     .buttonStyle(WatchActionStyle()).accessibilityIdentifier("watch.openAccount")
                 Text("버전 \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—")")

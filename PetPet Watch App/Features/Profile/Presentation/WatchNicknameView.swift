@@ -19,7 +19,6 @@ struct WatchNicknameView: View {
                 if model.state.status == .failed { Button("다시 확인") { model.setInput(model.state.input) } }
             }
             if let message = model.state.message { Text(message).font(.caption2).accessibilityIdentifier("nickname.feedback") }
-            Text("확인·변경 중에는 아이폰의 PetPet과 연결돼 있어야 해요.").font(.caption2).foregroundStyle(.secondary)
         }
         .navigationTitle("닉네임")
         .task { model.resume() }

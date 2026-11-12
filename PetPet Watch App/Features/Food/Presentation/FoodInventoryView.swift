@@ -41,7 +41,7 @@ struct FoodInventoryView: View {
                 } header: { Text("오늘의 보상") } footer: {
                     Text("1,000걸음마다 우유 1개 · 하루 한 번 사과 1개")
                     if cloudViewModel.account == nil {
-                        Text("아이폰에서 로그인한 뒤 백업하면 보상을 받아요.")
+                        Text("계정에서 로그인한 뒤 백업하면 보상을 받아요.")
                     } else if cloudViewModel.isDevelopment {
                         Text("Debug · 모의 백업으로 보상을 테스트해요.")
                     }

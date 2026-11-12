@@ -24,7 +24,7 @@ import PetPetCore
         guard !busy else { return }
         let text = question.trimmingCharacters(in:.whitespacesAndNewlines)
         do { try ChatProgress.validate(question:text) } catch { progress.fail("질문을 1~2,000자로 입력해 주세요"); return }
-        guard let account = services.cloud.account?.id else { progress.fail("아이폰에서 로그인해 주세요"); return }
+        guard let account = services.cloud.account?.id else { progress.fail("계정에서 로그인해 주세요"); return }
         let id = UUID(); jobID = id; accountID = account
         busy = true; progress = ChatProgress()
         task = Task {
@@ -103,7 +103,7 @@ struct WatchChatView: View {
                 if model.busy { Button("응답 중단") { model.stop() }.accessibilityIdentifier("chat.cancel").id("chat.cancellation"); ProgressView() }
                 if !model.progress.text.isEmpty { Text(model.progress.text).font(.caption).fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("chat.answer") }
             }
-            Text("아이폰의 PetPet과 연결이 필요해요.").font(.caption2).foregroundStyle(.secondary)
+            Text(cloud.connectionNote).font(.caption2).foregroundStyle(.secondary)
         }.navigationTitle("AI 대화")
             .task(id: model.busy) {
                 guard model.busy else { return }
