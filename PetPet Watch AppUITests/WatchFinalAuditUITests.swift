@@ -34,9 +34,7 @@ final class WatchFinalAuditUITests: XCTestCase {
     }
 
     func test20WatchNicknameChangeSurvivesRelaunch() {
-        crownTo("watch.openStreak"); app.buttons["watch.openStreak"].tap()
-        reveal(app.buttons["watch.openAccount"]); app.buttons["watch.openAccount"].tap()
-        reveal(app.buttons["watch.editNickname"]); app.buttons["watch.editNickname"].tap()
+        crownTo("watch.openStreak"); app.buttons["watch.openNickname"].tap()
         let input = app.descendants(matching: .any).matching(identifier: "nickname.input").firstMatch
         reveal(input); input.tap()
         let system = XCUIApplication(bundleIdentifier: "com.apple.Carousel")
@@ -64,8 +62,8 @@ final class WatchFinalAuditUITests: XCTestCase {
         print("FINAL_AUDIT_NICKNAME=\(name)")
         capture("final-watch-nickname-updated")
         app.terminate(); app.launch()
-        let account = app.staticTexts["watch.accountName"]
-        crownTo("watch.openStreak"); XCTAssertEqual(account.label, name)
+        let account = app.buttons["watch.openNickname"]
+        crownTo("watch.openStreak"); XCTAssertEqual(account.value as? String, name)
         capture("final-watch-nickname-after-relaunch")
     }
 

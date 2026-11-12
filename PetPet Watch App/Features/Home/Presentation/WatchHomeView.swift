@@ -99,6 +99,14 @@ struct WatchHomeView: View {
         let touchWidth = max(44, canvas.width - 88)
         let textColor: Color = period.usesLightText ? .white : .black
         return ZStack {
+            // A disabled Button can throttle its SpriteView label on watchOS.
+            // Keep rendering outside that control; only the clear hit target
+            // waits for the current greeting to finish.
+            WatchPetSpriteView(state: character.state, backgroundImageName: period.backgroundImageName,
+                               backgroundCanvas: canvas, backgroundCoordinateSpace: "pet.home")
+                .frame(width: petWidth, height: petHeight)
+                .allowsHitTesting(false)
+                .position(x: canvas.width / 2, y: canvas.height * 0.51)
             Button {
                 guard character.canTouch else { return }
                 Task {
@@ -111,16 +119,14 @@ struct WatchHomeView: View {
                     }
                 }
             } label: {
-                WatchPetSpriteView(state: character.state, backgroundImageName: period.backgroundImageName,
-                                   backgroundCanvas: canvas, backgroundCoordinateSpace: "pet.home")
-                    .frame(width: petWidth, height: petHeight)
+                Color.clear
                     .frame(width: touchWidth, height: petHeight)
                     .contentShape(Rectangle())
             }
             .buttonStyle(WatchPetTouchStyle())
             .disabled(petViewModel.isBusy || petViewModel.progress == nil || !character.canTouch)
             .accessibilityLabel("펫 쓰다듬기")
-            .accessibilityValue("쓰다듬기 \(petViewModel.progress?.touchCount ?? 0)/50, 애정도 \(petViewModel.progress?.pet.affection ?? 0)")
+            .accessibilityValue("애정도 \(petViewModel.progress?.pet.affection ?? 0)")
             .accessibilityHint("인사가 끝난 뒤 다시 눌러 주세요. 50회마다 애정도가 1 올라요")
             .accessibilityIdentifier("watch.petTouch")
             .position(x: canvas.width / 2, y: canvas.height * 0.51)
@@ -177,11 +183,7 @@ struct WatchHomeView: View {
     private func showTouchFeedback(_ text: String?) {
         feedbackTask?.cancel()
         touchFeedback = text
-        #if DEBUG
-        // Layout inspection only: leave the real saved value on screen long
-        // enough for XCTest snapshots, without changing touch/game rules.
-        if ProcessInfo.processInfo.arguments.contains("--watch-ui-hold-touch-feedback") { return }
-        #endif
+        guard text != nil else { return }
         feedbackTask = Task {
             do { try await Task.sleep(for: .seconds(2)) } catch { return }
             touchFeedback = nil

@@ -15,7 +15,7 @@ final class PetTouchModelTests: XCTestCase {
             XCTAssertTrue(saved)
             XCTAssertEqual(model.progress?.touchCount, count % 50)
             XCTAssertEqual(model.progress?.pet.affection, count == 50 ? 1 : 0)
-            XCTAssertEqual(model.message, count == 50 ? "애정도 +1!" : "쓰다듬기 \(count)/50")
+            XCTAssertEqual(model.message, count == 50 ? "애정도 +1!" : nil)
         }
         let restored = try await FileGameRepository(directory: directory).load()
         XCTAssertEqual(restored.touchCount, 0)
@@ -44,7 +44,7 @@ final class PetTouchModelTests: XCTestCase {
         XCTAssertTrue(saved)
         XCTAssertEqual(model.progress?.pet.affection, 1)
         XCTAssertEqual(model.progress?.touchCount, 1)
-        XCTAssertEqual(model.message, "쓰다듬기 1/50")
+        XCTAssertNil(model.message)
     }
 
     func testGreetingReadinessMatchesTheAnimationGate() async {

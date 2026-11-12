@@ -70,7 +70,7 @@ final class PetProgressViewModel: ObservableObject {
     func touch() async -> Bool {
         let saved = await perform(.touch) { change in
             change.progress.touchCount == 0
-                ? "애정도 +1!" : "쓰다듬기 \(change.progress.touchCount)/50"
+                ? "애정도 +1!" : nil
         }
         return saved != nil
     }

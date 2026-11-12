@@ -23,6 +23,12 @@ public enum PetDaylightPeriod: CaseIterable, Sendable {
 }
 
 /// Fixed-canvas greeting frames keep the same character pose between updates.
+public struct PetFrameBlend: Equatable, Sendable {
+    public let fromIndex: Int
+    public let toIndex: Int
+    public let amount: Float
+}
+
 public struct PetSpriteAnimation: Sendable {
     public static let greetingFrameCount = 16
     public static let greetingFrameInterval: TimeInterval = 1.0 / 15
@@ -35,9 +41,22 @@ public struct PetSpriteAnimation: Sendable {
         let count = isAnimated ? 16 : 1
         return (0..<count).map { String(format: "stepmate_fox_\(mode)_v3_%02d", $0) }
     }
-    public var cycleDuration: TimeInterval { Double(frameNames.count) * frameInterval }
+    public var cycleDuration: TimeInterval { Double(isAnimated ? Self.greetingFrameCount : 1) * frameInterval }
     public var isAnimated: Bool { activity == .running || activity == .touching }
     public var posterImageName: String { frameNames[activity == .touching ? 8 : 0] }
+    /// Interpolate aligned source frames at the renderer's cadence. Mixing
+    /// premultiplied pixels preserves an opaque body and soft moving edges.
+    public func blend(elapsed: TimeInterval) -> PetFrameBlend {
+        guard isAnimated else { return PetFrameBlend(fromIndex: 0, toIndex: 0, amount: 0) }
+        let time = elapsed.isFinite ? max(0, elapsed) : 0
+        let position = activity == .running
+            ? time.truncatingRemainder(dividingBy: cycleDuration) / frameInterval
+            : min(time / frameInterval, Double(Self.greetingFrameCount - 1))
+        let lower = min(Int(position.rounded(.down)), Self.greetingFrameCount - 1)
+        let upper = activity == .running ? (lower + 1) % Self.greetingFrameCount : min(lower + 1, Self.greetingFrameCount - 1)
+        return PetFrameBlend(fromIndex: lower, toIndex: upper,
+                             amount: lower == upper ? 0 : Float(max(0, min(1, position - Double(lower)))))
+    }
     public func imageName(elapsed: TimeInterval) -> String {
         let elapsed = elapsed.isFinite ? max(0, elapsed) : 0
         switch activity {

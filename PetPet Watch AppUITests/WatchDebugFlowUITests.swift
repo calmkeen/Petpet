@@ -62,11 +62,11 @@ final class WatchDebugFlowUITests: XCTestCase {
     }
     func test06LoggedOutWatchKeepsLocalPlay() {
         for _ in 0..<8 {
-            if app.staticTexts["watch.accountName"].isHittable { break }
+            if app.buttons["watch.openNickname"].isHittable { break }
             XCUIDevice.shared.rotateDigitalCrown(delta: 0.45)
         }
-        XCTAssertTrue(app.staticTexts["watch.accountName"].waitForExistence(timeout: 8))
-        XCTAssertEqual(app.staticTexts["watch.accountName"].label, "아이폰에서 로그인해 주세요")
+        XCTAssertTrue(app.buttons["watch.openNickname"].waitForExistence(timeout: 8))
+        XCTAssertEqual(app.buttons["watch.openNickname"].value as? String, "아이폰에서 로그인해 주세요")
         openFood()
         feedMilk(from: 4)
         reveal(app.buttons["watch.claimStepRewards"])

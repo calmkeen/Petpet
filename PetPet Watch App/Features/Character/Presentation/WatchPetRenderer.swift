@@ -55,10 +55,25 @@ final class WatchPetScene: SKScene {
     private var backdropName: String?
     private var textures: [String: SKTexture] = [:]
     private var request: PetPlaybackRequest?
+    private var frameNames: [String] = []
+    private let nextTexture = SKUniform(name: "u_nextFrame", texture: nil)
+    private let frameMix = SKUniform(name: "u_frameMix", float: 0)
+    private lazy var frameShader = SKShader(source: """
+        void main() {
+            vec4 current = texture2D(u_texture, v_tex_coord);
+            vec4 next = texture2D(u_nextFrame, v_tex_coord);
+            gl_FragColor = mix(current, next, u_frameMix) * v_color_mix.a;
+        }
+        """, uniforms: [nextTexture, frameMix])
     private var firstTick: TimeInterval?
     private var lastTick: TimeInterval?
     private var ticks = 0
     private var worstGap: TimeInterval = 0
+    #if DEBUG
+    private var observedFrames: [String] = []
+    private var mixedSamples = 0
+    private var displaySamples = 0
+    #endif
 
     override init(size: CGSize) {
         super.init(size: size)
@@ -99,23 +114,59 @@ final class WatchPetScene: SKScene {
     func install(_ textures: [String: SKTexture]) {
         self.textures = textures
         pet.texture = textures[PetSpriteAnimation(.idle).posterImageName]
+        nextTexture.textureValue = pet.texture
+        pet.shader = frameShader
     }
     func apply(_ value: PetPlaybackRequest) {
         guard request != value else { return }
         stopPlayback(); request = value
         let animation = PetSpriteAnimation(value.activity)
-        pet.texture = textures[value.isPlaying ? animation.frameNames[0] : animation.posterImageName]
-        guard value.isPlaying else { return }
-        let frames = animation.frameNames.compactMap { textures[$0] }
-        guard frames.count == animation.frameNames.count else { return }
-        let clip = SKAction.animate(with: frames, timePerFrame: animation.frameInterval, resize: false, restore: false)
-        pet.run(value.activity == .running ? .repeatForever(clip) : clip, withKey: "pet.clip")
+        frameNames = animation.frameNames
+        if value.isPlaying { selectFrame(at: Date()) }
+        else {
+            pet.texture = textures[animation.posterImageName]
+            nextTexture.textureValue = pet.texture; frameMix.floatValue = 0
+        }
+    }
+    private func selectFrame(at date: Date) {
+        guard let request, request.isPlaying else { return }
+        let sample = PetSpriteAnimation(request.activity).blend(elapsed: date.timeIntervalSince(request.startedAt))
+        guard frameNames.indices.contains(sample.fromIndex), frameNames.indices.contains(sample.toIndex) else { return }
+        pet.texture = textures[frameNames[sample.fromIndex]]
+        nextTexture.textureValue = textures[frameNames[sample.toIndex]]
+        frameMix.floatValue = sample.amount
+        #if DEBUG
+        displaySamples += 1
+        if sample.amount > 0.01 && sample.amount < 0.99 { mixedSamples += 1 }
+        #endif
     }
     func stopPlayback() {
+        #if DEBUG
+        if let request, request.isPlaying {
+            AnimationDiagnostics.recordPlayback([
+                "driver": "interpolated-textures", "mode": String(describing: request.activity),
+                "observedFrameNames": observedFrames, "distinctFrameCount": Set(observedFrames).count,
+                "requestedFrameCount": PetSpriteAnimation(request.activity).frameNames.count,
+                "displaySamples": displaySamples, "interpolatedSamples": mixedSamples,
+                "capturedAt": Date().timeIntervalSince1970
+            ], mode: String(describing: request.activity))
+        }
+        observedFrames = []
+        displaySamples = 0; mixedSamples = 0
+        #endif
         pet.removeAction(forKey: "pet.clip"); request = nil
         firstTick = nil; lastTick = nil; ticks = 0; worstGap = 0
     }
+    override func didEvaluateActions() {
+        #if DEBUG
+        guard request?.isPlaying == true,
+              let name = textures.first(where: { $0.value === pet.texture })?.key,
+              observedFrames.last != name, observedFrames.count < 128 else { return }
+        observedFrames.append(name)
+        #endif
+    }
     override func update(_ currentTime: TimeInterval) {
+        selectFrame(at: Date())
         #if DEBUG
         guard let request, request.isPlaying else { return }
         if let lastTick { worstGap = max(worstGap, currentTime - lastTick) }

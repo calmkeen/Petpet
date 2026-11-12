@@ -13,9 +13,6 @@ struct PetStatisticsView: View {
                     ProgressView(value: Double(progress.pet.experience), total: Double(progress.experienceRequired)).tint(.green)
                     Text("경험치 \(progress.pet.experience) / \(progress.experienceRequired)").font(.caption2).monospacedDigit()
                     Label("호감도 \(progress.pet.affection)", systemImage: "heart.fill").foregroundStyle(.pink).font(.caption)
-                    Text("쓰다듬기 \(progress.touchCount)/50 · 50회마다 애정도 +1")
-                        .font(.caption2)
-                        .accessibilityIdentifier("watch.touchCount")
                 }
                 Section {
                     Text("스탯 포인트 \(progress.pet.statPoints)").foregroundStyle(.yellow)

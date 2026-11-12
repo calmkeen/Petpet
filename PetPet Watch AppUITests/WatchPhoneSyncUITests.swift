@@ -22,13 +22,13 @@ final class WatchPhoneSyncUITests: XCTestCase {
         capture(app, "watch-fed-milk")
         app.terminate(); app.launch()
         for _ in 0..<10 {
-            if app.staticTexts["watch.accountName"].isHittable { break }
+            if app.buttons["watch.openNickname"].isHittable { break }
             app.swipeUp()
         }
-        let name = app.staticTexts["watch.accountName"]
+        let name = app.buttons["watch.openNickname"]
         XCTAssertTrue(name.waitForExistence(timeout: 8))
-        XCTAssertTrue(name.label.hasPrefix("Phone"), name.label)
-        print("WATCH_AUDIT_NICKNAME=\(name.label)")
+        XCTAssertTrue((name.value as? String ?? "").hasPrefix("Phone"), name.value as? String ?? "")
+        print("WATCH_AUDIT_NICKNAME=\(name.value as? String ?? "")")
         capture(app, "watch-synced-phone-nickname")
     }
     private func count(_ label: String) -> Int { Int(label.filter(\.isNumber)) ?? -1 }

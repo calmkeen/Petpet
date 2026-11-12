@@ -7,19 +7,29 @@ struct WatchStreakOverview: View {
     var body: some View {
         WatchOverviewLayout { compact in
           VStack(spacing: 6) {
-            Label("스트릭", systemImage: model.summary.currentDays >= 7 ? "flame.fill" : "calendar")
-                .font(.headline)
-            Text("연속 \(model.summary.currentDays)일").font(.title2.bold())
-                .lineLimit(1).accessibilityIdentifier("watch.currentStreak")
             if !compact {
-                Text(cloud.account?.displayName ?? "아이폰에서 로그인")
-                    .font(.caption2).lineLimit(1).truncationMode(.middle)
-                    .accessibilityLabel(cloud.account?.displayName ?? "아이폰에서 로그인해 주세요")
-                    .accessibilityIdentifier("watch.accountName")
+                Label("스트릭", systemImage: model.summary.currentDays >= 7 ? "flame.fill" : "calendar").font(.headline)
             }
+            Text("연속 \(model.summary.currentDays)일").font(compact ? .headline : .title2.bold())
+                .lineLimit(1).accessibilityIdentifier("watch.currentStreak")
             NavigationLink("월별 걸음 기록") { WatchStreakView(model: model, cloud: cloud) }
                 .buttonStyle(WatchActionStyle())
                 .accessibilityIdentifier("watch.openStreak")
+            NavigationLink {
+                if cloud.account != nil { WatchNicknameView(editor: cloud.makeNicknameEditor()) }
+                else { WatchCloudView(viewModel: cloud) }
+            } label: {
+                VStack(spacing: 0) {
+                    Text(cloud.account == nil ? "로그인 · 계정" : "닉네임 변경").font(.caption2.bold())
+                    if let name = cloud.account?.displayName {
+                        Text(name).font(.caption2).lineLimit(1).truncationMode(.middle)
+                    }
+                }
+            }
+            .buttonStyle(WatchActionStyle(color: .gray))
+            .accessibilityLabel(cloud.account == nil ? "로그인과 계정" : "닉네임 변경")
+            .accessibilityValue(cloud.account?.displayName ?? "아이폰에서 로그인해 주세요")
+            .accessibilityIdentifier("watch.openNickname")
         }
         }
         .task { await model.appear() }
@@ -92,6 +102,8 @@ struct WatchStreakView: View {
                 if cloud.account == nil { Text("닉네임 변경·백업은 아이폰에서 로그인한 뒤 사용할 수 있어요.").font(.caption2).foregroundStyle(.secondary) }
                 NavigationLink("계정·백업") { WatchCloudView(viewModel: cloud) }
                     .buttonStyle(WatchActionStyle()).accessibilityIdentifier("watch.openAccount")
+                Text("버전 \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—")")
+                    .font(.caption2).foregroundStyle(.secondary).accessibilityIdentifier("watch.appVersion")
             }.padding(.horizontal, 10).padding(.bottom, 18)
         }
         .navigationTitle("스트릭")
