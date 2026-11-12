@@ -36,7 +36,7 @@ final class WatchPetTouchUITests: XCTestCase {
         app.terminate(); app.launch()
         XCTAssertTrue(app.buttons["watch.petTouch"].waitForExistence(timeout: 10)); ready(app.buttons["watch.petTouch"])
         XCTAssertEqual(affection(app.buttons["watch.petTouch"]), original + 1)
-        app.buttons["watch.openPetStatistics"].tap()
+        openWatchPetCare(app)
         let label = app.staticTexts["watch.affection"]
         XCTAssertTrue(label.waitForExistence(timeout: 5)); XCTAssertEqual(label.label, "애정도 \(original + 1)")
         capture(app, "pet-touch-status-after-relaunch")
@@ -46,8 +46,7 @@ final class WatchPetTouchUITests: XCTestCase {
     func test20SavedCountDetail() {
         continueAfterFailure = false
         let app = XCUIApplication(); app.launch()
-        XCTAssertTrue(app.buttons["watch.openPetStatistics"].waitForExistence(timeout: 10))
-        app.buttons["watch.openPetStatistics"].tap()
+        openWatchPetCare(app)
         XCTAssertTrue(app.buttons["watch.managePetStatistics"].waitForExistence(timeout: 5))
         app.buttons["watch.managePetStatistics"].tap()
         XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "watch.touchCount").firstMatch.exists)

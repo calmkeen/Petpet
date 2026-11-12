@@ -97,7 +97,7 @@ struct WatchHomeView: View {
         // watchOS clock stays in its system position; the Crown owns paging.
         let petWidth = min(canvas.width * 0.60, canvas.height * 0.53)
         let petHeight = petWidth * 336 / 256
-        let touchWidth = max(44, canvas.width - 88)
+        let touchWidth = max(44, petWidth)
         let textColor: Color = period.usesLightText ? .white : .black
         return ZStack {
             // A disabled Button can throttle its SpriteView label on watchOS.
@@ -130,18 +130,6 @@ struct WatchHomeView: View {
             .accessibilityValue("애정도 \(petViewModel.progress?.pet.affection ?? 0)")
             .accessibilityHint("인사가 끝난 뒤 다시 눌러 주세요. 50회마다 애정도가 1 올라요")
             .accessibilityIdentifier("watch.petTouch")
-            .position(x: canvas.width / 2, y: canvas.height * 0.51)
-
-            HStack(spacing: 0) {
-                pageArrow("chevron.left", label: "이전 화면, 음성과 AI", id: "watch.previousPage") {
-                    withAnimation { selectedSection = .chat }
-                }
-                Spacer(minLength: 0)
-                pageArrow("chevron.right", label: "다음 화면, 상태", id: "watch.openPetStatistics") {
-                    withAnimation { selectedSection = .statistics }
-                }
-            }
-            .frame(width: canvas.width)
             .position(x: canvas.width / 2, y: canvas.height * 0.51)
 
             HStack(spacing: 0) {
@@ -189,16 +177,6 @@ struct WatchHomeView: View {
             do { try await Task.sleep(for: .seconds(2)) } catch { return }
             touchFeedback = nil
         }
-    }
-
-    private func pageArrow(_ symbol: String, label: String, id: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: symbol).font(.title3.bold()).foregroundStyle(.white)
-                .shadow(color: .black, radius: 1.5)
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain).accessibilityLabel(label).accessibilityIdentifier(id)
     }
 
     private var characterIsVisible: Bool { selectedSection == .home && scenePhase == .active && !luminanceReduced }

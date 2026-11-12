@@ -21,12 +21,11 @@ final class WatchHomeParityUITests: XCTestCase {
         let pet = app.buttons["watch.petTouch"]
         XCTAssertTrue(pet.waitForExistence(timeout: 10))
         let screen = app.windows.firstMatch.frame
-        let left = app.buttons["watch.previousPage"], right = app.buttons["watch.openPetStatistics"]
-        target(pet); target(left); target(right)
+        target(pet)
+        XCTAssertFalse(app.buttons["watch.previousPage"].exists)
+        XCTAssertFalse(app.buttons["watch.openPetStatistics"].exists)
         XCTAssertGreaterThan(pet.frame.height, screen.height * 0.55, "The pet must dominate the home, not sit in a small dashboard tile")
         XCTAssertEqual(pet.frame.midX, screen.midX, accuracy: 2)
-        XCTAssertLessThanOrEqual(left.frame.maxX, pet.frame.minX + 1)
-        XCTAssertGreaterThanOrEqual(right.frame.minX, pet.frame.maxX - 1)
         XCTAssertFalse(app.buttons["watch.openFoodInventory"].exists)
         XCTAssertFalse(app.buttons["성장"].exists)
         XCTAssertFalse(app.buttons["먹이"].exists)
@@ -34,14 +33,17 @@ final class WatchHomeParityUITests: XCTestCase {
         XCTAssertTrue(steps.exists); XCTAssertTrue(screen.contains(steps.frame))
         XCTAssertGreaterThan(steps.frame.midY, pet.frame.midY)
         capture("parity-\(mode)-\(large ? "large" : "normal")-home")
-        left.tap()
-        XCTAssertTrue(app.buttons["watch.openChat"].waitForExistence(timeout: 5), "Left arrow wraps to Android's final voice page")
+        app.swipeUp()
+        XCTAssertTrue(app.buttons["watch.managePetStatistics"].waitForExistence(timeout: 5))
+        app.swipeDown()
+        XCTAssertTrue(pet.waitForExistence(timeout: 5))
+        capture("navigation-\(mode)-\(large ? "large" : "normal")-returned-home")
     }
 
     func test10FivePagesAndCareDestinations() {
         app.launchArguments = ["--watch-ui-night"]; app.launch()
         XCTAssertTrue(app.buttons["watch.petTouch"].waitForExistence(timeout: 10))
-        app.buttons["watch.openPetStatistics"].tap()
+        openWatchPetCare(app)
         let food = app.buttons["watch.manageFoodInventory"], stats = app.buttons["watch.managePetStatistics"]
         XCTAssertTrue(food.waitForExistence(timeout: 5)); target(food); target(stats)
         capture("parity-status-page")

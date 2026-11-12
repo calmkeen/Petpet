@@ -25,7 +25,7 @@ final class WatchFinalAuditUITests: XCTestCase {
         }
         capture("final-watch-repeated-backup")
         app.terminate(); app.launch()
-        app.buttons["watch.openPetStatistics"].tap()
+        openWatchPetCare(app)
         XCTAssertTrue(app.buttons["watch.managePetStatistics"].waitForExistence(timeout: 5))
         app.buttons["watch.managePetStatistics"].tap()
         reveal(app.staticTexts["watch.stat.health"])
@@ -68,15 +68,14 @@ final class WatchFinalAuditUITests: XCTestCase {
     }
 
     private func openFood() {
-        XCTAssertTrue(app.buttons["watch.openPetStatistics"].waitForExistence(timeout: 10))
-        app.buttons["watch.openPetStatistics"].tap()
+        openWatchPetCare(app)
         XCTAssertTrue(app.buttons["watch.manageFoodInventory"].waitForExistence(timeout: 5))
         app.buttons["watch.manageFoodInventory"].tap()
         XCTAssertTrue(app.staticTexts["watch.foodQuantity.1"].waitForExistence(timeout: 5))
     }
     private func crownTo(_ id: String) {
         let element = app.buttons[id]
-        let pages = ["watch.openPetStatistics", "watch.managePetStatistics", "watch.openGames", "watch.openStreak", "watch.openChat"]
+        let pages = ["watch.petTouch", "watch.managePetStatistics", "watch.openGames", "watch.openStreak", "watch.openChat"]
         let destination = pages.firstIndex(of: id)
         var previous: Int?
         var stalled = 0
