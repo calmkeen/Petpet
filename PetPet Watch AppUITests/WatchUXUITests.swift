@@ -108,7 +108,9 @@ final class WatchUXUITests: XCTestCase {
             var down = true
             if element.exists {
                 let frame = element.frame, screen = app.windows.firstMatch.frame
-                if (!enabled || element.isHittable) && screen.insetBy(dx: -1, dy: -1).contains(frame) { return }
+                // watchOS scales list rows near the curved edge. Move the
+                // action into the list's interior before measuring its size.
+                if (!enabled || element.isHittable) && frame.width >= 44 && frame.height >= 44 && screen.insetBy(dx: -1, dy: -1).contains(frame) { return }
                 if !frame.isEmpty { down = frame.midY >= screen.midY }
             }
             app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: down ? 0.83 : 0.45))
