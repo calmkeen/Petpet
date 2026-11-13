@@ -133,7 +133,10 @@ public final class WatchStandaloneService {
     }
     public func requestFeature(_ data: Data) async throws -> Data {
         guard state.isSelected else { throw BackendError.sessionChanged }
-        return try await featureWire.requestFeature(data)
+        do {
+            let reply = try await featureWire.requestFeature(data)
+            await refreshSession(); return reply
+        } catch { await refreshSession(); throw error }
     }
 
     public func backup() async throws {

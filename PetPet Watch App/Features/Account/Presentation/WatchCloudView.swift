@@ -27,6 +27,12 @@ struct WatchCloudView: View {
             Section("계정") {
                 if let account = viewModel.account {
                     Text(account.displayName).font(.body).fixedSize(horizontal: false, vertical: true)
+                    if let client = viewModel.featureClient {
+                        NavigationLink("대표 이미지 변경") { WatchProfileImageView(client: client, cloud: viewModel) }
+                            .accessibilityIdentifier("watch.editPicture")
+                        NavigationLink("누적 걸음수 랭킹") { WatchRankingPageView(kind: .steps, client: client, cloud: viewModel) }
+                            .accessibilityIdentifier("watch.stepRanking")
+                    }
                     NavigationLink("닉네임 변경") { WatchNicknameView(editor: viewModel.makeNicknameEditor()) }
                         .accessibilityIdentifier("watch.editNickname")
                 } else {

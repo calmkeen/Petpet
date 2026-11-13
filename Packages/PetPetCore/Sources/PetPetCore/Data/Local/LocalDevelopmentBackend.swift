@@ -17,6 +17,8 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport, BackendChatTransport
         var records: [String: Int] = [:]
         var nickname: String?
         var gameScores: [String: GameScore]?
+        var image: RepresentativeImage?
+        var pictureUrl: String?
     }
     private let fileURL: URL
     private var cached: Archive?
@@ -26,7 +28,7 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport, BackendChatTransport
     public func send(_ request: URLRequest) async throws -> BackendHTTPResponse {
         guard let url = request.url, url.scheme == Self.baseURL.scheme, url.host == Self.baseURL.host,
               url.port == nil, url.user == nil, url.password == nil, url.fragment == nil,
-              url.query == nil || (url.path == "/api/v1/users/nickname/check" && request.httpMethod == "GET") else {
+              url.query == nil || (request.httpMethod == "GET" && (url.path == "/api/v1/users/nickname/check" || url.path == "/api/v1/stepcounts/ranking" || url.path.hasSuffix("/rank/range"))) else {
             throw BackendError.configurationMissing
         }
         try load()
@@ -44,7 +46,28 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport, BackendChatTransport
         if url.path.contains("/rank/") { return try gameRank(request) }
         switch (request.httpMethod ?? "GET", url.path) {
         case ("GET", "/api/v1/users/me"):
-            return try json(["nickname": currentNickname])
+            var profile: [String: Any] = ["nickname": currentNickname]
+            if let url = cached!.pictureUrl { profile["pictureUrl"] = url }
+            return try json(profile)
+        case ("PATCH", "/api/v1/users/me/picture"):
+            guard let body = request.httpBody, body.count <= RepresentativeImage.maximumBytes + 1024,
+                  let image = try? RepresentativeImage.fromMultipart(body, contentType: request.value(forHTTPHeaderField: "Content-Type") ?? "") else { return response(400) }
+            var next = cached!; next.image = image
+            let url = Self.baseURL.appendingPathComponent("avatars/\(UUID().uuidString).jpg").absoluteString
+            next.pictureUrl = url; try write(next)
+            return try json(["pictureUrl": url])
+        case ("GET", "/api/v1/stepcounts/ranking"):
+            guard let page = try? rankingPage(url) else { return response(400) }
+            var rows: [(Int64, String, Int64)] = (1...22).map { (900_001_000 + Int64($0), "걷기친구\($0)", Int64(250_000 - $0 * 5000)) }
+            let total = try cached!.records.values.reduce(Int64(0)) { sum, count in
+                let (value, overflow) = sum.addingReportingOverflow(Int64(count))
+                guard !overflow else { throw BackendError.invalidResponse }; return value
+            }
+            rows.append((Self.accountID, currentNickname, total))
+            rows.sort { $0.2 == $1.2 ? $0.0 < $1.0 : $0.2 > $1.2 }
+            let slice = rows.dropFirst((page.page - 1) * page.size).prefix(page.size)
+            return try json(["page": page.page, "size": page.size, "totalUsers": rows.count,
+                "rankings": slice.map { row in ["rank": 1 + rows.filter { $0.2 > row.2 }.count, "userId": row.0, "nickname": row.1, "totalStepCount": row.2] as [String: Any] }])
         case ("POST", "/api/v1/ai/chat/stream"):
             return response(200)
         case ("GET", "/api/v1/users/nickname/check"):
@@ -131,10 +154,13 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport, BackendChatTransport
             return try json(["userId": Self.accountID, "updated": improves])
         }
         var entries: [(Int64, String, Int, Int)] = [(900_000_101,"연습여우",30,20),(900_000_102,"산책친구",15,10),(900_000_103,"초보펫",5,3)]
+        entries += (1...15).map { (900_000_200 + Int64($0), "게임친구\($0)", 0, 0) }
         if let best = cached?.gameScores?[game.rawValue] { entries.append((Self.accountID,currentNickname,best.score,best.maxCombo)) }
         entries.sort { $0.2 == $1.2 ? ($0.3 == $1.3 ? $0.0 < $1.0 : $0.3 > $1.3) : $0.2 > $1.2 }
-        if operation == "top10", request.httpMethod == "GET" {
-            return try json(["ranks": entries.map { row -> [String: Any] in
+        if (operation == "top10" || operation == "range"), request.httpMethod == "GET" {
+            guard let url = request.url, let page = try? (operation == "range" ? rankingPage(url) : RankingPageRequest(page: 1, size: 10)) else { return response(400) }
+            let slice = entries.dropFirst((page.page - 1) * page.size).prefix(page.size)
+            return try json(["ranks": slice.map { row -> [String: Any] in
                 let rank = 1 + entries.filter { $0.2 > row.2 || (game == .starStair && $0.2 == row.2 && $0.3 > row.3) }.count
                 var item: [String: Any] = ["rank":rank,"userId":row.0,"userName":row.1]
                 if game == .shooting { item["score"] = row.2 } else { item["maxStep"] = row.2; item["maxCombo"] = row.3 }
@@ -146,6 +172,17 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport, BackendChatTransport
             return try json(["userId":Self.accountID,"rank":rank])
         }
         return response(404)
+    }
+
+    public func representativeImage() throws -> RepresentativeImage? {
+        try load(); try cached!.image?.validate(); return cached!.image
+    }
+    private func rankingPage(_ url: URL) throws -> RankingPageRequest {
+        let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
+        guard Set(items.map(\.name)).count == items.count, items.allSatisfy({ ["page", "size"].contains($0.name) }),
+              let page = Int(items.first { $0.name == "page" }?.value ?? "1"),
+              let size = Int(items.first { $0.name == "size" }?.value ?? "10") else { throw BackendError.invalidResponse }
+        let value = RankingPageRequest(page: page, size: size); try value.validate(); return value
     }
 
     private func issueSession() throws -> BackendHTTPResponse {
@@ -182,6 +219,8 @@ public actor LocalDevelopmentBackend: BackendHTTPTransport, BackendChatTransport
                 throw BackendError.storage
             }
             if let pet = value.pet { try validate(pet) }
+            try value.image?.validate()
+            _ = try AccountProfileDetails.imageURL(value.pictureUrl)
             cached = value
         } else { cached = Archive() }
     }

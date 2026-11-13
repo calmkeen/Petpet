@@ -96,3 +96,7 @@ xcodebuild -project PetPet.xcodeproj -scheme PetPet -configuration Release -dest
 이미지와 Git blob SHA는 [매니페스트](../Artwork/AndroidGameSources.json)에 기록했다. 스크립트는 33개 원본 해시를 확인하고 긴 변을 최대 512px로 패킹한다.
 
 근거: [Android 슈팅](https://github.com/Chaeros/StepMate/blob/4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3/app/src/main/java/com/chaeros/stepmate/feature_game1/presentation/FoxGameScreen.kt), [별계단](https://github.com/Chaeros/StepMate/blob/4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3/app/src/main/java/com/chaeros/stepmate/feature_game2/presentation/domain/logic/HeavenStairsEngine.kt), [SSE 클라이언트](https://github.com/Chaeros/StepMate/blob/4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3/app/src/main/java/com/chaeros/stepmate/feature_voice/data/remote/AiChatStreamClient.kt), [Apple 시스템 입력](https://developer.apple.com/documentation/watchkit/wkinterfacecontroller/presenttextinputcontroller(withsuggestions:allowedinputmode:completion:)), [URLSession 스트리밍](https://developer.apple.com/documentation/foundation/urlsession/bytes(for:delegate:)).
+
+## 구간 랭킹 (2026-11-13)
+
+워치 게임 목록에서 각 게임의 **구간 랭킹**을 열어 5명씩 이전·다음 페이지를 조회한다. TOP 10과 결과 제출은 기존 API를 유지한다. [누적 걸음수·구간 랭킹·대표 이미지 연결과 검증](CommunityAPIs-2026-11-13.md).

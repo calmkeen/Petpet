@@ -7,6 +7,8 @@ import Foundation
 public struct CompanionFeatureRequest: Codable, Sendable {
     public enum Action: Codable, Sendable {
         case ranking(MiniGame), submit(GameScore)
+        case gamePage(MiniGame, RankingPageRequest), stepPage(RankingPageRequest)
+        case profile, updatePicture(RepresentativeImage)
         case startChat(UUID, String), pollChat(UUID), cancelChat(UUID)
     }
     public let id: UUID
@@ -20,6 +22,7 @@ public struct CompanionFeatureRequest: Codable, Sendable {
 public struct CompanionFeatureReply: Codable, Sendable {
     public enum Result: Codable, Sendable {
         case ranking(GameRanking), chat(ChatProgress), accepted
+        case gamePage(GameRankingPage), stepPage(StepRankingPage), profile(AccountProfileDetails)
         case failure(ProfileFailure)
     }
     public let id: UUID

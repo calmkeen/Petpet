@@ -12,6 +12,7 @@ final class WatchCloudController: ObservableObject {
     @Published private(set) var usesStandalone = false
     @Published private(set) var restorePreview: WatchRestoreImport?
     @Published private(set) var isPreparingRestore = false
+    var featureClient: WatchFeatureClient?
     var supportsStandalone: Bool { standalone != nil }
     var connectionNote: String {
         usesStandalone ? (isDevelopment ? "Debug · 워치 내부 모의 서버로 연결해요." : "워치에서 직접 연결해요. 인터넷이 필요해요.") : "아이폰의 PetPet과 연결이 필요해요."

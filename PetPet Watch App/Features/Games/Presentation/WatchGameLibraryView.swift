@@ -34,6 +34,8 @@ struct WatchGameLibraryView: View {
             ForEach(MiniGame.allCases, id: \.self) { game in
                 NavigationLink { WatchLeaderboardView(game: game, services: services) } label: { Text(game.title).fixedSize(horizontal: false, vertical: true) }
                     .accessibilityIdentifier("game.openRanking.\(game.rawValue)")
+                NavigationLink("\(game.title) · 구간 랭킹") { WatchRankingPageView(kind: .game(game), client: services.client, cloud: services.cloud) }
+                    .accessibilityIdentifier("game.openRange.\(game.rawValue)")
             }
             } header: { Text("랭킹") } footer: {
                 if services.cloud.isDevelopment { Text("Debug · 개발 모의 랭킹") }
