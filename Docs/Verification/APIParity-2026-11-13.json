@@ -1,0 +1,394 @@
+{
+  "date": "2026-11-13",
+  "branch": "feature/android-api-ui-parity",
+  "baseDevelop": "0cfb3fd",
+  "specification": {
+    "url": "https://www.stepmatecp.com/v3/api-docs",
+    "sha256": "261522fc22db9353ce1c634cdecad2e3d0f8277510b9bcf41c93d3f254fd48c5"
+  },
+  "android": {
+    "repository": "https://github.com/Chaeros/StepMate",
+    "commit": "4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3",
+    "scope": "app and mobile Kotlin sources; API declaration and caller/UI inspection"
+  },
+  "counts": {
+    "swaggerOperations": 25,
+    "iOSConnected": 18,
+    "iOSFallback": 1,
+    "iOSUnused": 6,
+    "androidUsedIncludingFallback": 15
+  },
+  "operations": [
+    {
+      "method": "POST",
+      "path": "/api/v1/star-stair-game/rank/score",
+      "operationId": "starStairGameSaveScore",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_game2/data/remote/StarStairGameRankApiService.kt"
+      ],
+      "outputOrReason": "별계단 게임 종료 시 기록 저장. Android도 응답의 best/updated는 직접 표시하지 않음",
+      "iOSBackendMethod": "ranking(game, submitting:)",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/star-stair-game/rank/position",
+      "operationId": "starStairGameGetExpectedRank",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_game2/data/remote/StarStairGameRankApiService.kt"
+      ],
+      "outputOrReason": "별계단 게임 결과의 예상 순위. 제출 점수·콤보는 현재 게임 기록 표시",
+      "iOSBackendMethod": "ranking(game, submitting:)",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shooting-game/rank/score",
+      "operationId": "shootingGameSaveScore",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_game1/data/remote/ShootingGameRankApiService.kt"
+      ],
+      "outputOrReason": "슈팅 게임 종료 시 기록 저장. Android도 응답의 best/updated는 직접 표시하지 않음",
+      "iOSBackendMethod": "ranking(game, submitting:)",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/shooting-game/rank/position",
+      "operationId": "shootingGameGetExpectedRank",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_game1/data/remote/ShootingGameRankApiService.kt"
+      ],
+      "outputOrReason": "슈팅 게임 결과의 예상 순위. 제출 점수·콤보는 현재 게임 기록 표시",
+      "iOSBackendMethod": "ranking(game, submitting:)",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/backup",
+      "operationId": "backupSaveData",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_backup/data/remote/BackupApiService.kt"
+      ],
+      "outputOrReason": "백업 성공·실패 안내. savedStepCountDays는 Android도 숫자로 표시하지 않음",
+      "iOSBackendMethod": "backup",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/refresh",
+      "operationId": "authRefreshToken",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_auth/data/remote/AuthApiService.kt"
+      ],
+      "outputOrReason": "401/403 뒤 인증 갱신. 토큰과 만료 메타데이터는 내부 사용",
+      "iOSBackendMethod": "refresh",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/refresh",
+      "operationId": "authRefreshToken_1",
+      "iOSStatus": "fallback",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_auth/data/remote/AuthApiService.kt"
+      ],
+      "outputOrReason": "기본 갱신 경로가 404/405일 때만 사용하는 예비 경로",
+      "iOSBackendMethod": "refresh (404/405 fallback)",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/refresh",
+      "operationId": "authRefreshToken_2",
+      "iOSStatus": "unused",
+      "unusedCategory": "unused_alias",
+      "androidUsed": false,
+      "androidSources": [],
+      "outputOrReason": "갱신 별칭; Android도 미사용",
+      "iOSBackendMethod": null
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/google",
+      "operationId": "authGoogleLogin",
+      "iOSStatus": "unused",
+      "unusedCategory": "apple_replacement",
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_auth/data/remote/AuthApiService.kt",
+        "mobile/src/main/java/com/chaeros/stepmate/mobile/feature_auth/data/remote/MobileAuthApiService.kt"
+      ],
+      "outputOrReason": "Android는 사용. iOS는 사용자가 선택한 Apple 로그인으로 대체; Google 클라이언트 계약만 존재",
+      "iOSBackendMethod": "signIn(GoogleIdentity) — 계약만 존재, 앱 UI 미사용",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/google",
+      "operationId": "authGoogleLogin_1",
+      "iOSStatus": "unused",
+      "unusedCategory": "unused_alias",
+      "androidUsed": false,
+      "androidSources": [],
+      "outputOrReason": "Google 로그인 별칭; Android도 미사용",
+      "iOSBackendMethod": null
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/google",
+      "operationId": "authGoogleLogin_2",
+      "iOSStatus": "unused",
+      "unusedCategory": "unused_alias",
+      "androidUsed": false,
+      "androidSources": [],
+      "outputOrReason": "Google 로그인 별칭; Android도 미사용",
+      "iOSBackendMethod": null
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/ai/chat/stream",
+      "operationId": "aiChatStream",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_voice/data/remote/AiChatStreamClient.kt"
+      ],
+      "outputOrReason": "워치·아이폰 질문 입력 → 스트리밍 답변·완료·오류·취소 상태",
+      "iOSBackendMethod": "streamChat",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/users/nickname",
+      "operationId": "userUpdateNickname",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_stepstreak/data/remote/NicknameApiService.kt"
+      ],
+      "outputOrReason": "닉네임 편집 → 계정 표시명 갱신·중복/실패 안내",
+      "iOSBackendMethod": "updateNickname",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/users/me/picture",
+      "operationId": "userUpdateRepresentativeImage",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": false,
+      "androidSources": [],
+      "outputOrReason": "워치·아이폰 대표 이미지 변경 → 업로드한 이미지·저장 상태",
+      "iOSBackendMethod": "updatePicture",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/users/nickname/check",
+      "operationId": "userCheckNickname",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_stepstreak/data/remote/NicknameApiService.kt"
+      ],
+      "outputOrReason": "닉네임 편집 → 중복 여부와 사용 가능 안내",
+      "iOSBackendMethod": "checkNickname",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/users/me",
+      "operationId": "userGetMe",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": false,
+      "androidSources": [],
+      "outputOrReason": "계정 닉네임·대표 이미지 조회. googleId는 화면에 노출하지 않음",
+      "iOSBackendMethod": "profileDetails",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/usermates/{mateId}",
+      "operationId": "userMateGetDetail",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "mobile/src/main/java/com/chaeros/stepmate/mobile/feature_usermate/data/remote/UsermateApiService.kt"
+      ],
+      "outputOrReason": "복원 미리보기·적용 및 아이폰 서버 펫 정보(레벨·경험치·애정·기분·능력치)",
+      "iOSBackendMethod": "serverPet / restore",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/test/t2",
+      "operationId": "testConnectionTwo",
+      "iOSStatus": "unused",
+      "unusedCategory": "diagnostic",
+      "androidUsed": false,
+      "androidSources": [],
+      "outputOrReason": "연결 진단용; Android도 미사용, 사용자 기능 없음",
+      "iOSBackendMethod": null
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/test/t1",
+      "operationId": "testConnectionOne",
+      "iOSStatus": "unused",
+      "unusedCategory": "diagnostic",
+      "androidUsed": false,
+      "androidSources": [],
+      "outputOrReason": "연결 진단용; Android도 미사용, 사용자 기능 없음",
+      "iOSBackendMethod": null
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stepcounts/ranking",
+      "operationId": "stepCountGetRankings",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": false,
+      "androidSources": [],
+      "outputOrReason": "누적 걸음수 랭킹 → rank·nickname·totalStepCount·전체 인원·페이지",
+      "iOSBackendMethod": "stepRanking",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/stepcounts/me",
+      "operationId": "stepCountGetMine",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "mobile/src/main/java/com/chaeros/stepmate/mobile/feature_stepcount/data/remote/StepStreakApiService.kt"
+      ],
+      "outputOrReason": "날짜별 걸음수·월별 스트릭·복원",
+      "iOSBackendMethod": "serverSteps / restore",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/star-stair-game/rank/top10",
+      "operationId": "starStairGameGetTop10",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_game2/data/remote/StarStairGameRankApiService.kt"
+      ],
+      "outputOrReason": "별계단 TOP 10 → rank·userName·maxStep·maxCombo",
+      "iOSBackendMethod": "ranking(game, submitting:)",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/star-stair-game/rank/range",
+      "operationId": "starStairGameGetRankRange",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": false,
+      "androidSources": [],
+      "outputOrReason": "별계단 구간 랭킹 → 전체 순위·닉네임·계단·최대 콤보·페이지",
+      "iOSBackendMethod": "gameRankingPage",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/shooting-game/rank/top10",
+      "operationId": "shootingGameGetTop10",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": true,
+      "androidSources": [
+        "app/src/main/java/com/chaeros/stepmate/feature_game1/data/remote/ShootingGameRankApiService.kt"
+      ],
+      "outputOrReason": "슈팅 TOP 10 → rank·userName·score",
+      "iOSBackendMethod": "ranking(game, submitting:)",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/shooting-game/rank/range",
+      "operationId": "shootingGameGetRankRange",
+      "iOSStatus": "connected",
+      "unusedCategory": null,
+      "androidUsed": false,
+      "androidSources": [],
+      "outputOrReason": "슈팅 구간 랭킹 → 전체 순위·닉네임·점수·페이지",
+      "iOSBackendMethod": "gameRankingPage",
+      "iOSBackendSource": "Packages/PetPetCore/Sources/PetPetCore/Application/BackendClient.swift"
+    }
+  ],
+  "verification": {
+    "simulatorsOnly": true,
+    "mockAccountOnly": true,
+    "physicalDevicesUsed": false,
+    "productionServerWritesPerformed": false,
+    "photosLibrarySelectionTested": false,
+    "pictureSourceTested": "bundled pet image through normal upload action",
+    "corePassed": 207,
+    "phoneModelPassed": 12,
+    "phoneUIPassedFlows": 5,
+    "watchModelPassed": 11,
+    "watchUIPassedFlows": 5,
+    "releaseSimulatorBuild": "passed",
+    "results": [
+      "/private/tmp/petpet-api-parity-phone-final.xcresult",
+      "/private/tmp/petpet-api-parity-watch-final.xcresult"
+    ],
+    "coreLog": "/private/tmp/petpet-api-parity-core-final.log",
+    "releaseDebugSymbolsAbsent": [
+      "LocalDevelopmentBackend",
+      "signInForDevelopment"
+    ],
+    "releaseBuildLog": "/private/tmp/petpet-api-parity-release.log",
+    "phoneSimulator": {
+      "device": "iPhone SE (3rd generation)",
+      "runtime": "iOS 18.0",
+      "udid": "62CC3FF5-FBE5-44D0-93A6-A10DA462ED7E"
+    },
+    "watchSimulator": {
+      "device": "Apple Watch SE (2nd generation) 40mm",
+      "runtime": "watchOS 11.0",
+      "udid": "239DFD2B-8250-409E-9B90-FF960B5BA636",
+      "paired": false
+    },
+    "watchUIFailed": 0,
+    "picturePersistedAfterRelaunchBothPlatforms": true
+  },
+  "outsideSwagger": {
+    "POST /api/v1/auth/apple": "Native Apple login client implemented; production server/capability configuration not verified here",
+    "POST debug/login": "Debug local backend only; compiled out of Release"
+  },
+  "implementationCommits": [
+    "afed125",
+    "a9765a8"
+  ]
+}
