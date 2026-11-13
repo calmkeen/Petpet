@@ -17,8 +17,12 @@ import XCTest
 
     func test10WatchLoginBackupRestoreWithoutCompanion() {
         openAccount()
+        if app.buttons["watch.editPicture"].waitForExistence(timeout: 2) {
+            let logout = app.buttons["watch.standaloneLogout"]; reveal(logout); logout.tap()
+        }
         reveal(app.buttons["watch.standaloneLogin"]); app.buttons["watch.standaloneLogin"].tap()
         let mode = app.staticTexts["watch.connectionMode"]
+        reveal(mode)
         XCTAssertTrue(mode.waitForExistence(timeout: 8)); XCTAssertEqual(mode.label, "아이폰 없이 사용 중")
         capture("standalone-40mm-login")
         for _ in 0..<2 {
@@ -41,7 +45,7 @@ import XCTest
     }
 
     func test20WatchNicknameWithoutCompanion() {
-        openAccount(); reveal(app.buttons["watch.editNickname"], down: false); app.buttons["watch.editNickname"].tap()
+        openAccount(); reveal(app.buttons["watch.editNickname"]); app.buttons["watch.editNickname"].tap()
         let input = app.descendants(matching: .any).matching(identifier: "nickname.input").firstMatch
         reveal(input); input.tap()
         dismissOptionalDictationSharingIfRequested(timeout: 3)

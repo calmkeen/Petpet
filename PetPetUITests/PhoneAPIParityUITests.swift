@@ -26,6 +26,18 @@ import XCTest
         let image = app.descendants(matching: .any).matching(identifier: "phone.profilePicture").firstMatch
         XCTAssertEqual(image.label, "저장된 대표 이미지"); capture("api-parity-phone-picture-relaunch")
     }
+    func test31WatchPictureAndNicknameAreVisibleWithoutPhoneUpload() {
+        openAccount(); loginIfNeeded()
+        let name = app.staticTexts["phone.accountName"]
+        XCTAssertTrue(wait { name.exists && name.label.hasPrefix("FinalWatch") })
+        capture("integrated-phone-watch-nickname")
+        open("phone.editPicture")
+        let state = app.staticTexts["phone.profilePictureState"]
+        XCTAssertTrue(wait { state.exists && state.label == "대표 이미지가 저장되어 있어요." })
+        let image = app.descendants(matching: .any).matching(identifier: "phone.profilePicture").firstMatch
+        XCTAssertEqual(image.label, "저장된 대표 이미지")
+        capture("integrated-phone-watch-picture")
+    }
     func test40LargeDarkStepRankingAndPictureControls() {
         app.terminate(); app.launchArguments = ["--phone-ui-large-text", "--phone-ui-dark"]; app.launch()
         openAccount(); loginIfNeeded(); open("phone.openStepRanking")

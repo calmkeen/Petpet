@@ -66,7 +66,7 @@ final class WatchDebugFlowUITests: XCTestCase {
             XCUIDevice.shared.rotateDigitalCrown(delta: 0.45)
         }
         XCTAssertTrue(app.buttons["watch.openNickname"].waitForExistence(timeout: 8))
-        XCTAssertEqual(app.buttons["watch.openNickname"].value as? String, "아이폰에서 로그인해 주세요")
+        XCTAssertEqual(app.buttons["watch.openNickname"].value as? String, "워치 또는 아이폰에서 로그인해 주세요")
         openFood()
         feedMilk(from: 4)
         reveal(app.buttons["watch.claimStepRewards"])

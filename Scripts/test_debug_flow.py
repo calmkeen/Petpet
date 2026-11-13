@@ -97,6 +97,7 @@ def xcode(args, side, action, label, test=None, companion=None, suite=None):
     if test:
         summary = json.loads(command("xcrun", "xcresulttool", "get", "test-results", "summary", "--path", str(result_bundle), "--compact"))
         assert summary["passedTests"] == 1 and summary["failedTests"] == 0, f"Expected one passing test: {result_bundle}"
+    return result_bundle if test else None
 
 
 def seed_steps(args):

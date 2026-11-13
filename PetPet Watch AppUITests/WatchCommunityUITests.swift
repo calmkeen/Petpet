@@ -31,6 +31,18 @@ import XCTest
         XCTAssertEqual(image.label, "저장된 대표 이미지")
         capture("community-40mm-picture-after-relaunch")
     }
+    func test40LargeTextRankingAndPictureControls() {
+        app.terminate(); app.launchArguments = ["--watch-ui-large-text"]; app.launch()
+        test10CumulativeStepsPageForwardBackAndRefresh()
+        capture("integrated-watch-large-ranking")
+        app.terminate(); app.launch(); openAccount(); openPicture()
+        for id in ["profile.choosePhoto", "profile.usePetImage", "profile.refresh"] {
+            let button = app.buttons[id]; reveal(button)
+            XCTAssertTrue(button.isEnabled); XCTAssertGreaterThanOrEqual(button.frame.height, 44)
+            XCTAssertTrue(app.windows.firstMatch.frame.contains(button.frame))
+        }
+        capture("integrated-watch-large-picture-controls")
+    }
     private func gamePages(_ game: String) {
         crownTo("watch.openGames"); app.buttons["watch.openGames"].tap()
         let link = app.buttons["game.openRange.\(game)"]; reveal(link); link.tap()
