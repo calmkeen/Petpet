@@ -59,6 +59,10 @@ def verify(args, baseline, stage):
         image = base64.b64decode(server["image"]["data"], validate=True)
         assert 0 < len(image) <= 32000 and server["pictureUrl"].startswith("https://debug.petpet.invalid/avatars/")
         image_hash = hashlib.sha256(image).hexdigest()
+        if 5 <= stage < 9:
+            assert image_hash == flow.read(args.artifacts, "state-04.json")["profileImageSHA256"], "Reading rankings/profile replaced the watch-uploaded image"
+        elif stage >= 10:
+            assert image_hash == flow.read(args.artifacts, "state-09.json")["profileImageSHA256"], "Reading profile replaced the phone-uploaded image"
     return dict(pet=current["pet"], inventory=current["inventory"], nickname=account["displayName"],
                 profileImageSHA256=image_hash, phoneSnapshotMatchesWatch=True, stayedInCompanionMode=True)
 
@@ -82,12 +86,13 @@ def main():
     assert args.from_stage <= args.through_stage
     args.artifacts.mkdir(parents=True, exist_ok=True)
     baseline_file = args.artifacts / "baseline.json"
-    if args.from_stage == 0:
-        assert not baseline_file.exists(), "Choose a new artifacts directory"
+    if args.from_stage == 0 and not baseline_file.exists():
         baseline = games.state(args)
         game = flow.read(flow.store(args.watch, flow.WATCH_BUNDLE), "game-state-v1.json")
         baseline.update(steps=game["game"]["records"], appliedBackups=len(game["appliedBackups"]), appliedRestores=len(game["appliedRestores"]))
         flow.write(baseline_file, baseline)
+    elif args.from_stage == 0:
+        assert not (args.artifacts / "state-00.json").exists(), "Stage zero already passed; resume the next stage"
     baseline = json.loads(baseline_file.read_text())
     for index in range(args.from_stage, args.through_stage + 1):
         side, suite, test = PHASES[index]

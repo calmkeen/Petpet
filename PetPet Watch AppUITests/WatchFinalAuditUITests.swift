@@ -35,7 +35,8 @@ final class WatchFinalAuditUITests: XCTestCase {
 
     func test20WatchNicknameChangeSurvivesRelaunch() {
         crownTo("watch.openStreak"); app.buttons["watch.openNickname"].tap()
-        let input = app.descendants(matching: .any).matching(identifier: "nickname.input").firstMatch
+        let container = app.descendants(matching: .any).matching(identifier: "nickname.input").firstMatch
+        let input = container.descendants(matching: .textField).firstMatch
         reveal(input); input.tap()
         let system = XCUIApplication(bundleIdentifier: "com.apple.Carousel")
         if system.buttons["지금 안 함"].exists {
@@ -55,8 +56,13 @@ final class WatchFinalAuditUITests: XCTestCase {
         app.typeText(name)
         let done = app.buttons.matching(NSPredicate(format: "label IN %@", ["완료", "Done"])).firstMatch
         XCTAssertTrue(wait { done.exists && done.isEnabled }); done.tap()
+        let host = app.descendants(matching: .any).matching(identifier: "TextInputHost").firstMatch
+        XCTAssertTrue(wait(timeout: 10) { !host.exists }, "System nickname input must close before checking availability")
         let submit = app.buttons["nickname.submit"]
-        reveal(submit); XCTAssertTrue(wait(timeout: 15) { submit.exists && submit.isEnabled }); submit.tap()
+        reveal(submit)
+        print("NICKNAME_EDITOR_AFTER_INPUT=\(app.debugDescription)")
+        capture("integrated-watch-nickname-before-submit")
+        XCTAssertTrue(wait(timeout: 45) { submit.exists && submit.isEnabled }, app.debugDescription); submit.tap()
         let feedback = app.staticTexts["nickname.feedback"]
         reveal(feedback); XCTAssertTrue(wait(timeout: 15) { feedback.exists && feedback.label == "닉네임을 바꿨어요." })
         print("FINAL_AUDIT_NICKNAME=\(name)")

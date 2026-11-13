@@ -75,12 +75,17 @@ def xcode(args, side, action, label, test=None, companion=None, suite=None):
     with log.open("w") as output:
         process = subprocess.Popen(cmd, cwd=ROOT, stdout=output, stderr=subprocess.STDOUT)
         restarted = companion is None
+        started_at = time.monotonic()
         while process.poll() is None:
             # Xcode can reinstall the paired app, moving its data container.
             # Launch it after installation; an already-running process would
             # continue writing its cached URL in the retired container.
             target = PHONE_BUNDLE if side == "phone" else WATCH_BUNDLE
-            if not restarted and f"Wait for {target} to idle" in log.read_text(errors="replace"):
+            app_started = f"Wait for {target} to idle" in log.read_text(errors="replace")
+            if test and not app_started and time.monotonic() - started_at > 120:
+                process.terminate(); process.wait(timeout=30)
+                raise RuntimeError(f"Simulator test app did not start within 120 seconds; see {log}")
+            if not restarted and app_started:
                 device, bundle = companion
                 command("xcrun", "simctl", "terminate", device, bundle, check=False)
                 try:
