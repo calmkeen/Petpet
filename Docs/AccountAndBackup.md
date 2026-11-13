@@ -85,3 +85,7 @@ swift test --package-path Packages/PetPetCore
 xcodebuild -project PetPet.xcodeproj -scheme PetPet -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
 xcodebuild -project PetPet.xcodeproj -scheme PetPet -configuration Release -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
 ```
+
+## 대표 이미지 (2026-11-13)
+
+워치 계정 화면의 **대표 이미지 변경**에서 사진 선택 또는 펫 이미지로 서버 대표 이미지를 설정한다. `PATCH /api/v1/users/me/picture`의 multipart `image`를 사용하며, 재실행 시 `GET /api/v1/users/me`의 pictureUrl을 조회한다. [구현·Debug 검증](CommunityAPIs-2026-11-13.md).

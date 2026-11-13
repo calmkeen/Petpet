@@ -56,3 +56,7 @@ Android의 부팅 이후 센서 원시 누적값·offset 보정은 Apple에 복�
 ## 워치 단독 연결 (2026-11-12)
 
 워치 자체 로그인과 닉네임·백업/복원·랭킹·AI 요청 경로를 추가했다. Android의 워치 서버 호출처럼 iPhone 중계 없이 동작한다. Debug는 워치 내부 모의 서버, Release는 네이티브 Apple 로그인·워치 Keychain·HTTPS를 사용한다. Google 인증을 재사용하지 않으므로 운영 Apple API와 watch bundle audience 설정은 서버 작업으로 남는다. [구현·검증 범위](WatchStandalone-2026-11-12.md).
+
+## 추가 Swagger API 연결 (2026-11-13)
+
+누적 걸음수 랭킹, 슈팅·별계단 구간 랭킹, 대표 이미지 변경을 공용 BackendClient와 워치 UI에 연결했다. 단독/중계 모드와 Debug 모의 서버를 지원한다. [검증 범위와 운영 서버 경계](CommunityAPIs-2026-11-13.md).

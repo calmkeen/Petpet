@@ -52,8 +52,12 @@ import XCTest
         XCTAssertTrue(wait { page.exists && page.label == "\(number)페이지" && self.app.buttons["rank.refresh"].isEnabled })
         XCTAssertFalse(app.staticTexts["rank.error"].exists)
     }
-    private func next() { let button = app.buttons["rank.next"]; reveal(button); XCTAssertTrue(wait { button.isEnabled }); button.tap() }
-    private func previous() { let button = app.buttons["rank.previous"]; reveal(button); XCTAssertTrue(wait { button.isEnabled }); button.tap() }
+    private func next() { let button = app.buttons["rank.next"]; reveal(button); XCTAssertTrue(wait { button.isEnabled }); button.tap(); assertHeaderVisible() }
+    private func previous() { let button = app.buttons["rank.previous"]; reveal(button); XCTAssertTrue(wait { button.isEnabled }); button.tap(); assertHeaderVisible() }
+    private func assertHeaderVisible() {
+        let header = app.staticTexts["rank.page"]
+        XCTAssertTrue(wait { header.exists && header.isHittable && self.app.windows.firstMatch.frame.contains(header.frame) }, "A new page must reveal its header without manual scrolling")
+    }
     private func crownTo(_ id: String) {
         let ids = ["watch.petTouch", "watch.managePetStatistics", "watch.openGames", "watch.openStreak", "watch.openChat"]
         for _ in 0..<12 {

@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-13",
+  "branch": "feature/watch-rankings-profile",
+  "baseDevelop": "a1766e4",
+  "simulatorsOnly": true,
+  "mockAccountOnly": true,
+  "specification": {
+    "url": "https://www.stepmatecp.com/v3/api-docs",
+    "sha256": "261522fc22db9353ce1c634cdecad2e3d0f8277510b9bcf41c93d3f254fd48c5"
+  },
+  "core": {
+    "passed": 202,
+    "failed": 0
+  },
+  "watchModels": {
+    "passed": 11,
+    "failed": 0
+  },
+  "watchUI": {
+    "passedFlows": 4,
+    "failed": 0,
+    "pagingRecheckPassed": 3,
+    "automaticHeaderVisibilityChecked": true
+  },
+  "watch": {
+    "device": "SE 2nd generation 40mm",
+    "runtime": "watchOS 11.0",
+    "udid": "239DFD2B-8250-409E-9B90-FF960B5BA636",
+    "paired": false
+  },
+  "picture": {
+    "sourceTested": "bundled pet image through real UI upload action",
+    "photosLibrarySelectionTested": false,
+    "persistedAfterRelaunch": true,
+    "maximumUploadBytes": 32000,
+    "maxThumbnailDimension": 160
+  },
+  "releaseSimulatorBuild": "passed",
+  "productionServerWritesPerformed": false,
+  "physicalDevicesUsed": false,
+  "results": [
+    "/private/tmp/petpet-community-ui.xcresult",
+    "/private/tmp/petpet-community-models.xcresult",
+    "/private/tmp/petpet-community-pages-final.xcresult"
+  ]
+}

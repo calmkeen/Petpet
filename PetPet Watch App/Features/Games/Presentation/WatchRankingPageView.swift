@@ -9,41 +9,55 @@ struct WatchRankingPageView: View {
         switch kind { case .steps: title = "누적 걸음수"; case let .game(game): title = game.title }
     }
     var body: some View {
-        List {
-            Section {
-                Text("\(model.page)페이지").font(.headline).accessibilityIdentifier("rank.page")
-                Button("새로고침") { model.load(model.page) }.disabled(model.busy).accessibilityIdentifier("rank.refresh")
-                if model.busy { ProgressView("랭킹 불러오는 중") }
-                if let error = model.error { Text(error).font(.caption).accessibilityIdentifier("rank.error") }
-            }
-            if let page = model.stepPage {
-                Section("전체 \(page.totalUsers)명") {
-                    if page.rankings.isEmpty { Text("이 구간에 기록이 없어요.") }
-                    ForEach(page.rankings, id: \.userId) { row in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("\(row.rank)위 · \(row.nickname)").lineLimit(2)
-                            Text("\(row.totalStepCount.formatted()) 걸음").font(.caption).foregroundStyle(.secondary)
-                        }.accessibilityIdentifier("rank.entry.\(row.userId)")
+        ScrollViewReader { proxy in
+            List {
+                Section {
+                    HStack {
+                        Text("\(model.page)페이지").font(.headline).accessibilityIdentifier("rank.page")
+                        Spacer()
+                        Button { model.load(model.page) } label: {
+                            Image(systemName: "arrow.clockwise").frame(width: 44, height: 44).contentShape(Rectangle())
+                        }.buttonStyle(.plain).disabled(model.busy).accessibilityLabel("랭킹 새로고침").accessibilityIdentifier("rank.refresh")
+                    }.id("rank.top")
+                    if model.busy { ProgressView("랭킹 불러오는 중") }
+                    if let error = model.error { Text(error).font(.caption).accessibilityIdentifier("rank.error") }
+                }
+                if let page = model.stepPage {
+                    Section("전체 \(page.totalUsers)명") {
+                        if page.rankings.isEmpty { Text("이 구간에 기록이 없어요.") }
+                        ForEach(page.rankings, id: \.userId) { row in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("\(row.rank)위 · \(row.nickname)").lineLimit(2)
+                                Text("\(row.totalStepCount.formatted()) 걸음").font(.caption).foregroundStyle(.secondary)
+                            }.accessibilityIdentifier("rank.entry.\(row.userId)")
+                        }
+                    }
+                    Text("서버에 백업된 걸음수의 누적 순위예요.").font(.caption2)
+                }
+                if let page = model.gamePage {
+                    Section("게임 랭킹") {
+                        if page.entries.isEmpty { Text("이 구간에 기록이 없어요.") }
+                        ForEach(page.entries, id: \.userID) { row in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("\(row.rank)위 · \(row.name)").lineLimit(2)
+                                Text("\(row.score)\(page.game == .shooting ? "점" : "계단")").font(.caption).foregroundStyle(.secondary)
+                                if page.game == .starStair { Text("최대 콤보 \(row.maxCombo)").font(.caption2) }
+                            }.accessibilityIdentifier("rank.entry.\(row.userID ?? 0)")
+                        }
                     }
                 }
-                Text("서버에 백업된 걸음수의 누적 순위예요.").font(.caption2)
-            }
-            if let page = model.gamePage {
-                Section("게임 랭킹") {
-                    if page.entries.isEmpty { Text("이 구간에 기록이 없어요.") }
-                    ForEach(page.entries, id: \.userID) { row in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("\(row.rank)위 · \(row.name)").lineLimit(2)
-                            Text("\(row.score)\(page.game == .shooting ? "점" : "계단")").font(.caption).foregroundStyle(.secondary)
-                            if page.game == .starStair { Text("최대 콤보 \(row.maxCombo)").font(.caption2) }
-                        }.accessibilityIdentifier("rank.entry.\(row.userID ?? 0)")
-                    }
+                Section("페이지 이동") {
+                    Text("\(model.page)페이지 · 5명씩").font(.caption2)
+                    Button("이전 페이지") { model.load(model.page - 1) }.disabled(model.busy || model.page <= 1).accessibilityIdentifier("rank.previous")
+                    Button("다음 페이지") { model.load(model.page + 1) }.disabled(model.busy || !model.hasNext).accessibilityIdentifier("rank.next")
                 }
             }
-            Section("페이지 이동") {
-                Button("이전 페이지") { model.load(model.page - 1) }.disabled(model.busy || model.page <= 1).accessibilityIdentifier("rank.previous")
-                Button("다음 페이지") { model.load(model.page + 1) }.disabled(model.busy || !model.hasNext).accessibilityIdentifier("rank.next")
+            .task(id: model.page) {
+                try? await Task.sleep(for: .milliseconds(120))
+                guard !Task.isCancelled else { return }
+                proxy.scrollTo("rank.top", anchor: .top)
             }
+            .onChange(of: model.error) { _, value in if value != nil { proxy.scrollTo("rank.top", anchor: .top) } }
         }.navigationTitle(title).task { model.load() }.onDisappear { model.stop() }
     }
 }
