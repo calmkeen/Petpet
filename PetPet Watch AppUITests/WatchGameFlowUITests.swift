@@ -193,7 +193,7 @@ final class WatchGameFlowUITests: XCTestCase {
             if element.exists {
                 let frame = element.frame, screen = app.windows.firstMatch.frame
                 let nav = app.navigationBars.firstMatch
-                let top = nav.exists ? max(screen.minY + 20, nav.frame.maxY + 2) : screen.minY + 20
+                let top = nav.exists ? max(screen.minY + 20, nav.frame.maxY) : screen.minY + 20
                 let visible = CGRect(x: screen.minX, y: top, width: screen.width, height: screen.maxY - top)
                 if element.isHittable && visible.insetBy(dx: -1, dy: -1).contains(frame) { return }
                 if !frame.isEmpty { down = frame.midY >= visible.midY }
