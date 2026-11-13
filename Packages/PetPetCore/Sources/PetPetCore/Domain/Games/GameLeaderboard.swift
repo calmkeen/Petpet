@@ -29,5 +29,8 @@ public struct GameRanking: Codable, Equatable, Sendable {
     public let game: MiniGame
     public let position: Int?
     public let entries: [GameRankEntry]
-    public init(game: MiniGame, position: Int? = nil, entries: [GameRankEntry]) { self.game = game; self.position = position; self.entries = entries }
+    public let warning: String?
+    public init(game: MiniGame, position: Int? = nil, entries: [GameRankEntry], warning: String? = nil) {
+        self.game = game; self.position = position; self.entries = entries; self.warning = warning
+    }
 }

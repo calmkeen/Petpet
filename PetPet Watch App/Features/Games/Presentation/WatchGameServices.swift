@@ -67,7 +67,7 @@ import PetPetCore
         do {
             let result = try await services.client.request(action, accountID: accountID)
             guard self.revision == revision, services.cloud.account?.id == accountID, !Task.isCancelled else { return }
-            if case let .ranking(value) = result { ranking = value }
+            if case let .ranking(value) = result { ranking = value; message = value.warning }
             else { throw BackendError.invalidResponse }
         } catch is CancellationError { }
         catch { guard self.revision == revision else { return }; message = (error as? BackendError ?? .network).localizedDescription }

@@ -3,6 +3,7 @@ import Foundation
 /// Streams on the credential-owning host. A local or companion transport polls
 /// bounded snapshots; credentials never enter the request/reply envelopes.
 @MainActor public final class PhoneFeatureCoordinator {
+    public var onProfileChange: ((String, AccountProfileDetails) -> Void)?
     public var onSessionInvalidated: (() async -> Void)?
     private struct ChatJob {
         let generation: UUID
@@ -32,12 +33,15 @@ import Foundation
         let request = try JSONDecoder().decode(CompanionFeatureRequest.self, from: data)
         guard request.environment == environment else { throw BackendError.environmentMismatch }
         var result: CompanionFeatureReply.Result
+        var changedProfile: AccountProfileDetails?
         do {
             guard try await backend.session()?.accountID == request.accountID else { throw BackendError.authenticationRequired }
             prune()
             switch request.action {
             case .profile: result = .profile(try await backend.profileDetails(accountID: request.accountID))
-            case let .updatePicture(image): result = .profile(try await backend.updatePicture(image, accountID: request.accountID))
+            case let .updatePicture(image):
+                let value = try await backend.updatePicture(image, accountID: request.accountID)
+                changedProfile = value; result = .profile(value)
             case let .stepPage(page): result = .stepPage(try await backend.stepRanking(page, accountID: request.accountID))
             case let .gamePage(game, page): result = .gamePage(try await backend.gameRankingPage(game, page: page, accountID: request.accountID))
             case let .ranking(game): result = .ranking(try await backend.ranking(game, accountID: request.accountID))
@@ -76,6 +80,7 @@ import Foundation
                 result = .accepted
             }
             guard try await backend.session()?.accountID == request.accountID else { throw BackendError.sessionChanged }
+            if let changedProfile { onProfileChange?(request.accountID, changedProfile) }
         } catch {
             result = .failure(ProfileFailure(error))
             await notifySessionChange(expected: request.accountID)

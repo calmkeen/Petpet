@@ -11,6 +11,11 @@ final class AccountViewModel: ObservableObject {
     @Published private(set) var isPreparingRestore = false
     @Published private(set) var message: String?
     @Published private(set) var preview: WatchRestoreImport?
+    @Published private(set) var profileDetails: AccountProfileDetails?
+    @Published private(set) var isRefreshingProfile = false
+    @Published private(set) var isUpdatingPicture = false
+    @Published private(set) var pictureMessage: String?
+    private var profileRevision = UUID()
     let configuration: AccountConfiguration
     private let backend: BackendClient?
     private let cloud: PhoneCloudCoordinator?
@@ -30,7 +35,7 @@ final class AccountViewModel: ObservableObject {
         }
     }
 
-    var isBusy: Bool { isSigningIn || isPreparingRestore || cloudState.phase != .idle }
+    var isBusy: Bool { isSigningIn || isPreparingRestore || isUpdatingPicture || cloudState.phase != .idle }
     var canSignIn: Bool { configuration.canSignIn && backend != nil }
     var feedback: String? { message ?? cloudState.error?.localizedDescription ?? cloudState.message }
 
@@ -50,13 +55,47 @@ final class AccountViewModel: ObservableObject {
     }
 
     func refreshProfile() async {
-        guard !isSigningIn, let id = session?.accountID else { return }
-        try? await profile?.refresh(accountID: id)
+        guard !isSigningIn, !isRefreshingProfile, !isUpdatingPicture, let backend, let id = session?.accountID else { return }
+        let token = profileRevision; isRefreshingProfile = true
+        defer { if token == profileRevision { isRefreshingProfile = false } }
+        do {
+            let details = try await backend.profileDetails(accountID: id)
+            guard token == profileRevision, session?.accountID == id, !Task.isCancelled else { return }
+            profileDetails = details
+            session = try await backend.session()
+            await cloud?.synchronizeAccount()
+        } catch is CancellationError { }
+        catch { if token == profileRevision { pictureMessage = (error as? BackendError ?? .network).localizedDescription } }
+    }
+    func updatePicture(_ data: Data) async {
+        guard !isSigningIn, !isUpdatingPicture, let backend, let id = session?.accountID else { return }
+        profileRevision = UUID(); let token = profileRevision
+        isRefreshingProfile = false; isUpdatingPicture = true; pictureMessage = nil
+        defer { if token == profileRevision { isUpdatingPicture = false } }
+        let image: RepresentativeImage
+        do { image = try RepresentativeImage.thumbnail(from: data) }
+        catch { pictureMessage = "사진을 읽지 못했어요. 다른 사진을 선택해 주세요."; return }
+        do {
+            let result = try await backend.updatePicture(image, accountID: id)
+            guard token == profileRevision, session?.accountID == id, !Task.isCancelled else { return }
+            profileDetails = result; pictureMessage = "대표 이미지를 바꿨어요."
+        } catch is CancellationError { }
+        catch { if token == profileRevision { pictureMessage = (error as? BackendError ?? .network).localizedDescription } }
+    }
+    func acceptProfile(_ details: AccountProfileDetails, accountID: String) {
+        guard session?.accountID == accountID, !isUpdatingPicture else { return }
+        profileRevision = UUID(); isRefreshingProfile = false; profileDetails = details; pictureMessage = nil
+    }
+    func makeRankingModel(_ kind: PhoneRankingPageModel.Kind) -> PhoneRankingPageModel {
+        PhoneRankingPageModel(kind: kind, backend: backend, account: self)
+    }
+    private func clearProfileState() {
+        profileRevision = UUID(); profileDetails = nil; isRefreshingProfile = false; isUpdatingPicture = false; pictureMessage = nil
     }
     func refreshServerSession() async {
         do {
             session = try await backend?.session()
-            if session == nil { preview = nil }
+            if session == nil { preview = nil; clearProfileState() }
             await cloud?.synchronizeAccount()
         } catch { message = BackendError.storage.localizedDescription }
     }
@@ -78,8 +117,9 @@ final class AccountViewModel: ObservableObject {
         defer { isSigningIn = false }
         do {
             session = try await backend.signInForDevelopment()
-            preview = nil
+            preview = nil; clearProfileState()
             await cloud?.synchronizeAccount()
+            isSigningIn = false; await refreshProfile()
         } catch { message = error.localizedDescription }
     }
     #endif
@@ -98,8 +138,9 @@ final class AccountViewModel: ObservableObject {
             guard let backend, canSignIn else { throw BackendError.configurationMissing }
             session = try await backend.signIn(identity)
             apple.confirmProfile(for: identity.userIdentifier)
-            preview = nil
+            preview = nil; clearProfileState()
             await cloud?.synchronizeAccount()
+            isSigningIn = false; await refreshProfile()
         } catch is CancellationError { }
         catch {
             session = try? await backend?.session()
@@ -117,7 +158,7 @@ final class AccountViewModel: ObservableObject {
             guard !isSigningIn, self.session == session else { return }
             if !authorized {
                 try await backend?.signOut()
-                self.session = nil; preview = nil
+                self.session = nil; preview = nil; clearProfileState()
                 await cloud?.synchronizeAccount()
                 message = "Apple 계정 연결이 해제되었어요. 다시 로그인해 주세요."
             }
@@ -129,7 +170,7 @@ final class AccountViewModel: ObservableObject {
     func signOut() async {
         do {
             try await backend?.signOut()
-            session = nil; preview = nil; message = nil
+            session = nil; preview = nil; message = nil; clearProfileState()
             await cloud?.synchronizeAccount()
         } catch { message = BackendError.storage.localizedDescription }
     }

@@ -13,9 +13,13 @@ struct AccountView: View {
                     Label {
                         Text(session.nickname ?? session.name ?? "내 계정").fixedSize(horizontal: false, vertical: true)
                             .accessibilityIdentifier("phone.accountName")
-                    } icon: { Image(systemName: "person.crop.circle.fill").foregroundStyle(PhoneDesign.accent) }
+                    } icon: { PhoneAccountAvatar(details: viewModel.profileDetails).frame(width: 32, height: 32).clipShape(Circle()) }
                         .font(.headline)
                     if let email = session.email { Text(email).font(.subheadline).foregroundStyle(.secondary) }
+                    NavigationLink("대표 이미지 변경") { PhoneProfilePictureView(account: viewModel) }
+                        .accessibilityIdentifier("phone.editPicture")
+                    NavigationLink("누적 걸음수 랭킹") { PhoneRankingPageView(kind: .steps, account: viewModel) }
+                        .accessibilityIdentifier("phone.openStepRanking")
                     NavigationLink("닉네임 변경") { PhoneNicknameView(editor: viewModel.makeNicknameEditor()) }
                         .accessibilityIdentifier("phone.editNickname")
                     Button("로그아웃", role: .destructive) { Task { await viewModel.signOut() } }
@@ -95,7 +99,7 @@ struct AccountView: View {
         .navigationBarTitleDisplayMode(.inline)
         .tint(PhoneDesign.accent)
         .toolbar(.visible, for: .navigationBar)
-        .task { await viewModel.start() }
+        .task { await viewModel.start(); await viewModel.refreshProfile() }
         .sheet(isPresented: Binding(get: { viewModel.preview != nil }, set: { if !$0 { viewModel.cancelPreview() } })) {
             if let preview = viewModel.preview { restorePreview(preview) }
         }

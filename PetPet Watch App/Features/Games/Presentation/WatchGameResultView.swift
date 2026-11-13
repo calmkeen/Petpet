@@ -23,8 +23,8 @@ struct WatchGameResultView: View {
             if let refresh { Button("랭킹 새로고침", action: refresh).disabled(model.busy).accessibilityIdentifier("game.refreshRanking") }
             if let ranking = model.ranking {
                 Section("TOP 10") {
-                    if let position = ranking.position { Text("이번 기록 \(position)위").foregroundStyle(.yellow).accessibilityIdentifier("game.position") }
-                    if ranking.entries.isEmpty { Text("등록된 기록이 없어요") }
+                    if let position = ranking.position { Text("예상 순위 \(position)위").foregroundStyle(.yellow).accessibilityIdentifier("game.position") }
+                    if ranking.entries.isEmpty && ranking.warning == nil { Text("등록된 기록이 없어요") }
                     ForEach(Array(ranking.entries.enumerated()), id: \.offset) { _, row in
                         VStack(alignment: .leading, spacing: 3) {
                             Text("\(row.rank)위 · \(row.name)").fixedSize(horizontal: false, vertical: true).accessibilityIdentifier("game.rankName.\(row.userID.map(String.init) ?? "place\(row.rank)")")

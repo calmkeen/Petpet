@@ -344,6 +344,20 @@ public actor BackendClient {
                   Int64(accountID).map({ $0 == value.userId }) ?? true else { throw BackendError.invalidResponse }
             position = value.rank
         }
+        do {
+            return try await topRanking(game, path: path, position: position, accountID: accountID, epoch: token)
+        } catch {
+            try checkEpoch(token)
+            try Task.checkCancellation()
+            guard position != nil, !(error is CancellationError), error as? BackendError != .authenticationRequired,
+                  error as? BackendError != .sessionChanged else { throw error }
+            // Android keeps the submitted record's expected rank when TOP 10 fails.
+            return GameRanking(game: game, position: position, entries: [],
+                               warning: "기록을 저장했어요. TOP 10을 불러오지 못했어요. 다시 시도해 주세요.")
+        }
+    }
+
+    private func topRanking(_ game: MiniGame, path: String, position: Int?, accountID: String, epoch token: Int) async throws -> GameRanking {
         let data = try await authorized(path: path + "top10", method: "GET", accountID: accountID)
         struct Row: Decodable { let rank: Int?; let userId: Int64?; let userName: String?; let score: Int?; let maxStep: Int?; let maxCombo: Int? }
         struct Rows: Decodable { let ranks: [Row] }
@@ -354,6 +368,7 @@ public actor BackendClient {
             return GameRankEntry(rank: row.rank ?? index + 1, userID: row.userId, name: String((row.userName ?? "이름 없음").prefix(255)), score: score, maxCombo: row.maxCombo ?? 0)
         }
         try checkEpoch(token)
+        try Task.checkCancellation()
         return GameRanking(game: game, position: position, entries: entries)
     }
 

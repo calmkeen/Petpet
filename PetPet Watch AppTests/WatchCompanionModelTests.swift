@@ -92,6 +92,21 @@ final class WatchCompanionModelTests: XCTestCase {
         XCTAssertEqual(model.ranking?.entries.first?.score, 0)
     }
 
+    func testPartialRankingKeepsPositionShowsWarningAndCanRetry() async throws {
+        let (base, _, directory, _) = try await setup()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let wire = RankingModelWire(); wire.warning = "TOP 10을 불러오지 못했어요."
+        let services = WatchGameServices(client: WatchFeatureClient(transport: wire, environment: .development), records: base.records, cloud: base.cloud)
+        let model = WatchGameResultModel(services: services)
+        model.finish(GameScore(game: .starStair, score: 4, maxCombo: 2))
+        await until { model.ranking != nil }
+        XCTAssertEqual(model.ranking?.position, 1); XCTAssertTrue(model.ranking?.entries.isEmpty == true)
+        XCTAssertEqual(model.message, wire.warning); XCTAssertTrue(model.canRetry); XCTAssertFalse(model.busy)
+        wire.warning = nil; model.retry()
+        await until { model.ranking?.warning == nil && model.ranking?.entries.isEmpty == false }
+        XCTAssertNil(model.message); XCTAssertEqual(model.best?.score, 4)
+    }
+
     func testLoggedOutChatDoesNotSendARequest() async throws {
         let (services, wire, directory, cloudWire) = try await setup()
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -140,6 +155,7 @@ final class WatchCompanionModelTests: XCTestCase {
 @MainActor private final class RankingModelWire: CompanionFeatureTransport {
     var onFeatureRequest: ((Data) async throws -> Data)?
     var fail = false
+    var warning: String?
     var submissions: [GameScore] = []
     var lastAccount: String?
     private var best: [String: Int] = [:]
@@ -149,7 +165,7 @@ final class WatchCompanionModelTests: XCTestCase {
         guard case let .submit(score) = request.action else { throw BackendError.invalidResponse }
         submissions.append(score); lastAccount = request.accountID
         best[request.accountID] = max(best[request.accountID] ?? 0, score.score)
-        let value = GameRanking(game: score.game, position: 1, entries: [GameRankEntry(rank: 1, userID: Int64(request.accountID), name: "Test", score: best[request.accountID]!)])
+        let value = GameRanking(game: score.game, position: 1, entries: warning == nil ? [GameRankEntry(rank: 1, userID: Int64(request.accountID), name: "Test", score: best[request.accountID]!)] : [], warning: warning)
         return try JSONEncoder().encode(CompanionFeatureReply(request: request, result: .ranking(value)))
     }
 }
