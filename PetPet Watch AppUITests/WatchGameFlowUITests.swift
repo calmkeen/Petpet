@@ -135,7 +135,8 @@ final class WatchGameFlowUITests: XCTestCase {
     }
     private func assertSubmitted() {
         reveal(app.staticTexts["game.position"])
-        XCTAssertTrue(app.staticTexts["game.position"].label.contains("위"))
+        XCTAssertTrue(app.staticTexts["game.position"].label.hasPrefix("예상 순위 "))
+        XCTAssertTrue(app.staticTexts["game.position"].label.hasSuffix("위"))
         reveal(app.staticTexts["game.rankName.900000001"])
         XCTAssertTrue(app.staticTexts["game.rankScore.900000001"].exists)
     }
