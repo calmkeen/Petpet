@@ -32,13 +32,13 @@ struct WatchProfileImageView: View {
             }
             Section("이미지 변경") {
                 PhotosPicker(selection: $selection, matching: .images) { Text("사진 선택") }
-                    .disabled(model.busy).accessibilityIdentifier("profile.choosePhoto")
+                    .disabled(!model.canEdit).accessibilityIdentifier("profile.choosePhoto")
                 Button("펫 이미지로 설정") {
                     photoError = nil
                     guard let bytes = UIImage(named: "stepmate_fox_idle")?.pngData() else { photoError = "펫 이미지를 읽지 못했어요."; return }
                     Task { await model.upload(bytes) }
-                }.disabled(model.busy).accessibilityIdentifier("profile.usePetImage")
-                Button("다시 불러오기") { Task { await model.load() } }.disabled(model.busy).accessibilityIdentifier("profile.refresh")
+                }.disabled(!model.canEdit).accessibilityIdentifier("profile.usePetImage")
+                Button("다시 불러오기") { photoError = nil; Task { await model.load() } }.disabled(!model.canEdit).accessibilityIdentifier("profile.refresh")
             }
             if model.busy { ProgressView("이미지 처리 중") }
             if let message = photoError ?? model.message { Text(message).font(.caption).accessibilityIdentifier("profile.feedback") }

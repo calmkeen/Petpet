@@ -53,6 +53,26 @@ import PetPetCore
         XCTAssertEqual(f.account.profileDetails, details)
         await f.account.signOut(); XCTAssertNil(f.account.profileDetails)
     }
+    func testSuccessfulProfileRetryClearsPreviousError() async throws {
+        let f = try await context()
+        await f.http.failProfile(true); await f.account.refreshProfile()
+        XCTAssertNotNil(f.account.pictureMessage); XCTAssertFalse(f.account.isRefreshingProfile)
+        await f.http.failProfile(false); await f.account.refreshProfile()
+        XCTAssertNil(f.account.pictureMessage); XCTAssertEqual(f.account.profileDetails?.nickname, "Tester")
+    }
+    func testCloudSessionInvalidationClearsDisplayedProfileImmediately() async throws {
+        let f = try await context()
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let cloud = PhoneCloudCoordinator(backend: f.backend, transport: PhoneParityCloud(),
+            receipts: FileCloudReceiptStore(fileURL: root.appendingPathComponent("receipts.json")), directory: root, environment: .development)
+        let account = AccountViewModel(backend: f.backend, cloud: cloud)
+        await account.start(); await account.refreshProfile()
+        XCTAssertNotNil(account.profileDetails)
+        try await f.backend.signOut(); await cloud.synchronizeAccount()
+        XCTAssertNil(account.session); XCTAssertNil(account.profileDetails)
+        XCTAssertNil(account.pictureMessage); XCTAssertFalse(account.isRefreshingProfile)
+    }
     func testPictureRestoresAcrossModelAndBackendRestartAndInvalidInputKeepsIt() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
@@ -67,11 +87,12 @@ import PetPetCore
         XCTAssertEqual(restarted.profileDetails, saved); XCTAssertNotNil(restarted.pictureMessage)
         await restarted.signOut(); XCTAssertNil(restarted.profileDetails)
     }
-    private func context() async throws -> (account: AccountViewModel, http: PhoneParityHTTP) {
+    private func context() async throws -> (account: AccountViewModel, http: PhoneParityHTTP, backend: BackendClient) {
         let http = PhoneParityHTTP()
         let session = BackendSession(accountID: "7", serverOrigin: url.absoluteString, accessToken: "test-access", refreshToken: nil, email: nil, name: nil, nickname: "Tester")
-        let account = AccountViewModel(backend: try BackendClient(baseURL: url, transport: http, store: PhoneParityStore(session)))
-        await account.start(); return (account, http)
+        let backend = try BackendClient(baseURL: url, transport: http, store: PhoneParityStore(session))
+        let account = AccountViewModel(backend: backend)
+        await account.start(); return (account, http, backend)
     }
     private func fixture() throws -> Data {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 20, height: 20))
@@ -89,6 +110,8 @@ private actor PhoneParityHTTP: BackendHTTPTransport {
     var failedPage: Int?
     var entered: XCTestExpectation?
     var continuation: CheckedContinuation<Void,Never>?
+    var profileFails = false
+    func failProfile(_ value: Bool) { profileFails = value }
     func setFailPage(_ value: Int?) { failedPage = value }
     func holdNext(_ value: XCTestExpectation) { entered = value }
     func release() { continuation?.resume(); continuation = nil }
@@ -97,9 +120,23 @@ private actor PhoneParityHTTP: BackendHTTPTransport {
         let page = Int(URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "page" }?.value ?? "1")!
         if failedPage == page { return BackendHTTPResponse(statusCode: 500) }
         let body: String
-        if request.httpMethod == "PATCH" { body = #"{"pictureUrl":"https://image.example.test/avatar.jpg"}"# }
+        if request.url!.path.hasSuffix("users/me") {
+            if profileFails { return BackendHTTPResponse(statusCode: 503) }
+            body = #"{"nickname":"Tester","pictureUrl":"https://image.example.test/avatar.jpg"}"#
+        }
+        else if request.httpMethod == "PATCH" { body = #"{"pictureUrl":"https://image.example.test/avatar.jpg"}"# }
         else if request.url!.path.contains("stepcounts/ranking") { body = "{\"page\":\(page),\"size\":5,\"totalUsers\":12,\"rankings\":[{\"rank\":\((page-1)*5+1),\"userId\":8,\"nickname\":\"친구\",\"totalStepCount\":123456}]}" }
         else { body = #"{"ranks":[{"rank":6,"userId":8,"userName":"친구","score":88,"maxStep":44,"maxCombo":22}]}"# }
         return BackendHTTPResponse(statusCode: 200, data: Data(body.utf8))
     }
+}
+@MainActor private final class PhoneParityCloud: CloudTransport {
+    var connection = SnapshotConnection(isActivated: false, isPaired: false, isCounterpartInstalled: false, isReachable: false)
+    var onCloudControl: ((Data) -> Void)?
+    var onCloudFile: ((URL) -> Void)?
+    var onCloudChallenge: (() async throws -> Data)?
+    var onCloudTransferError: ((String?) -> Void)?
+    func enqueueCloudControl(_ data: Data) {}
+    func enqueueCloudFile(_ url: URL) throws { throw BackendError.watchUnavailable }
+    func requestCloudChallenge() async throws -> Data { throw BackendError.watchUnavailable }
 }
