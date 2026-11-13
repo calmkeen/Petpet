@@ -84,6 +84,7 @@ import PetPetCore
 struct PhoneExtrasView: View {
     @ObservedObject var model: PhoneExtrasModel
     let development: Bool
+    var account: AccountViewModel? = nil
     private enum Pane: Hashable { case rankings, chat }
     @State private var pane: Pane = .rankings
     @State private var game = MiniGame.shooting
@@ -162,6 +163,12 @@ struct PhoneExtrasView: View {
                 Button("랭킹 새로고침") { model.load(game) }.buttonStyle(PhoneActionStyle())
                     .disabled(model.rankingBusy || !model.isSignedIn).accessibilityIdentifier("phone.refreshRanking")
             } header: { Text("TOP 10") } footer: { Text("게임은 Apple Watch에서 플레이할 수 있어요.") }
+            if let account {
+                Section("전체 랭킹") {
+                    NavigationLink("\(game.title) · 구간 랭킹") { PhoneRankingPageView(kind: .game(game), account: account) }
+                        .accessibilityIdentifier("phone.openGameRange")
+                }
+            }
             if development { Text("Debug · 개발 모의 랭킹").font(.caption).foregroundStyle(.secondary) }
         }
     }

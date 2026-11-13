@@ -120,7 +120,7 @@ struct PhoneHomeView: View {
                 shortcut("계정·백업", icon: "icloud", detail: accountViewModel.session?.nickname ?? (accountViewModel.session == nil ? "아이폰에서 로그인" : "연결됨"))
             }.accessibilityIdentifier("phone.openAccount")
             if let extras {
-                NavigationLink { PhoneExtrasView(model: extras, development: accountViewModel.configuration.isDevelopment) } label: {
+                NavigationLink { PhoneExtrasView(model: extras, development: accountViewModel.configuration.isDevelopment, account: accountViewModel) } label: {
                     shortcut("게임·대화", icon: "gamecontroller.fill", detail: "랭킹 · AI 대화")
                 }.accessibilityIdentifier("phone.openExtras")
             }

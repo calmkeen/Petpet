@@ -130,11 +130,13 @@ final class CommunityAPITests: XCTestCase {
         let session = try await backend.signInForDevelopment()
         let transport = CommunityLoopback(); let host = PhoneFeatureCoordinator(backend: backend, transport: transport, environment: .development)
         defer { host.accountChanged() }
+        var deliveredProfile: AccountProfileDetails?
+        host.onProfileChange = { id, profile in XCTAssertEqual(id, session.accountID); deliveredProfile = profile }
         let client = WatchFeatureClient(transport: transport, environment: .development)
         guard case let .stepPage(page) = try await client.request(.stepPage(RankingPageRequest(page: 2)), accountID: session.accountID) else { return XCTFail() }
         XCTAssertEqual(page.page, 2)
         guard case let .profile(profile) = try await client.request(.updatePicture(fixture()), accountID: session.accountID) else { return XCTFail() }
-        XCTAssertNotNil(profile.preview)
+        XCTAssertNotNil(profile.preview); XCTAssertEqual(deliveredProfile, profile)
         do { _ = try await client.request(.profile, accountID: "other"); XCTFail() } catch { XCTAssertEqual(error as? BackendError, .authenticationRequired) }
     }
     #endif
