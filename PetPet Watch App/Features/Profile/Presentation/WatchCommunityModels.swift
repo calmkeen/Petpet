@@ -55,10 +55,12 @@ import PetPetCore
     private let cloud: WatchCloudController
     private var revision = UUID()
     private var account: AnyCancellable?
+    var canEdit: Bool { !busy && cloud.account != nil }
     init(client: WatchFeatureClient, cloud: WatchCloudController) {
         self.client = client; self.cloud = cloud
-        account = cloud.$account.map { $0?.id }.removeDuplicates().dropFirst().sink { [weak self] _ in
-            self?.revision = UUID(); self?.profile = nil; self?.busy = false; self?.message = nil
+        account = cloud.$account.map { $0?.id }.removeDuplicates().dropFirst().sink { [weak self] id in
+            self?.revision = UUID(); self?.profile = nil; self?.busy = false
+            self?.message = id == nil ? "계정에서 로그인해 주세요." : nil
         }
     }
     func load() async { await perform(.profile, success: nil) }

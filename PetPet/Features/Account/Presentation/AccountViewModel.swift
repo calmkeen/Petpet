@@ -5,7 +5,9 @@ import PetPetCore
 
 @MainActor
 final class AccountViewModel: ObservableObject {
-    @Published private(set) var session: BackendSession?
+    @Published private(set) var session: BackendSession? {
+        didSet { if oldValue?.accountID != session?.accountID { clearProfileState() } }
+    }
     @Published private(set) var cloudState = PhoneCloudState()
     @Published private(set) var isSigningIn = false
     @Published private(set) var isPreparingRestore = false
@@ -56,7 +58,7 @@ final class AccountViewModel: ObservableObject {
 
     func refreshProfile() async {
         guard !isSigningIn, !isRefreshingProfile, !isUpdatingPicture, let backend, let id = session?.accountID else { return }
-        let token = profileRevision; isRefreshingProfile = true
+        let token = profileRevision; isRefreshingProfile = true; pictureMessage = nil
         defer { if token == profileRevision { isRefreshingProfile = false } }
         do {
             let details = try await backend.profileDetails(accountID: id)

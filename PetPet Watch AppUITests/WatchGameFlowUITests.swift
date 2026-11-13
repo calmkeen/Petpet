@@ -57,6 +57,7 @@ final class WatchGameFlowUITests: XCTestCase {
         reveal(app.staticTexts["game.rankName.900000001"])
         XCTAssertTrue(app.staticTexts["game.rankScore.900000001"].exists)
         reveal(app.buttons["game.refreshRanking"], down: false); app.buttons["game.refreshRanking"].tap()
+        XCTAssertTrue(app.navigationBars["랭킹"].waitForExistence(timeout: 4))
         reveal(app.staticTexts["game.rankName.900000001"])
         capture("games-stairs-ranking-reloaded")
     }
@@ -69,6 +70,7 @@ final class WatchGameFlowUITests: XCTestCase {
         let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in self.app.buttons["game.refreshRanking"].exists && self.app.buttons["game.refreshRanking"].isEnabled }, object: nil)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 20), .completed)
         app.buttons["game.refreshRanking"].tap()
+        XCTAssertTrue(app.navigationBars["랭킹"].waitForExistence(timeout: 4))
         reveal(app.staticTexts["game.rankName.900000001"])
         XCTAssertTrue(app.staticTexts["game.rankScore.900000001"].exists)
         capture("games-ranking-refresh-button")
@@ -190,8 +192,11 @@ final class WatchGameFlowUITests: XCTestCase {
             var down = preferredDown
             if element.exists {
                 let frame = element.frame, screen = app.windows.firstMatch.frame
-                if element.isHittable && screen.insetBy(dx: -1, dy: -1).contains(frame) { return }
-                if !frame.isEmpty { down = frame.midY >= screen.midY }
+                let nav = app.navigationBars.firstMatch
+                let top = nav.exists ? max(screen.minY + 20, nav.frame.maxY) : screen.minY + 20
+                let visible = CGRect(x: screen.minX, y: top, width: screen.width, height: screen.maxY - top)
+                if element.isHittable && visible.insetBy(dx: -1, dy: -1).contains(frame) { return }
+                if !frame.isEmpty { down = frame.midY >= visible.midY }
             }
             if crown { XCUIDevice.shared.rotateDigitalCrown(delta: down ? 0.6 : -0.6) }
             else {

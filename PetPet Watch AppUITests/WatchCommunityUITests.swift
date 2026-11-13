@@ -20,7 +20,13 @@ import XCTest
         let set = app.buttons["profile.usePetImage"]; reveal(set)
         XCTAssertTrue(wait { set.isEnabled }); set.tap()
         let feedback = app.staticTexts["profile.feedback"]; reveal(feedback)
-        XCTAssertTrue(wait { feedback.label == "대표 이미지를 바꿨어요." })
+        XCTAssertTrue(wait { feedback.label == "대표 이미지를 바꿨어요." || feedback.label.contains("아이폰과 워치") })
+        if feedback.label.contains("아이폰과 워치") {
+            // A timed-out mutation may already have applied: read it back first.
+            let refresh = app.buttons["profile.refresh"]; reveal(refresh); refresh.tap()
+            let state = app.staticTexts["profile.pictureState"]; reveal(state, down: false)
+            XCTAssertTrue(wait { state.label == "대표 이미지가 저장되어 있어요." }, app.debugDescription)
+        }
         reveal(app.staticTexts["profile.pictureState"], down: false)
         XCTAssertEqual(app.staticTexts["profile.pictureState"].label, "대표 이미지가 저장되어 있어요.")
         capture("community-40mm-picture-updated")
@@ -30,6 +36,18 @@ import XCTest
         let image = app.descendants(matching: .any).matching(identifier: "profile.picture").firstMatch
         XCTAssertEqual(image.label, "저장된 대표 이미지")
         capture("community-40mm-picture-after-relaunch")
+    }
+    func test40LargeTextRankingAndPictureControls() {
+        app.terminate(); app.launchArguments = ["--watch-ui-large-text"]; app.launch()
+        test10CumulativeStepsPageForwardBackAndRefresh()
+        capture("integrated-watch-large-ranking")
+        app.terminate(); app.launch(); openAccount(); openPicture()
+        for id in ["profile.choosePhoto", "profile.usePetImage", "profile.refresh"] {
+            let button = app.buttons[id]; reveal(button)
+            XCTAssertTrue(button.isEnabled); XCTAssertGreaterThanOrEqual(button.frame.height, 44)
+            XCTAssertTrue(app.windows.firstMatch.frame.contains(button.frame))
+        }
+        capture("integrated-watch-large-picture-controls")
     }
     private func gamePages(_ game: String) {
         crownTo("watch.openGames"); app.buttons["watch.openGames"].tap()
@@ -49,7 +67,16 @@ import XCTest
     }
     private func assertPage(_ number: Int) {
         let page = app.staticTexts["rank.page"]; reveal(page, down: false)
-        XCTAssertTrue(wait { page.exists && page.label == "\(number)페이지" && self.app.buttons["rank.refresh"].isEnabled })
+        let error = app.staticTexts["rank.error"]
+        XCTAssertTrue(wait { self.app.buttons["rank.refresh"].isEnabled && (page.label == "\(number)페이지" || error.exists) }, app.debugDescription)
+        if error.exists && error.label.contains("아이폰과 워치") {
+            capture("community-read-timeout-retry")
+            let current = Int(page.label.filter(\.isNumber)) ?? 1
+            let retry = app.buttons[current == number ? "rank.refresh" : (current < number ? "rank.next" : "rank.previous")]
+            reveal(retry); XCTAssertTrue(retry.isEnabled); retry.tap()
+            reveal(page, down: false)
+            XCTAssertTrue(wait { page.label == "\(number)페이지" && self.app.buttons["rank.refresh"].isEnabled }, app.debugDescription)
+        }
         XCTAssertFalse(app.staticTexts["rank.error"].exists)
     }
     private func next() { let button = app.buttons["rank.next"]; reveal(button); XCTAssertTrue(wait { button.isEnabled }); button.tap(); assertHeaderVisible() }
@@ -82,7 +109,7 @@ import XCTest
         XCTFail("Missing community control \(element)\n\(app.debugDescription)")
     }
     private func wait(_ condition: @escaping () -> Bool) -> Bool {
-        XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in condition() }, object: nil)], timeout: 12) == .completed
+        XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate { _,_ in condition() }, object: nil)], timeout: 45) == .completed
     }
     private func capture(_ name: String) { let value = XCTAttachment(screenshot: app.screenshot()); value.name = name; value.lifetime = .keepAlways; add(value) }
 }

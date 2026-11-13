@@ -27,6 +27,30 @@ import PetPetCore
         f.wire.release(); await work.value
         XCTAssertNil(model.stepPage); XCTAssertNil(model.gamePage); XCTAssertFalse(model.busy)
     }
+    func testProfileRetryClearsErrorAndLogoutDisablesEditing() async throws {
+        let f = try await CommunityContext(); defer { f.remove() }
+        let model = WatchProfileImageModel(client: f.client, cloud: f.cloud)
+        f.wire.rejectProfile = true; await model.load()
+        XCTAssertNotNil(model.message); XCTAssertTrue(model.canEdit)
+        f.wire.rejectProfile = false; await model.load()
+        XCTAssertEqual(model.profile?.nickname, "Test"); XCTAssertNil(model.message)
+        f.transport.onCloudControl?(try CloudWire.encodeControl(.account(nil), environment: .development))
+        await f.cloud.finishWork()
+        XCTAssertNil(model.profile); XCTAssertFalse(model.canEdit)
+        XCTAssertEqual(model.message, "계정에서 로그인해 주세요.")
+    }
+    func testLogoutDiscardsLateProfileAndReleasesBusyState() async throws {
+        let f = try await CommunityContext(); defer { f.remove() }
+        let entered = expectation(description: "Profile entered"); f.wire.entered = entered; f.wire.hold = true
+        let model = WatchProfileImageModel(client: f.client, cloud: f.cloud)
+        let work = Task { await model.load() }
+        await fulfillment(of: [entered], timeout: 3)
+        XCTAssertFalse(model.canEdit)
+        f.transport.onCloudControl?(try CloudWire.encodeControl(.account(nil), environment: .development))
+        await f.cloud.finishWork(); f.wire.release(); await work.value
+        XCTAssertNil(model.profile); XCTAssertFalse(model.busy); XCTAssertFalse(model.canEdit)
+        XCTAssertEqual(model.message, "계정에서 로그인해 주세요.")
+    }
 }
 @MainActor private struct CommunityContext {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -48,15 +72,21 @@ import PetPetCore
 @MainActor private final class CommunityRankWire: CompanionFeatureTransport {
     var onFeatureRequest: ((Data) async throws -> Data)?
     var rejectSecondPage = false
+    var rejectProfile = false
     var hold = false
     var entered: XCTestExpectation?
     var pages: [Int] = []
     var continuation: CheckedContinuation<Void,Never>?
     func requestFeature(_ data: Data) async throws -> Data {
         let request = try JSONDecoder().decode(CompanionFeatureRequest.self, from: data)
+        if hold { await withCheckedContinuation { continuation = $0; entered?.fulfill() } }
+        if case .profile = request.action {
+            if rejectProfile { throw BackendError.network }
+            return try JSONEncoder().encode(CompanionFeatureReply(request: request,
+                result: .profile(AccountProfileDetails(nickname: "Test", pictureURL: URL(string: "https://image.example.test/pet.jpg")))))
+        }
         guard case let .stepPage(page) = request.action else { throw BackendError.invalidResponse }
         pages.append(page.page)
-        if hold { await withCheckedContinuation { continuation = $0; entered?.fulfill() } }
         if rejectSecondPage && page.page == 2 { throw BackendError.network }
         let records = (0..<5).map { offset in ["rank": (page.page - 1) * 5 + offset + 1, "userId": offset + 10, "nickname": "친구", "totalStepCount": 100] as [String: Any] }
         let value = try JSONDecoder().decode(StepRankingPage.self, from: JSONSerialization.data(withJSONObject: ["page": page.page, "size": 5, "totalUsers": 12, "rankings": records]))

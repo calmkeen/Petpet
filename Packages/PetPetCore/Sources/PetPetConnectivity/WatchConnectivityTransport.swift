@@ -116,26 +116,26 @@ public final class WatchConnectivityTransport: NSObject, SnapshotTransport, Clou
     public func requestProfile(_ data: Data) async throws -> Data {
         guard data.count <= 60_000 else { throw BackendError.transferTooLarge }
         guard let session, session.activationState == .activated, session.isReachable else { throw BackendError.watchUnavailable }
-        return try await withCheckedThrowingContinuation { continuation in
+        return try await DataReply.wait { complete in
             session.sendMessage([Self.profileKey: data], replyHandler: { reply in
                 guard let data = reply[Self.profileKey] as? Data, data.count <= 60_000 else {
-                    continuation.resume(throwing: BackendError.watchUnavailable); return
+                    complete(.failure(BackendError.watchUnavailable)); return
                 }
-                continuation.resume(returning: data)
-            }, errorHandler: { _ in continuation.resume(throwing: BackendError.watchUnavailable) })
+                complete(.success(data))
+            }, errorHandler: { _ in complete(.failure(BackendError.watchUnavailable)) })
         }
     }
 
     public func requestFeature(_ data: Data) async throws -> Data {
         guard data.count <= 60_000 else { throw BackendError.transferTooLarge }
         guard let session, session.activationState == .activated, session.isReachable else { throw BackendError.watchUnavailable }
-        return try await withCheckedThrowingContinuation { continuation in
+        return try await DataReply.wait { complete in
             session.sendMessage([Self.featureKey: data], replyHandler: { reply in
                 guard let data = reply[Self.featureKey] as? Data, data.count <= 60_000 else {
-                    continuation.resume(throwing: BackendError.watchUnavailable); return
+                    complete(.failure(BackendError.watchUnavailable)); return
                 }
-                continuation.resume(returning: data)
-            }, errorHandler: { _ in continuation.resume(throwing: BackendError.watchUnavailable) })
+                complete(.success(data))
+            }, errorHandler: { _ in complete(.failure(BackendError.watchUnavailable)) })
         }
     }
 

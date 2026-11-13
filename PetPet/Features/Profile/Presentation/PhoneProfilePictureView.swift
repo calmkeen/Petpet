@@ -43,7 +43,7 @@ struct PhoneProfilePictureView: View {
                     guard let data = UIImage(named: "stepmate_fox_idle")?.pngData() else { photoError = "펫 이미지를 읽지 못했어요."; return }
                     Task { await account.updatePicture(data) }
                 }.buttonStyle(PhoneActionStyle()).disabled(account.isUpdatingPicture || account.session == nil).accessibilityIdentifier("phone.usePetPicture")
-                Button("다시 불러오기") { Task { await account.refreshProfile() } }
+                Button("다시 불러오기") { photoError = nil; Task { await account.refreshProfile() } }
                     .frame(minHeight: 44).disabled(account.isUpdatingPicture || account.isRefreshingProfile || account.session == nil).accessibilityIdentifier("phone.refreshPicture")
             }
             if account.isUpdatingPicture || account.isRefreshingProfile { ProgressView("이미지 처리 중") }

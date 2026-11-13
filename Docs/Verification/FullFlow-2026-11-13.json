@@ -1,0 +1,978 @@
+{
+  "date": "2026-11-13",
+  "branch": "feature/full-flow-final-audit",
+  "baseDevelop": "0295f86",
+  "androidCommit": "4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3",
+  "productCommits": [
+    "1ab181d",
+    "7d07af8"
+  ],
+  "finalUICommit": "c3ab8f9",
+  "simulatorsOnly": true,
+  "mockAccountsOnly": true,
+  "physicalDevicesUsed": false,
+  "productionAPIWritesPerformed": false,
+  "photosLibrarySelectionTested": false,
+  "core": {
+    "passed": 213,
+    "failed": 0,
+    "log": "/private/tmp/petpet-complete-20261113/core-confirmed.log"
+  },
+  "models": {
+    "phone-models": {
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "62CC3FF5-FBE5-44D0-93A6-A10DA462ED7E",
+        "deviceName": "PetPet Final Verified Nov11 iPhone",
+        "modelName": "iPhone SE (3rd generation)",
+        "osBuildNumber": "22A3351",
+        "osVersion": "18.0",
+        "platform": "iOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-complete-20261113/phone-models.xcresult"
+    },
+    "watch-models": {
+      "passed": 28,
+      "failed": 0,
+      "skipped": 0,
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "239DFD2B-8250-409E-9B90-FF960B5BA636",
+        "deviceName": "PetPet Standalone 40mm",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "resultBundle": "/private/tmp/petpet-complete-20261113/watch-models.xcresult"
+    }
+  },
+  "acceptedUIExecutions": 47,
+  "acceptedUIFailed": 0,
+  "fullJourney": {
+    "verifiedAt": "2026-11-13T05:08:36.255619+00:00",
+    "simulatorOnly": true,
+    "phoneSimulator": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+    "watchSimulator": "815985F9-E819-488C-B6FD-41306283BF34",
+    "passedUIExecutions": 22,
+    "failedUIExecutions": 0,
+    "skippedUIExecutions": 0,
+    "uniqueUITestMethods": 19,
+    "results": [
+      {
+        "part": "journey",
+        "stage": 0,
+        "side": "watch",
+        "test": "test00NewWatchCanPlayWithoutLogin",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/journey/phase-00-131023.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "journey",
+        "stage": 1,
+        "side": "phone",
+        "test": "test01LoginAndEmptyRestore",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/journey/phase-01-131103.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      },
+      {
+        "part": "journey",
+        "stage": 2,
+        "side": "watch",
+        "test": "test02FeedGrowAndAllocate",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/journey/phase-02-131224.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "journey",
+        "stage": 3,
+        "side": "phone",
+        "test": "test03SyncedGrowthBackupTwiceAndCancelRestore",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/journey/phase-03-131346.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      },
+      {
+        "part": "journey",
+        "stage": 4,
+        "side": "watch",
+        "test": "test04SpendAfterBackup",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/journey/phase-04-131518.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "journey",
+        "stage": 5,
+        "side": "phone",
+        "test": "test05ReconnectRestoreOlderPetAndLogout",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/journey/phase-05-131610.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      },
+      {
+        "part": "journey",
+        "stage": 6,
+        "side": "watch",
+        "test": "test06LoggedOutWatchKeepsLocalPlay",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/journey/phase-06-131709.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "journey",
+        "stage": 7,
+        "side": "phone",
+        "test": "test07ReloginKeepsBackupAndLocalProgress",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/journey/phase-07-131813.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      },
+      {
+        "part": "journey",
+        "stage": 8,
+        "side": "watch",
+        "test": "test08WatchRequestsBackupAfterRelogin",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/journey/phase-08-131902.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 0,
+        "side": "phone",
+        "test": "test00EnsureDevelopmentLogin",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-00-test00EnsureDevelopmentLogin-131957.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 1,
+        "side": "watch",
+        "test": "test10ShootingResultSubmitsAndReplayKeepsBest",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-01-test10ShootingResultSubmitsAndReplayKeepsBest-132015.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 2,
+        "side": "watch",
+        "test": "test11StairsResultSubmitsAndLeaderboardReloads",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-02-test11StairsResultSubmitsAndLeaderboardReloads-132835.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 3,
+        "side": "watch",
+        "test": "test12StandaloneRankingRefresh",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-03-test12StandaloneRankingRefresh-132944.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 4,
+        "side": "phone",
+        "test": "test21BothRankingsShowWatchRecords",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-04-test21BothRankingsShowWatchRecords-133026.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 5,
+        "side": "watch",
+        "test": "test20ChatThroughSystemInput",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-05-test20ChatThroughSystemInput-133042.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 6,
+        "side": "watch",
+        "test": "test22ChatCancellationAndReturn",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-06-test22ChatCancellationAndReturn-133210.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 7,
+        "side": "phone",
+        "test": "test30Logout",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-07-test30Logout-133330.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 8,
+        "side": "watch",
+        "test": "test31LoggedOutGameKeepsLocalRecordAndChatRequiresLogin",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-08-test31LoggedOutGameKeepsLocalRecordAndChatRequiresLogin-133345.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 9,
+        "side": "phone",
+        "test": "test00EnsureDevelopmentLogin",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-09-test00EnsureDevelopmentLogin-133507.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 10,
+        "side": "watch",
+        "test": "test12StandaloneRankingRefresh",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-10-test12StandaloneRankingRefresh-133525.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 11,
+        "side": "watch",
+        "test": "test20ChatThroughSystemInput",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-11-test20ChatThroughSystemInput-133608.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "part": "games",
+        "stage": 12,
+        "side": "phone",
+        "test": "test40PhoneChatRepeatsAndCancels",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/verified/games/stage-12-test40PhoneChatRepeatsAndCancels-140529.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      }
+    ],
+    "phoneSnapshotMatchesWatch": true,
+    "serverPetStatsStepsAndGameScoresMatchWatch": true,
+    "pet": {
+      "id": 1,
+      "affection": 0,
+      "defense": 0,
+      "level": 2,
+      "attack": 50,
+      "lastFedAt": 816236284.251365,
+      "experience": 1,
+      "statPoints": 0,
+      "mood": "HAPPY",
+      "health": 9
+    },
+    "inventory": [
+      {
+        "foodID": 1,
+        "id": 1,
+        "quantity": 3
+      },
+      {
+        "quantity": 1,
+        "id": 2,
+        "foodID": 2
+      }
+    ],
+    "steps": {
+      "2026-11-13": 4321,
+      "2026-11-12": 2000
+    },
+    "nickname": "개발 테스트 계정",
+    "localGameRecords": {
+      "starStair": {
+        "game": "starStair",
+        "score": 1,
+        "maxCombo": 1
+      },
+      "shooting": {
+        "score": 9,
+        "game": "shooting",
+        "maxCombo": 4
+      }
+    },
+    "serverGameRecords": {
+      "shooting": {
+        "score": 9,
+        "maxCombo": 0,
+        "game": "shooting"
+      },
+      "starStair": {
+        "score": 1,
+        "game": "starStair",
+        "maxCombo": 1
+      }
+    },
+    "appliedBackups": 3,
+    "appliedRestores": 1,
+    "pendingBackups": 0,
+    "pendingRestores": 0
+  },
+  "newAPI": {
+    "simulatorOnly": true,
+    "mockAccountOnly": true,
+    "passedUIExecutions": 15,
+    "failedUIExecutions": 0,
+    "skippedUIExecutions": 0,
+    "nicknameResult": {
+      "pet": {
+        "defense": 0,
+        "id": 1,
+        "level": 2,
+        "affection": 0,
+        "health": 9,
+        "statPoints": 0,
+        "experience": 1,
+        "attack": 50
+      },
+      "inventory": [
+        {
+          "id": 1,
+          "foodID": 1,
+          "quantity": 3
+        },
+        {
+          "id": 2,
+          "foodID": 2,
+          "quantity": 1
+        }
+      ],
+      "nickname": "FinalWatch547655",
+      "profileImageSHA256": null,
+      "phoneSnapshotMatchesWatch": true,
+      "stayedInCompanionMode": true,
+      "stage": 0,
+      "suite": "WatchFinalAuditUITests",
+      "test": "test20WatchNicknameChangeSurvivesRelaunch",
+      "side": "watch",
+      "passed": true,
+      "resultBundle": "/private/tmp/petpet-complete-20261113/community/stage-00-test20WatchNicknameChangeSurvivesRelaunch-142550.xcresult",
+      "device": {
+        "architecture": "arm64",
+        "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+        "deviceName": "PetPet Complete Nov13 iPhone",
+        "modelName": "Apple Watch SE",
+        "osBuildNumber": "22R349",
+        "osVersion": "11.0",
+        "platform": "watchOS Simulator"
+      },
+      "verifiedAt": "2026-11-13T05:29:19.309529+00:00"
+    },
+    "groups": [
+      {
+        "pet": {
+          "id": 1,
+          "statPoints": 0,
+          "level": 2,
+          "attack": 50,
+          "affection": 0,
+          "defense": 0,
+          "experience": 1,
+          "health": 9
+        },
+        "inventory": [
+          {
+            "foodID": 1,
+            "id": 1,
+            "quantity": 3
+          },
+          {
+            "foodID": 2,
+            "id": 2,
+            "quantity": 1
+          }
+        ],
+        "nickname": "FinalWatch547655",
+        "profileImageSHA256": "cf6b76a73b00adb137628acca80f3204aeab847c8486aed1770cb63a72c877e5",
+        "phoneSnapshotMatchesWatch": true,
+        "stayedInCompanionMode": true,
+        "pictureURL": "https://debug.petpet.invalid/avatars/DDD29287-54E5-4559-9D3E-4CAA8DA8C0CF.jpg",
+        "group": 0,
+        "tests": [
+          "WatchCommunityUITests/test30PictureUploadAndRelaunch"
+        ],
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/api-groups/group-00-1794549872.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 Watch",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "pet": {
+          "id": 1,
+          "health": 9,
+          "statPoints": 0,
+          "experience": 1,
+          "level": 2,
+          "attack": 50,
+          "affection": 0,
+          "defense": 0
+        },
+        "inventory": [
+          {
+            "quantity": 3,
+            "foodID": 1,
+            "id": 1
+          },
+          {
+            "id": 2,
+            "foodID": 2,
+            "quantity": 1
+          }
+        ],
+        "nickname": "FinalWatch547655",
+        "profileImageSHA256": "cf6b76a73b00adb137628acca80f3204aeab847c8486aed1770cb63a72c877e5",
+        "phoneSnapshotMatchesWatch": true,
+        "stayedInCompanionMode": true,
+        "pictureURL": "https://debug.petpet.invalid/avatars/DDD29287-54E5-4559-9D3E-4CAA8DA8C0CF.jpg",
+        "group": 1,
+        "tests": [
+          "PhoneAPIParityUITests/test31WatchPictureAndNicknameAreVisibleWithoutPhoneUpload"
+        ],
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/api-groups/group-01-1794550012.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      },
+      {
+        "pet": {
+          "statPoints": 0,
+          "level": 2,
+          "affection": 0,
+          "defense": 0,
+          "health": 9,
+          "attack": 50,
+          "id": 1,
+          "experience": 1
+        },
+        "inventory": [
+          {
+            "quantity": 3,
+            "id": 1,
+            "foodID": 1
+          },
+          {
+            "id": 2,
+            "foodID": 2,
+            "quantity": 1
+          }
+        ],
+        "nickname": "FinalWatch547655",
+        "profileImageSHA256": "cf6b76a73b00adb137628acca80f3204aeab847c8486aed1770cb63a72c877e5",
+        "phoneSnapshotMatchesWatch": true,
+        "stayedInCompanionMode": true,
+        "pictureURL": "https://debug.petpet.invalid/avatars/DDD29287-54E5-4559-9D3E-4CAA8DA8C0CF.jpg",
+        "group": 2,
+        "tests": [
+          "WatchCommunityUITests/test10CumulativeStepsPageForwardBackAndRefresh",
+          "WatchCommunityUITests/test20ShootingRangePages",
+          "WatchCommunityUITests/test21StarStairRangePages",
+          "WatchCommunityUITests/test40LargeTextRankingAndPictureControls"
+        ],
+        "passedTests": 4,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/api-groups/group-02-1794550055.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 Watch",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "pet": {
+          "attack": 50,
+          "defense": 0,
+          "id": 1,
+          "affection": 0,
+          "experience": 1,
+          "health": 9,
+          "statPoints": 0,
+          "level": 2
+        },
+        "inventory": [
+          {
+            "quantity": 3,
+            "id": 1,
+            "foodID": 1
+          },
+          {
+            "id": 2,
+            "quantity": 1,
+            "foodID": 2
+          }
+        ],
+        "nickname": "FinalWatch547655",
+        "profileImageSHA256": "cf6b76a73b00adb137628acca80f3204aeab847c8486aed1770cb63a72c877e5",
+        "phoneSnapshotMatchesWatch": true,
+        "stayedInCompanionMode": true,
+        "pictureURL": "https://debug.petpet.invalid/avatars/4036232E-0716-490E-89F0-4032EE30FE30.jpg",
+        "group": 3,
+        "tests": [
+          "PhoneAPIParityUITests/test10StepRankingPagesAndServerOutput",
+          "PhoneAPIParityUITests/test20ShootingRangePages",
+          "PhoneAPIParityUITests/test21StairsRangePagesAndComboOutput",
+          "PhoneAPIParityUITests/test30PictureUpdatePersistsAcrossRelaunch",
+          "PhoneAPIParityUITests/test40LargeDarkStepRankingAndPictureControls"
+        ],
+        "passedTests": 5,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/api-groups/group-03-1794550421.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      },
+      {
+        "pet": {
+          "experience": 1,
+          "defense": 0,
+          "statPoints": 0,
+          "health": 9,
+          "affection": 0,
+          "attack": 50,
+          "id": 1,
+          "level": 2
+        },
+        "inventory": [
+          {
+            "id": 1,
+            "foodID": 1,
+            "quantity": 3
+          },
+          {
+            "quantity": 1,
+            "id": 2,
+            "foodID": 2
+          }
+        ],
+        "nickname": "FinalWatch547655",
+        "profileImageSHA256": "cf6b76a73b00adb137628acca80f3204aeab847c8486aed1770cb63a72c877e5",
+        "phoneSnapshotMatchesWatch": true,
+        "stayedInCompanionMode": true,
+        "pictureURL": "https://debug.petpet.invalid/avatars/4036232E-0716-490E-89F0-4032EE30FE30.jpg",
+        "group": 4,
+        "tests": [
+          "WatchSmallScreenUITests/testDateSelectionReturnsToCalendar",
+          "WatchSmallScreenUITests/testYearAndMonthSelectionReturnAndRespectLeapDay",
+          "WatchPetTouchUITests/test00SingleTouch"
+        ],
+        "passedTests": 3,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/api-groups/group-04-1794550559.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 Watch",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      }
+    ]
+  },
+  "standalone": {
+    "passedUIExecutions": 8,
+    "failedUIExecutions": 0,
+    "skippedUIExecutions": 0,
+    "device": {
+      "architecture": "arm64",
+      "deviceId": "7202D847-A698-494B-81E1-4DF9BAED61CC",
+      "deviceName": "PetPet Complete Nov13 Solo 40mm",
+      "modelName": "Apple Watch SE",
+      "osBuildNumber": "22R349",
+      "osVersion": "11.0",
+      "platform": "watchOS Simulator"
+    },
+    "paired": false,
+    "mode": "standalone",
+    "resultBundle": "/private/tmp/petpet-complete-20261113/standalone-final.xcresult",
+    "nickname": "SoloWatch44075",
+    "profileImagePersisted": true,
+    "appliedBackups": 2,
+    "appliedRestores": 1,
+    "serverPetMatchesWatch": true,
+    "noPendingOperations": true
+  },
+  "postFixProfile": {
+    "passedTests": 2,
+    "failedTests": 0,
+    "explicitPhoneRelaunch": true,
+    "states": [
+      {
+        "pet": {
+          "affection": 0,
+          "statPoints": 0,
+          "experience": 1,
+          "attack": 50,
+          "id": 1,
+          "level": 2,
+          "health": 9,
+          "defense": 0
+        },
+        "inventory": [
+          {
+            "foodID": 1,
+            "quantity": 3,
+            "id": 1
+          },
+          {
+            "quantity": 1,
+            "foodID": 2,
+            "id": 2
+          }
+        ],
+        "nickname": "FinalWatch550838",
+        "profileImageSHA256": "cf6b76a73b00adb137628acca80f3204aeab847c8486aed1770cb63a72c877e5",
+        "phoneSnapshotMatchesWatch": true,
+        "stayedInCompanionMode": true,
+        "pictureURL": "https://debug.petpet.invalid/avatars/4036232E-0716-490E-89F0-4032EE30FE30.jpg",
+        "group": 0,
+        "tests": [
+          "WatchFinalAuditUITests/test20WatchNicknameChangeSurvivesRelaunch"
+        ],
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/postgate-profile/group-00-1794550775.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "815985F9-E819-488C-B6FD-41306283BF34",
+          "deviceName": "PetPet Complete Nov13 Watch",
+          "modelName": "Apple Watch SE",
+          "osBuildNumber": "22R349",
+          "osVersion": "11.0",
+          "platform": "watchOS Simulator"
+        }
+      },
+      {
+        "pet": {
+          "attack": 50,
+          "statPoints": 0,
+          "id": 1,
+          "experience": 1,
+          "defense": 0,
+          "health": 9,
+          "affection": 0,
+          "level": 2
+        },
+        "inventory": [
+          {
+            "id": 1,
+            "foodID": 1,
+            "quantity": 3
+          },
+          {
+            "foodID": 2,
+            "quantity": 1,
+            "id": 2
+          }
+        ],
+        "nickname": "FinalWatch550838",
+        "profileImageSHA256": "cf6b76a73b00adb137628acca80f3204aeab847c8486aed1770cb63a72c877e5",
+        "phoneSnapshotMatchesWatch": true,
+        "stayedInCompanionMode": true,
+        "pictureURL": "https://debug.petpet.invalid/avatars/4036232E-0716-490E-89F0-4032EE30FE30.jpg",
+        "group": 1,
+        "tests": [
+          "PhoneAPIParityUITests/test32WatchProfilePersistsAfterExplicitPhoneRelaunch"
+        ],
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "resultBundle": "/private/tmp/petpet-complete-20261113/postgate-profile/group-01-1794550910.xcresult",
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "C6792C5E-D531-4B90-9334-AB274CCA612D",
+          "deviceName": "PetPet Complete Nov13 iPhone",
+          "modelName": "iPhone SE (3rd generation)",
+          "osBuildNumber": "22A3351",
+          "osVersion": "18.0",
+          "platform": "iOS Simulator"
+        }
+      }
+    ]
+  },
+  "releaseSimulatorBuild": "passed",
+  "releaseMockSymbolsAbsent": [
+    "LocalDevelopmentBackend",
+    "signInForDevelopment"
+  ],
+  "releaseBuildLog": "/private/tmp/petpet-complete-20261113/relay-release.log",
+  "diagnostics": [
+    "Initial UI scripts assumed earlier account menu positions and used obscured navigation/input containers. These were corrected.",
+    "An old UI bundle was launched before its rebuild finished; that run was stopped and final builds were awaited.",
+    "An iPhone XCTest app launch timed out before functional checks; only test simulators/launchers were restarted and the final phone AI stage passed.",
+    "Paired community calls reproduced missing live replies with indefinitely busy UI. Added 30-second completion bounds, cancellation and single-completion protection; safe reads are explicitly retried and timed-out image mutations are read back. Final new API groups and post-fix profile checks passed."
+  ],
+  "diagnosticArtifacts": [
+    "/private/tmp/petpet-complete-20261113/standalone.xcresult",
+    "/private/tmp/petpet-complete-20261113/verified/games/stage-02-test11StairsResultSubmitsAndLeaderboardReloads-132135.xcresult",
+    "/private/tmp/petpet-complete-20261113/verified/games/stage-02-test11StairsResultSubmitsAndLeaderboardReloads-132530.xcresult",
+    "/private/tmp/petpet-complete-20261113/verified/games/stage-12-test40PhoneChatRepeatsAndCancels-133730.xcresult",
+    "/private/tmp/petpet-complete-20261113/community",
+    "/private/tmp/petpet-complete-20261113/api-groups/group-00-1794548488.xcresult"
+  ]
+}

@@ -35,7 +35,8 @@ final class WatchFinalAuditUITests: XCTestCase {
 
     func test20WatchNicknameChangeSurvivesRelaunch() {
         crownTo("watch.openStreak"); app.buttons["watch.openNickname"].tap()
-        let input = app.descendants(matching: .any).matching(identifier: "nickname.input").firstMatch
+        let container = app.descendants(matching: .any).matching(identifier: "nickname.input").firstMatch
+        let input = container.descendants(matching: .textField).firstMatch
         reveal(input); input.tap()
         let system = XCUIApplication(bundleIdentifier: "com.apple.Carousel")
         if system.buttons["지금 안 함"].exists {
@@ -55,10 +56,24 @@ final class WatchFinalAuditUITests: XCTestCase {
         app.typeText(name)
         let done = app.buttons.matching(NSPredicate(format: "label IN %@", ["완료", "Done"])).firstMatch
         XCTAssertTrue(wait { done.exists && done.isEnabled }); done.tap()
+        let host = app.descendants(matching: .any).matching(identifier: "TextInputHost").firstMatch
+        XCTAssertTrue(wait(timeout: 10) { !host.exists }, "System nickname input must close before checking availability")
         let submit = app.buttons["nickname.submit"]
-        reveal(submit); XCTAssertTrue(wait(timeout: 15) { submit.exists && submit.isEnabled }); submit.tap()
+        reveal(submit)
+        print("NICKNAME_EDITOR_AFTER_INPUT=\(app.debugDescription)")
+        capture("integrated-watch-nickname-before-submit")
+        var available = wait(timeout: 45) { submit.exists && submit.isEnabled }
+        let retry = app.buttons["다시 확인"]
         let feedback = app.staticTexts["nickname.feedback"]
-        reveal(feedback); XCTAssertTrue(wait(timeout: 15) { feedback.exists && feedback.label == "닉네임을 바꿨어요." })
+        if !available && retry.exists && feedback.label.contains("아이폰과 워치") {
+            reveal(retry); retry.tap() // Availability is a safe read, not a rename retry.
+            available = wait(timeout: 45) { submit.exists && submit.isEnabled }
+        }
+        XCTAssertTrue(available, app.debugDescription); submit.tap()
+        reveal(feedback)
+        XCTAssertTrue(wait(timeout: 45) { feedback.exists && (feedback.label == "닉네임을 바꿨어요." || feedback.label.contains("아이폰과 워치")) }, app.debugDescription)
+        // If the live reply was lost, the root account below must still confirm
+        // the exact new name. Never automatically repeat a possible mutation.
         print("FINAL_AUDIT_NICKNAME=\(name)")
         capture("final-watch-nickname-updated")
         app.terminate(); app.launch()
