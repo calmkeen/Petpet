@@ -36,6 +36,10 @@ import Foundation
             guard try await backend.session()?.accountID == request.accountID else { throw BackendError.authenticationRequired }
             prune()
             switch request.action {
+            case .profile: result = .profile(try await backend.profileDetails(accountID: request.accountID))
+            case let .updatePicture(image): result = .profile(try await backend.updatePicture(image, accountID: request.accountID))
+            case let .stepPage(page): result = .stepPage(try await backend.stepRanking(page, accountID: request.accountID))
+            case let .gamePage(game, page): result = .gamePage(try await backend.gameRankingPage(game, page: page, accountID: request.accountID))
             case let .ranking(game): result = .ranking(try await backend.ranking(game, accountID: request.accountID))
             case let .submit(score): result = .ranking(try await backend.ranking(score.game, submitting: score, accountID: request.accountID))
             case let .startChat(id, question):

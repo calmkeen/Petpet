@@ -16,7 +16,7 @@ struct NicknameResponse: Decodable {
     let duplicated: Bool
     let nickname: String
 }
-struct AccountProfileResponse: Decodable { let nickname: String? }
+struct AccountProfileResponse: Decodable { let nickname: String?; let pictureUrl: String? }
 
 extension BackendSession {
     func replacingNickname(_ nickname: String) -> BackendSession {

@@ -17,6 +17,8 @@ public actor BackendClient {
     private var storageTail: Task<Void, Error>?
     private var nicknameTail: Task<String, Error>?
     private var nicknameRevision = 0
+    private var pictureRevision = 0
+    private var pictureUpdate: (epoch: Int, accountID: String, url: URL, image: RepresentativeImage)?
     private var sessionInvalidationHandler: (@Sendable () async -> Void)?
 
     public init(baseURL: URL, transport: any BackendHTTPTransport = URLSessionBackendTransport(),
@@ -152,22 +154,74 @@ public actor BackendClient {
     }
 
     public func profileNickname(accountID: String) async throws -> String? {
+        try await profileDetails(accountID: accountID).nickname
+    }
+    public func profileDetails(accountID: String) async throws -> AccountProfileDetails {
         _ = try await session()
         let token = epoch
         let revision = nicknameRevision
+        let imageRevision = pictureRevision
         let data = try await authorized(path: "api/v1/users/me", method: "GET", accountID: accountID)
         let profile: AccountProfileResponse
         do { profile = try JSONDecoder().decode(AccountProfileResponse.self, from: data) }
         catch { throw BackendError.invalidResponse }
+        var nickname = profile.nickname
         if revision != nicknameRevision {
             _ = try? await storageTail?.value
             try checkEpoch(token)
-            return cached?.nickname
+            nickname = cached?.nickname
+        } else if let nickname { try await persistNickname(nickname, accountID: accountID, epoch: token) }
+        var url = try AccountProfileDetails.imageURL(profile.pictureUrl)
+        var preview: RepresentativeImage?
+        if let saved = pictureUpdate, saved.epoch == token, saved.accountID == accountID,
+           imageRevision != pictureRevision || saved.url == url { url = saved.url; preview = saved.image }
+        #if DEBUG
+        if let local = transport as? LocalDevelopmentBackend, baseURL == LocalDevelopmentBackend.baseURL {
+            preview = try await local.representativeImage()
         }
-        if let nickname = profile.nickname {
-            try await persistNickname(nickname, accountID: accountID, epoch: token)
+        #endif
+        try checkEpoch(token)
+        return AccountProfileDetails(nickname: nickname, pictureURL: url, preview: preview)
+    }
+
+    public func updatePicture(_ image: RepresentativeImage, accountID: String) async throws -> AccountProfileDetails {
+        try image.validate()
+        let token = epoch
+        let boundary = "PetPet-" + UUID().uuidString
+        let body = try image.multipart(boundary: boundary)
+        let data = try await authorized(path: "api/v1/users/me/picture", method: "PATCH", data: body,
+            accountID: accountID, contentType: "multipart/form-data; boundary=\(boundary)")
+        struct Reply: Decodable { let pictureUrl: String }
+        let reply = try JSONDecoder().decode(Reply.self, from: data)
+        guard let url = try AccountProfileDetails.imageURL(reply.pictureUrl) else { throw BackendError.invalidResponse }
+        try checkEpoch(token)
+        pictureRevision += 1; pictureUpdate = (token, accountID, url, image)
+        return AccountProfileDetails(nickname: cached?.nickname, pictureURL: url, preview: image)
+    }
+
+    public func stepRanking(_ page: RankingPageRequest, accountID: String) async throws -> StepRankingPage {
+        try page.validate()
+        let data = try await authorized(path: "api/v1/stepcounts/ranking", method: "GET", accountID: accountID, query: page.query)
+        let value = try JSONDecoder().decode(StepRankingPage.self, from: data)
+        guard value.page == page.page, value.size == page.size, value.totalUsers >= 0, value.rankings.count <= page.size,
+              value.rankings.allSatisfy({ $0.rank > 0 && $0.userId > 0 && $0.totalStepCount >= 0 && $0.nickname.utf8.count <= 2048 }),
+              Set(value.rankings.map(\.userId)).count == value.rankings.count else { throw BackendError.invalidResponse }
+        return value
+    }
+    public func gameRankingPage(_ game: MiniGame, page: RankingPageRequest, accountID: String) async throws -> GameRankingPage {
+        try page.validate()
+        let data = try await authorized(path: "api/v1/\(game.serverPath)/rank/range", method: "GET", accountID: accountID, query: page.query)
+        struct Row: Decodable { let rank: Int; let userId: Int64; let userName: String; let score: Int?; let maxStep: Int?; let maxCombo: Int? }
+        struct Reply: Decodable { let ranks: [Row] }
+        let rows = try JSONDecoder().decode(Reply.self, from: data).ranks
+        guard rows.count <= page.size else { throw BackendError.invalidResponse }
+        let entries = try rows.map { row -> GameRankEntry in
+            guard let score = game == .shooting ? row.score : row.maxStep,
+                  score >= 0, row.rank > 0, row.userId > 0, (row.maxCombo ?? 0) >= 0,
+                  row.userName.utf8.count <= 2048 else { throw BackendError.invalidResponse }
+            return GameRankEntry(rank: row.rank, userID: row.userId, name: row.userName, score: score, maxCombo: row.maxCombo ?? 0)
         }
-        return profile.nickname
+        return GameRankingPage(game: game, request: page, entries: entries)
     }
 
     public func stepHistory(accountID: String) async throws -> [DailyStepRecord] {
@@ -329,15 +383,15 @@ public actor BackendClient {
     }
 
     private func authorized(path: String, method: String, data: Data? = nil, accountID: String,
-                            query: [URLQueryItem] = []) async throws -> Data {
+                            query: [URLQueryItem] = [], contentType: String = "application/json") async throws -> Data {
         guard let current = try await session(), current.accountID == accountID else { throw BackendError.authenticationRequired }
         let token = epoch
-        var response = try await send(path: path, method: method, data: data, bearer: current.accessToken, query: query)
+        var response = try await send(path: path, method: method, data: data, bearer: current.accessToken, query: query, contentType: contentType)
         try checkEpoch(token)
         if response.statusCode == 401 || response.statusCode == 403 {
             let renewed = try await refresh(rejectedToken: current.accessToken, epoch: token)
             try checkEpoch(token)
-            response = try await send(path: path, method: method, data: data, bearer: renewed.accessToken, query: query)
+            response = try await send(path: path, method: method, data: data, bearer: renewed.accessToken, query: query, contentType: contentType)
             try checkEpoch(token)
             if response.statusCode == 401 || response.statusCode == 403 {
                 try await invalidateSession()
@@ -409,7 +463,7 @@ public actor BackendClient {
     }
 
     private func send(path: String, method: String, data: Data?, bearer: String? = nil,
-                      query: [URLQueryItem] = []) async throws -> BackendHTTPResponse {
+                      query: [URLQueryItem] = [], contentType: String = "application/json") async throws -> BackendHTTPResponse {
         guard var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false) else {
             throw BackendError.invalidServerURL
         }
@@ -423,7 +477,7 @@ public actor BackendClient {
         var request = URLRequest(url: url)
         request.httpMethod = method; request.httpBody = data
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        if data != nil { request.setValue("application/json", forHTTPHeaderField: "Content-Type") }
+        if data != nil { request.setValue(contentType, forHTTPHeaderField: "Content-Type") }
         if let bearer { request.setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization") }
         return try await transport.send(request)
     }
