@@ -192,7 +192,7 @@ public actor BackendClient {
         let data = try await authorized(path: "api/v1/users/me/picture", method: "PATCH", data: body,
             accountID: accountID, contentType: "multipart/form-data; boundary=\(boundary)")
         struct Reply: Decodable { let pictureUrl: String }
-        let reply = try JSONDecoder().decode(Reply.self, from: data)
+        let reply = try decodeCommunity(Reply.self, from: data)
         guard let url = try AccountProfileDetails.imageURL(reply.pictureUrl) else { throw BackendError.invalidResponse }
         try checkEpoch(token)
         pictureRevision += 1; pictureUpdate = (token, accountID, url, image)
@@ -202,9 +202,9 @@ public actor BackendClient {
     public func stepRanking(_ page: RankingPageRequest, accountID: String) async throws -> StepRankingPage {
         try page.validate()
         let data = try await authorized(path: "api/v1/stepcounts/ranking", method: "GET", accountID: accountID, query: page.query)
-        let value = try JSONDecoder().decode(StepRankingPage.self, from: data)
-        guard value.page == page.page, value.size == page.size, value.totalUsers >= 0, value.rankings.count <= page.size,
-              value.rankings.allSatisfy({ $0.rank > 0 && $0.userId > 0 && $0.totalStepCount >= 0 && $0.nickname.utf8.count <= 2048 }),
+        let value = try decodeCommunity(StepRankingPage.self, from: data)
+        guard value.page == page.page, value.size == page.size, value.totalUsers >= Int64(value.rankings.count), value.rankings.count <= page.size,
+              value.rankings.allSatisfy({ $0.rank > 0 && $0.rank <= value.totalUsers && $0.userId > 0 && $0.totalStepCount >= 0 && $0.nickname.utf8.count <= 2048 }),
               Set(value.rankings.map(\.userId)).count == value.rankings.count else { throw BackendError.invalidResponse }
         return value
     }
@@ -213,7 +213,7 @@ public actor BackendClient {
         let data = try await authorized(path: "api/v1/\(game.serverPath)/rank/range", method: "GET", accountID: accountID, query: page.query)
         struct Row: Decodable { let rank: Int; let userId: Int64; let userName: String; let score: Int?; let maxStep: Int?; let maxCombo: Int? }
         struct Reply: Decodable { let ranks: [Row] }
-        let rows = try JSONDecoder().decode(Reply.self, from: data).ranks
+        let rows = try decodeCommunity(Reply.self, from: data).ranks
         guard rows.count <= page.size else { throw BackendError.invalidResponse }
         let entries = try rows.map { row -> GameRankEntry in
             guard let score = game == .shooting ? row.score : row.maxStep,
@@ -221,7 +221,13 @@ public actor BackendClient {
                   row.userName.utf8.count <= 2048 else { throw BackendError.invalidResponse }
             return GameRankEntry(rank: row.rank, userID: row.userId, name: row.userName, score: score, maxCombo: row.maxCombo ?? 0)
         }
+        guard Set(entries.compactMap(\.userID)).count == entries.count else { throw BackendError.invalidResponse }
         return GameRankingPage(game: game, request: page, entries: entries)
+    }
+
+    private func decodeCommunity<Value: Decodable>(_ type: Value.Type, from data: Data) throws -> Value {
+        do { return try JSONDecoder().decode(type, from: data) }
+        catch { throw BackendError.invalidResponse }
     }
 
     public func stepHistory(accountID: String) async throws -> [DailyStepRecord] {

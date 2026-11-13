@@ -34,6 +34,7 @@ final class WatchAppModel: ObservableObject {
         if let standalone { featureTransport = WatchFeatureRouter(direct: standalone, companion: transport) }
         else { featureTransport = transport }
         games = WatchGameServices(client: WatchFeatureClient(transport:featureTransport,environment:environment), records:FileMiniGameRecords(fileURL:directory.appendingPathComponent("minigame-records-v1.json")),cloud:cloud)
+        cloud.featureClient = games.client
         sync = WatchSyncController(home: home, pet: pet, history: game, progress: game,
                                    outboxURL: directory.appendingPathComponent("watch-sync-outbox-v1.json"), transport: transport)
     }

@@ -46,6 +46,12 @@ final class CommunityAPITests: XCTestCase {
             catch { XCTAssertEqual(error as? BackendError, .invalidResponse) }
         }
     }
+    func testMalformedNewAPIRepliesUseUserFacingBackendError() async throws {
+        let client = try BackendClient(baseURL: origin, transport: CommunityHTTP { _ in BackendHTTPResponse(statusCode: 200, data: Data("{}".utf8)) }, store: TestSessionStore(session: session()))
+        do { _ = try await client.stepRanking(RankingPageRequest(), accountID: "7"); XCTFail() } catch { XCTAssertEqual(error as? BackendError, .invalidResponse) }
+        do { _ = try await client.gameRankingPage(.shooting, page: RankingPageRequest(), accountID: "7"); XCTFail() } catch { XCTAssertEqual(error as? BackendError, .invalidResponse) }
+        do { _ = try await client.updatePicture(fixture(), accountID: "7"); XCTFail() } catch { XCTAssertEqual(error as? BackendError, .invalidResponse) }
+    }
     func testMultipartRefreshPreservesExactBodyAndImageField() async throws {
         let image = try fixture()
         let http = AvatarRefreshHTTP()
