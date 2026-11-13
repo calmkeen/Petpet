@@ -10,7 +10,8 @@ public actor FileWatchSnapshotOutbox {
 
     public init(fileURL: URL, environment: CloudEnvironment = .production) { self.fileURL = fileURL; self.environment = environment }
 
-    public func prepare(steps: [DailyStepRecord], progress: PetProgress, at date: Date) throws -> WatchSnapshot {
+    public func prepare(steps: [DailyStepRecord], progress: PetProgress, at date: Date,
+                        customization: PetCustomization? = nil) throws -> WatchSnapshot {
         try loadIfNeeded()
         let previousRevision = cached?.revision ?? 0
         guard previousRevision < Int64.max else { throw SnapshotSyncError.revisionOverflow }
@@ -18,7 +19,8 @@ public actor FileWatchSnapshotOutbox {
             sourceID: cached?.sourceID ?? UUID(), revision: previousRevision + 1,
             generatedAt: date,
             steps: Array(steps.sorted { $0.date > $1.date }.prefix(WatchSnapshotCodec.maximumStepDays)),
-            pet: progress.pet, inventory: progress.inventory, environment: environment
+            pet: progress.pet, inventory: progress.inventory, environment: environment,
+            customization: customization ?? cached?.customization
         )
         let data = try WatchSnapshotCodec.encode(snapshot)
         try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)

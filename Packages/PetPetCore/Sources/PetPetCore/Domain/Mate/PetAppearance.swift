@@ -34,40 +34,42 @@ public struct PetSpriteAnimation: Sendable {
     public static let greetingFrameInterval: TimeInterval = 1.0 / 15
     public static let greetingDuration: TimeInterval = 16.0 / 15
     public let activity: CharacterActivity
-    public init(_ activity: CharacterActivity) { self.activity = activity }
-    public var frameInterval: TimeInterval { Self.greetingFrameInterval }
-    public var frameNames: [String] {
-        let mode = activity == .running ? "running" : "greeting"
-        let count = isAnimated ? 16 : 1
-        return (0..<count).map { String(format: "stepmate_fox_\(mode)_v3_%02d", $0) }
+    public let characterID: String
+    public let motionID: String
+    public init(_ activity: CharacterActivity, characterID: String = PetCustomization.default.characterID, motionID: String? = nil) {
+        self.activity = activity
+        let character = PetCustomizationCatalog.character(id: characterID)
+        self.characterID = character.id
+        let defaultMotion = activity == .running ? "running" : activity == .touching ? "greeting" : "idle"
+        self.motionID = character.motion(id: motionID ?? defaultMotion).id
     }
-    public var cycleDuration: TimeInterval { Double(isAnimated ? Self.greetingFrameCount : 1) * frameInterval }
-    public var isAnimated: Bool { activity == .running || activity == .touching }
-    public var posterImageName: String { frameNames[activity == .touching ? 8 : 0] }
+    public var clip: PetMotionClip { PetCustomizationCatalog.character(id: characterID).motion(id: motionID) }
+    public var frameInterval: TimeInterval { clip.frameInterval }
+    public var frameNames: [String] { clip.frames }
+    public var cycleDuration: TimeInterval { clip.duration }
+    public var isAnimated: Bool { frameNames.count > 1 }
+    public var posterImageName: String { frameNames[clip.posterIndex] }
     /// Interpolate aligned source frames at the renderer's cadence. Mixing
     /// premultiplied pixels preserves an opaque body and soft moving edges.
     public func blend(elapsed: TimeInterval) -> PetFrameBlend {
         guard isAnimated else { return PetFrameBlend(fromIndex: 0, toIndex: 0, amount: 0) }
         let time = elapsed.isFinite ? max(0, elapsed) : 0
-        let position = activity == .running
+        let position = clip.loops
             ? time.truncatingRemainder(dividingBy: cycleDuration) / frameInterval
-            : min(time / frameInterval, Double(Self.greetingFrameCount - 1))
-        let lower = min(Int(position.rounded(.down)), Self.greetingFrameCount - 1)
-        let upper = activity == .running ? (lower + 1) % Self.greetingFrameCount : min(lower + 1, Self.greetingFrameCount - 1)
+            : min(time / frameInterval, Double(frameNames.count - 1))
+        let lower = min(Int(position.rounded(.down)), frameNames.count - 1)
+        let upper = clip.loops ? (lower + 1) % frameNames.count : min(lower + 1, frameNames.count - 1)
         return PetFrameBlend(fromIndex: lower, toIndex: upper,
                              amount: lower == upper ? 0 : Float(max(0, min(1, position - Double(lower)))))
     }
     public func imageName(elapsed: TimeInterval) -> String {
         let elapsed = elapsed.isFinite ? max(0, elapsed) : 0
-        switch activity {
-        case .running:
+        if clip.loops {
             let frame = Int((elapsed.truncatingRemainder(dividingBy: cycleDuration) / frameInterval + 1e-9).rounded(.down))
-            return frameNames[min(frame, 15)]
-        case .touching:
-            let frame = min(Int(min(elapsed / Self.greetingFrameInterval + 1e-9, Double(Self.greetingFrameCount - 1)).rounded(.down)), Self.greetingFrameCount - 1)
-            return frameNames[frame]
-        case .idle, .stopped: return frameNames[0]
+            return frameNames[min(frame, frameNames.count - 1)]
         }
+        let frame = Int(min(elapsed / frameInterval + 1e-9, Double(frameNames.count - 1)).rounded(.down))
+        return frameNames[frame]
     }
 }
 
@@ -76,9 +78,14 @@ public struct PetPlaybackRequest: Equatable, Sendable {
     public let activity: CharacterActivity
     public let startedAt: Date
     public let isPlaying: Bool
-    public init(state: PetAnimationState, suppressed: Bool) {
+    public let characterID: String
+    public let motionID: String
+    public var animation: PetSpriteAnimation { PetSpriteAnimation(activity, characterID: characterID, motionID: motionID) }
+    public init(state: PetAnimationState, suppressed: Bool, characterID: String = PetCustomization.default.characterID, motionID: String? = nil) {
         activity = state.activity; startedAt = state.startedAt
-        isPlaying = state.isActive && PetSpriteAnimation(state.activity).isAnimated && !suppressed
+        let animation = PetSpriteAnimation(state.activity, characterID: characterID, motionID: motionID)
+        self.characterID = animation.characterID; self.motionID = animation.motionID
+        isPlaying = state.isActive && animation.isAnimated && !suppressed
     }
 }
 
@@ -91,15 +98,14 @@ public struct PetAnimationState: Equatable, Sendable {
     private var baseline: DailyStepRecord?
     public init() {}
 
-    #if DEBUG
-    /// Visual-only preview. It never reads or mutates the game repository.
+    /// Visual-only preview, also used by the customization screen in Release.
+    /// It never reads or mutates the game repository.
     public static func preview(_ activity: CharacterActivity, at date: Date = Date()) -> Self {
         var state = Self()
         state.isActive = true; state.activity = activity; state.startedAt = date
         state.expiresAt = activity == .touching ? date.addingTimeInterval(PetSpriteAnimation.greetingDuration) : nil
         return state
     }
-    #endif
 
     public mutating func setActive(_ value: Bool, at date: Date) {
         guard value != isActive else { return }
@@ -128,10 +134,10 @@ public struct PetAnimationState: Equatable, Sendable {
         activity = .running; expiresAt = date.addingTimeInterval(2)
     }
     @discardableResult
-    public mutating func touch(at date: Date) -> Bool {
+    public mutating func touch(at date: Date, duration: TimeInterval = PetSpriteAnimation.greetingDuration) -> Bool {
         tick(at: date)
         guard isActive, activity != .running, activity != .touching else { return false }
-        activity = .touching; startedAt = date; expiresAt = date.addingTimeInterval(PetSpriteAnimation.greetingDuration)
+        activity = .touching; startedAt = date; expiresAt = date.addingTimeInterval(duration)
         return true
     }
     public mutating func tick(at date: Date) {

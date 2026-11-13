@@ -12,9 +12,12 @@ public struct WatchSnapshot: Codable, Equatable, Sendable {
     public var steps: [DailyStepRecord]
     public var pet: PetProfile
     public var inventory: [FoodInventoryItem]
+    public var customization: PetCustomization?
+    public var resolvedCustomization: PetCustomization { customization ?? .default }
 
     public init(sourceID: UUID, revision: Int64, generatedAt: Date,
-                steps: [DailyStepRecord], pet: PetProfile, inventory: [FoodInventoryItem], environment: CloudEnvironment = .production) {
+                steps: [DailyStepRecord], pet: PetProfile, inventory: [FoodInventoryItem], environment: CloudEnvironment = .production,
+                customization: PetCustomization? = nil) {
         version = environment == .development ? 2 : 1
         self.environment = environment == .development ? environment : nil
         self.sourceID = sourceID
@@ -23,6 +26,7 @@ public struct WatchSnapshot: Codable, Equatable, Sendable {
         self.steps = steps
         self.pet = pet
         self.inventory = inventory
+        self.customization = customization
     }
 }
 
@@ -50,6 +54,7 @@ public enum WatchSnapshotCodec {
     }
 
     public static func validate(_ value: WatchSnapshot) throws {
+        do { try value.customization?.validate() } catch { throw SnapshotSyncError.invalidSnapshot }
         guard (value.version == 1 && value.resolvedEnvironment == .production)
                 || (value.version == 2 && value.environment == .development) else {
             throw SnapshotSyncError.unsupportedVersion(value.version)
