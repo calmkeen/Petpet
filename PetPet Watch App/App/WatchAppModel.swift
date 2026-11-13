@@ -10,6 +10,7 @@ final class WatchAppModel: ObservableObject {
     let cloud: WatchCloudController
     let streak: WatchStreakViewModel
     let games: WatchGameServices
+    let customization: WatchCustomizationModel
     private let sync: WatchSyncController
     private let transport: WatchConnectivityTransport
 
@@ -17,6 +18,9 @@ final class WatchAppModel: ObservableObject {
         let environment = CloudEnvironment.current
         let root = URL.applicationSupportDirectory.appendingPathComponent("PetPet", isDirectory: true)
         let directory = environment.storageDirectory(in: root)
+        let appearanceStore = FilePetCustomizationRepository(fileURL: directory.appendingPathComponent("pet-customization-v1.json"))
+        let customization = WatchCustomizationModel(repository: appearanceStore)
+        self.customization = customization
         #if DEBUG
         let game = FileGameRepository(developmentDirectory: directory, seedDirectory: root)
         #else
@@ -36,7 +40,8 @@ final class WatchAppModel: ObservableObject {
         games = WatchGameServices(client: WatchFeatureClient(transport:featureTransport,environment:environment), records:FileMiniGameRecords(fileURL:directory.appendingPathComponent("minigame-records-v1.json")),cloud:cloud)
         cloud.featureClient = games.client
         sync = WatchSyncController(home: home, pet: pet, history: game, progress: game,
-                                   outboxURL: directory.appendingPathComponent("watch-sync-outbox-v1.json"), transport: transport)
+                                   outboxURL: directory.appendingPathComponent("watch-sync-outbox-v1.json"), transport: transport,
+                                   customization: customization, customizationRepository: appearanceStore)
     }
 
     func finishBackgroundTransfer() async {

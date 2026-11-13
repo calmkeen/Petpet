@@ -13,35 +13,48 @@ final class WatchPetRenderer: ObservableObject {
     @Published private(set) var isReady = false
     let scene = WatchPetScene(size: CGSize(width: 256, height: 336))
     private var preparation: Task<Void, Never>?
+    private var preparingCharacterID: String?
+    private var preparedCharacterID: String?
+    private var generation = UUID()
     private var request: PetPlaybackRequest?
 
-    func prepare() async {
-        if let preparation { await preparation.value; return }
+    func prepare(characterID: String = PetCustomization.default.characterID) async {
+        let character = PetCustomizationCatalog.character(id: characterID)
+        if isReady, preparedCharacterID == character.id { return }
+        if preparingCharacterID == character.id, let preparation { await preparation.value; return }
+        preparation?.cancel()
+        let token = UUID(); generation = token
+        preparingCharacterID = character.id; isReady = false
+        scene.stopPlayback()
         let task = Task { @MainActor [weak self] in
             guard let self else { return }
-            let names = PetSpriteAnimation(.running).frameNames + PetSpriteAnimation(.touching).frameNames
+            defer { if self.generation == token { self.preparingCharacterID = nil } }
+            // Preload just this character, rather than every future catalog entry.
+            let names = Set(character.motions.flatMap(\.frames))
             let textures = Dictionary(uniqueKeysWithValues: names.map { ($0, SKTexture(imageNamed: $0)) })
             for texture in textures.values { texture.filteringMode = .linear }
             await withCheckedContinuation { continuation in
                 SKTexture.preload(Array(textures.values)) { continuation.resume() }
             }
+            guard !Task.isCancelled, self.generation == token else { return }
             guard textures.values.allSatisfy({ texture in
                 let size = texture.size()
-                return size.height > 0 && abs(size.width / size.height - 256.0 / 336) < 0.001
+                return size.height > 0 && abs(size.width / size.height - CGFloat(character.canvasWidth / character.canvasHeight)) < 0.001
             }) else {
                 AnimationDiagnostics.recordRenderer(["renderer": "SpriteKit", "texturesReady": false])
                 return
             }
-            self.scene.install(textures)
+            self.scene.install(textures, character: character)
+            self.preparedCharacterID = character.id
             self.isReady = true
-            if let request = self.request { self.scene.apply(request) }
+            if let request = self.request, request.characterID == character.id { self.scene.apply(request) }
         }
         preparation = task
         await task.value
     }
     func apply(_ request: PetPlaybackRequest) {
         self.request = request
-        if isReady { scene.apply(request) }
+        if isReady, preparedCharacterID == request.characterID { scene.apply(request) }
     }
     func configureBackdrop(_ backdrop: PetSpriteBackdrop) { scene.configureBackdrop(backdrop) }
     func stop() { request = nil; scene.stopPlayback() }
@@ -54,6 +67,7 @@ final class WatchPetScene: SKScene {
     private var backdropProjection: PetSpriteBackdrop?
     private var backdropName: String?
     private var textures: [String: SKTexture] = [:]
+    private var character = PetCustomizationCatalog.characters[0]
     private var request: PetPlaybackRequest?
     private var frameNames: [String] = []
     private let nextTexture = SKUniform(name: "u_nextFrame", texture: nil)
@@ -95,8 +109,9 @@ final class WatchPetScene: SKScene {
         layoutCanvas()
     }
     private func layoutCanvas() {
-        let petScale = min(size.width / 256, size.height / 336)
-        pet.size = CGSize(width: 256 * petScale, height: 336 * petScale)
+        let width = CGFloat(character.canvasWidth), height = CGFloat(character.canvasHeight)
+        let petScale = min(size.width / width, size.height / height)
+        pet.size = CGSize(width: width * petScale, height: height * petScale)
         pet.position = CGPoint(x: size.width / 2, y: size.height / 2)
         guard let projection = backdropProjection, let texture = backdrop.texture,
               projection.viewport.width > 0, projection.viewport.height > 0 else { return }
@@ -111,16 +126,18 @@ final class WatchPetScene: SKScene {
         let y = projection.canvas.height / 2 - projection.viewport.minY
         backdrop.position = CGPoint(x: x * sx, y: size.height - y * sy)
     }
-    func install(_ textures: [String: SKTexture]) {
+    func install(_ textures: [String: SKTexture], character: PetCharacterDefinition) {
         self.textures = textures
-        pet.texture = textures[PetSpriteAnimation(.idle).posterImageName]
+        self.character = character
+        layoutCanvas()
+        pet.texture = textures[PetSpriteAnimation(.idle, characterID: character.id).posterImageName]
         nextTexture.textureValue = pet.texture
         pet.shader = frameShader
     }
     func apply(_ value: PetPlaybackRequest) {
         guard request != value else { return }
         stopPlayback(); request = value
-        let animation = PetSpriteAnimation(value.activity)
+        let animation = value.animation
         frameNames = animation.frameNames
         if value.isPlaying { selectFrame(at: Date()) }
         else {
@@ -130,7 +147,7 @@ final class WatchPetScene: SKScene {
     }
     private func selectFrame(at date: Date) {
         guard let request, request.isPlaying else { return }
-        let sample = PetSpriteAnimation(request.activity).blend(elapsed: date.timeIntervalSince(request.startedAt))
+        let sample = request.animation.blend(elapsed: date.timeIntervalSince(request.startedAt))
         guard frameNames.indices.contains(sample.fromIndex), frameNames.indices.contains(sample.toIndex) else { return }
         pet.texture = textures[frameNames[sample.fromIndex]]
         nextTexture.textureValue = textures[frameNames[sample.toIndex]]
@@ -146,7 +163,7 @@ final class WatchPetScene: SKScene {
             AnimationDiagnostics.recordPlayback([
                 "driver": "interpolated-textures", "mode": String(describing: request.activity),
                 "observedFrameNames": observedFrames, "distinctFrameCount": Set(observedFrames).count,
-                "requestedFrameCount": PetSpriteAnimation(request.activity).frameNames.count,
+                "requestedFrameCount": request.animation.frameNames.count,
                 "displaySamples": displaySamples, "interpolatedSamples": mixedSamples,
                 "capturedAt": Date().timeIntervalSince1970
             ], mode: String(describing: request.activity))
@@ -178,7 +195,7 @@ final class WatchPetScene: SKScene {
             "renderer": "SpriteKit", "texturesReady": true, "mode": String(describing: request.activity),
             "targetFPS": 30, "nativeUpdateFPS": Double(ticks - 1) / elapsed,
             "maxFrameGapMS": worstGap * 1000, "sampleSeconds": elapsed, "renderTicks": ticks,
-            "textureFrameCount": 16, "sceneWidth": size.width, "sceneHeight": size.height,
+            "textureFrameCount": request.animation.frameNames.count, "sceneWidth": size.width, "sceneHeight": size.height,
             "spriteWidth": pet.size.width, "spriteHeight": pet.size.height
         ])
         self.firstTick = currentTime; ticks = 1; worstGap = 0

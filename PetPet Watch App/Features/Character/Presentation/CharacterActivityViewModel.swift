@@ -22,8 +22,8 @@ final class CharacterActivityViewModel: ObservableObject {
         if deadline != state.expiresAt { scheduleCompletion() }
     }
     @discardableResult
-    func handleTouch() -> Bool {
-        guard state.touch(at: Date()) else { return false }
+    func handleTouch(greetingDuration: TimeInterval = PetSpriteAnimation.greetingDuration) -> Bool {
+        guard state.touch(at: Date(), duration: greetingDuration) else { return false }
         scheduleCompletion()
         return true
     }

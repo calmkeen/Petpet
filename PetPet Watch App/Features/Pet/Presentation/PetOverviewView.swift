@@ -7,12 +7,13 @@ struct PetOverviewView: View {
     @ObservedObject var viewModel: PetProgressViewModel
     @ObservedObject var stepViewModel: WatchHomeViewModel
     @ObservedObject var cloudViewModel: WatchCloudController
+    @ObservedObject var customization: WatchCustomizationModel
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
             ZStack {
                 GeometryReader { geometry in
-                    Image(WatchAppearance.period(at: context.date).backgroundImageName)
+                    Image(customization.selection.background(at: context.date, automaticPeriod: WatchAppearance.period(at: context.date)).imageName)
                         .resizable().scaledToFill()
                         .frame(width: geometry.size.width, height: geometry.size.height).clipped()
                 }.ignoresSafeArea()
@@ -25,7 +26,12 @@ struct PetOverviewView: View {
         VStack(spacing: 6) {
             if let progress = viewModel.progress {
                 HStack(spacing: 6) {
-                    portrait(progress, compact: compact)
+                    NavigationLink { WatchCustomizationView(model: customization) } label: {
+                        portrait(progress, compact: compact)
+                    }.buttonStyle(.plain)
+                        .accessibilityLabel("캐릭터와 배경 꾸미기")
+                        .accessibilityHint("캐릭터 선택과 배경, 동작 미리보기를 열어요")
+                        .accessibilityIdentifier("watch.customizePet")
                     statistics(progress.pet)
                 }
             } else { ProgressView("펫 불러오는 중") }
@@ -35,14 +41,17 @@ struct PetOverviewView: View {
 
     private func portrait(_ progress: PetProgress, compact: Bool) -> some View {
         VStack(spacing: 2) {
-            Image("stepmate_fox_idle").resizable().scaledToFit()
+            Image(PetSpriteAnimation(.idle, characterID: customization.selection.character.id).posterImageName).resizable().scaledToFit()
                 .frame(width: compact ? 42 : 52, height: compact ? 54 : 66)
                 .accessibilityHidden(true)
-            Text("Lv.\(WatchNumber.compact(progress.pet.level))").font(.caption2.bold())
+            HStack(spacing: 3) {
+                Text("Lv.\(WatchNumber.compact(progress.pet.level))")
+                Image(systemName: "paintbrush.pointed.fill").accessibilityHidden(true)
+            }.font(.caption2.bold())
             ProgressView(value: Double(progress.pet.experience), total: Double(progress.experienceRequired)).tint(.blue)
             Text("\(progress.pet.experience) / \(progress.experienceRequired)")
                 .font(.caption2).lineLimit(1).minimumScaleFactor(0.6)
-        }.frame(maxWidth: .infinity)
+        }.frame(maxWidth: .infinity, minHeight: 44)
             .foregroundStyle(.white).shadow(color: .black.opacity(0.7), radius: 1)
     }
 

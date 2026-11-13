@@ -178,7 +178,11 @@ struct PhoneHomeView: View {
                 }
                 let portraitLayout = textSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 16)) : AnyLayout(HStackLayout(spacing: 16))
                 portraitLayout {
-                    PhonePetPortrait()
+                    VStack(spacing: 5) {
+                        PhonePetPortrait(customization: viewModel.snapshot?.resolvedCustomization ?? .default)
+                        Text((viewModel.snapshot?.resolvedCustomization ?? .default).character.name)
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Lv.\(pet.level)").font(.largeTitle.bold())
                             .accessibilityIdentifier("phone.petLevel")
@@ -188,6 +192,12 @@ struct PhoneHomeView: View {
                             .font(.caption).foregroundStyle(.secondary).monospacedDigit()
                             .accessibilityIdentifier("phone.petExperience")
                     }
+                }
+                if let customization = viewModel.snapshot?.resolvedCustomization {
+                    Text("홈 배경 · \(PetCustomizationCatalog.background(id: customization.backgroundID).name)")
+                        .font(.caption).foregroundStyle(.secondary).accessibilityIdentifier("phone.customization")
+                    Text("워치의 상태 화면에서 펫을 누르면 꾸미기를 열 수 있어요.")
+                        .font(.caption2).foregroundStyle(.secondary)
                 }
                 let columns = Array(repeating: GridItem(.flexible(), alignment: .top), count: textSize.isAccessibilitySize ? 1 : 3)
                 LazyVGrid(columns: columns, spacing: 16) {

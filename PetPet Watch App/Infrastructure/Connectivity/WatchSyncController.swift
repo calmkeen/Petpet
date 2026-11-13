@@ -13,7 +13,8 @@ final class WatchSyncController: ObservableObject {
 
     init(home: WatchHomeViewModel, pet: PetProgressViewModel,
          history: any StepHistoryRepository, progress: any PetProgressRepository, outboxURL: URL,
-         transport: WatchConnectivityTransport) {
+         transport: WatchConnectivityTransport, customization: WatchCustomizationModel,
+         customizationRepository: any PetCustomizationRepository) {
         self.home = home
         self.transport = transport
         let publisher = WatchSnapshotPublisher(
@@ -22,7 +23,7 @@ final class WatchSyncController: ObservableObject {
             beforeReading: {
                 await home.flush()
                 guard !home.state.hasStorageError else { throw StepHistoryStoreError.invalidRecord }
-            }
+            }, customization: customizationRepository
         )
         self.publisher = publisher
         transport.onSnapshotRequest = { [weak publisher] in
@@ -43,6 +44,10 @@ final class WatchSyncController: ObservableObject {
             .sink { [weak self] _ in self?.schedule() }
             .store(in: &subscriptions)
         home.onRecordsReady = { [weak self] in self?.schedule() }
+        customization.$selection.combineLatest(customization.$hasLoaded)
+            .filter { $0.1 }.map { $0.0 }.removeDuplicates()
+            .sink { [weak self] _ in self?.schedule() }
+            .store(in: &subscriptions)
         transport.activate()
     }
 

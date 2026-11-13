@@ -3,17 +3,19 @@ import PetPetCore
 
 /// A visual greeting only; pet progression remains owned by the watch.
 struct PhonePetPortrait: View {
+    var customization: PetCustomization = .default
     @State private var greeting: Date?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
-            let period = PetDaylightPeriod(date: context.date)
+            let background = customization.background(at: context.date)
             Button { if greeting == nil { greeting = Date() } } label: {
                 ZStack {
-                    Image(period.backgroundImageName).resizable().scaledToFill()
-                    NativePhonePetSprite(greeting: greeting, suppressed: reduceMotion || scenePhase != .active)
+                    Image(background.imageName).resizable().scaledToFill()
+                    NativePhonePetSprite(greeting: greeting, suppressed: reduceMotion || scenePhase != .active,
+                                         characterID: customization.character.id)
                         .padding(12).allowsHitTesting(false)
                 }
                 .frame(width: 104, height: 126).clipped()
@@ -24,10 +26,11 @@ struct PhonePetPortrait: View {
         }
         .task(id: greeting) {
             guard greeting != nil else { return }
-            do { try await Task.sleep(for: .seconds(PetSpriteAnimation.greetingDuration)) } catch { return }
+            do { try await Task.sleep(for: .seconds(PetSpriteAnimation(.touching, characterID: customization.character.id).cycleDuration)) } catch { return }
             greeting = nil
         }
         .onChange(of: scenePhase) { _, phase in if phase != .active { greeting = nil } }
+        .onChange(of: customization.characterID) { _, _ in greeting = nil }
         .onDisappear { greeting = nil }
     }
 }
