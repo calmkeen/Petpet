@@ -62,9 +62,18 @@ final class WatchFinalAuditUITests: XCTestCase {
         reveal(submit)
         print("NICKNAME_EDITOR_AFTER_INPUT=\(app.debugDescription)")
         capture("integrated-watch-nickname-before-submit")
-        XCTAssertTrue(wait(timeout: 45) { submit.exists && submit.isEnabled }, app.debugDescription); submit.tap()
+        var available = wait(timeout: 45) { submit.exists && submit.isEnabled }
+        let retry = app.buttons["다시 확인"]
         let feedback = app.staticTexts["nickname.feedback"]
-        reveal(feedback); XCTAssertTrue(wait(timeout: 15) { feedback.exists && feedback.label == "닉네임을 바꿨어요." })
+        if !available && retry.exists && feedback.label.contains("아이폰과 워치") {
+            reveal(retry); retry.tap() // Availability is a safe read, not a rename retry.
+            available = wait(timeout: 45) { submit.exists && submit.isEnabled }
+        }
+        XCTAssertTrue(available, app.debugDescription); submit.tap()
+        reveal(feedback)
+        XCTAssertTrue(wait(timeout: 45) { feedback.exists && (feedback.label == "닉네임을 바꿨어요." || feedback.label.contains("아이폰과 워치")) }, app.debugDescription)
+        // If the live reply was lost, the root account below must still confirm
+        // the exact new name. Never automatically repeat a possible mutation.
         print("FINAL_AUDIT_NICKNAME=\(name)")
         capture("final-watch-nickname-updated")
         app.terminate(); app.launch()
