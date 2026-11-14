@@ -1,8 +1,10 @@
 # PetPet iOS·watchOS 구조
 
-현재 통합 기준과 미통합 선행 feature, Android 구조 대응은 [개발 공유 안내](Collaboration/README.md)를 먼저 확인한다. 기능별 인계는 [공유 절차와 예시](Collaboration/FeatureHandoff.md)를 따른다.
+현재 통합 기준과 feature별 이력, Android 구조 대응은 [개발 공유 안내](Collaboration/README.md)를 먼저 확인한다. 기능별 인계는 [공유 절차와 예시](Collaboration/FeatureHandoff.md)를 따른다.
 
 ## 현재 완료 범위
+
+캐릭터·배경·동작 카탈로그와 워치 꾸미기 선택/미리보기, 선택 정보의 로컬 저장·폰 표시 경로를 develop에 통합했다. 현재 캐릭터는 눈여우 1종이며 레벨·먹이·걸음 기록과 별도로 외형만 바꾼다. 별계단 정답 방향별 반응·시간 초과 햅틱도 포함한다. 새 변경은 빌드 확인 범위이며 실행 검토는 대기다. [통합 기록](Integration-2026-11-14.md).
 
 워치 홈, 하루 걸음수, 먹이·성장·스탯·호감도, iPhone 표시용 동기화를 구현했다. iPhone과 워치에는 Apple 로그인·각 기기의 Keychain 세션과 StepMate 백업·복원 클라이언트를 연결했으며, 워치는 서버 성공 확인 뒤 보상을 지급한다. Apple 인증 서버 추가와 capability 프로파일 설정·실제 계정 검증이 남아 있다. [설정과 검증 범위](AccountAndBackup.md).
 
@@ -31,7 +33,7 @@ PetPet Watch App/               watchOS 앱 타깃
   Features/Account/Presentation/ 계정·서버 백업 상태
   Features/Streak/Presentation/  로컬 스트릭·월별 기록·날짜 선택
   Features/Profile/Presentation/ watchOS 시스템 입력 기반 닉네임 편집
-  Features/Character/Presentation/ 네이티브 캐릭터 반응
+  Features/Character/Presentation/ 네이티브 캐릭터 반응·꾸미기 선택·동작 미리보기
   Features/Games/Presentation/   게임 선택·SpriteKit 슈팅·별계단·랭킹
   Features/Chat/Presentation/    시스템 입력·AI 대화
   Infrastructure/Account/       워치 Apple 인증·Keychain·단독 호스트 조립

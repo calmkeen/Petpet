@@ -28,7 +28,7 @@ iOS에서 먼저 개발해도 Android가 소스 전체를 다시 분석하지 �
 
 ### 현재 iOS 구현 상태
 
-`feature/pet-customization`의 세 커밋 `01b38a7`, `3d3ea67`, `4fbf6b6`에 구현되어 있다. develop과 이번 별계단 브랜치에는 아직 합치지 않았다. Debug/Release 빌드는 확인했고 UI·워치→폰 실행 검토는 대기다.
+`feature/pet-customization`의 세 커밋 `01b38a7`, `3d3ea67`, `4fbf6b6`에서 선행 구현한 뒤, 2026-11-14 별계단 수정과 함께 develop에 통합했다. 현재 구현은 develop에서 확인한다. Debug/Release 빌드 확인 범위이며 UI·워치→폰 실행 검토는 대기다. [통합 기록](../Integration-2026-11-14.md), [꾸미기 구현 상세](../PetCustomization.md).
 
 현재 사용 가능한 캐릭터는 눈여우 **1종**이다. 새 동물이나 배경을 임의로 제작한 상태가 아니라, 리소스를 나중에 등록할 수 있는 구조다.
 
@@ -69,7 +69,7 @@ iOS에서 먼저 개발해도 Android가 소스 전체를 다시 분석하지 �
 
 현재 눈여우의 인사/달리기는 16프레임, 프레임 간격 1/15초다. 인사는 한 번, 달리기는 반복한다. 새 캐릭터에도 16장을 강제하지 않는다. 모든 프레임의 투명 캔버스·정렬·종횡비를 맞춰야 한다. 배경은 이미지 이름과 밝은/어두운 글자 사용 여부를 함께 제공한다.
 
-Apple 등록 지점은 해당 feature의 `PetCustomizationCatalog`이며 `PetSpriteAnimation`, `WatchPetRenderer`, `NativePhonePetSprite`가 재생한다. Android는 같은 ID·프레임·시간 규칙을 자체 리소스/렌더러에 연결하면 된다. 게임 전용 플레이어 아트와 서버 대표 이미지는 별도 기능이다.
+Apple 등록 지점은 develop의 [PetCustomizationCatalog](../../Packages/PetPetCore/Sources/PetPetCore/Domain/Mate/PetCustomization.swift)이며 `PetSpriteAnimation`, `WatchPetRenderer`, `NativePhonePetSprite`가 재생한다. Android는 같은 ID·프레임·시간 규칙을 자체 리소스/렌더러에 연결하면 된다. 게임 전용 플레이어 아트와 서버 대표 이미지는 별도 기능이다.
 
 ### 양쪽이 확인할 예시
 

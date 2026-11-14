@@ -1,6 +1,6 @@
 # 별계단 정답 동작·시간 초과 진동
 
-develop `33b9945`에서 `feature/star-stair-feedback`을 새로 만들었다. 꾸미기 feature를 합치거나 기존 미커밋 파일을 변경하지 않았다. Android 비교 기준은 `Chaeros/StepMate`의 `4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3`다.
+develop `33b9945`에서 `feature/star-stair-feedback`을 새로 만들어 꾸미기와 분리해 개발했다. 이후 2026-11-14 두 feature를 develop에 함께 통합했다. [통합 기록](Integration-2026-11-14.md). Android 비교 기준은 `Chaeros/StepMate`의 `4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3`다.
 
 ## 변경한 동작
 
