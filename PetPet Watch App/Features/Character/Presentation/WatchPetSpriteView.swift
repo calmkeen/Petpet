@@ -7,15 +7,17 @@ struct WatchPetSpriteView: View {
     var backgroundImageName = "stepmate_background_night"
     var backgroundCanvas: CGSize?
     var backgroundCoordinateSpace: String?
+    var characterID = PetCustomization.default.characterID
+    var motionID: String?
     @StateObject private var renderer = WatchPetRenderer()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.isLuminanceReduced) private var luminanceReduced
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
-        let animation = PetSpriteAnimation(state.activity)
+        let animation = PetSpriteAnimation(state.activity, characterID: characterID, motionID: motionID)
         let paused = !state.isActive || !animation.isAnimated || reduceMotion || luminanceReduced || scenePhase != .active
-        let request = PetPlaybackRequest(state: state, suppressed: paused)
+        let request = PetPlaybackRequest(state: state, suppressed: paused, characterID: characterID, motionID: motionID)
         GeometryReader { geometry in
             let viewport = backgroundCoordinateSpace.map { geometry.frame(in: .named($0)) } ?? CGRect(origin: .zero, size: geometry.size)
             let backdrop = PetSpriteBackdrop(name: backgroundImageName, canvas: backgroundCanvas ?? geometry.size, viewport: viewport)
@@ -32,7 +34,7 @@ struct WatchPetSpriteView: View {
             .frame(width: geometry.size.width, height: geometry.size.height)
             .onChange(of: backdrop, initial: true) { _, value in renderer.configureBackdrop(value) }
         }
-        .task { await renderer.prepare() }
+        .task(id: animation.characterID) { await renderer.prepare(characterID: animation.characterID) }
         .onChange(of: request, initial: true) { _, value in renderer.apply(value) }
         .onChange(of: [reduceMotion, luminanceReduced, scenePhase == .active, state.isActive], initial: true) { _, flags in
             AnimationDiagnostics.record(reduceMotion: flags[0], luminanceReduced: flags[1], sceneActive: flags[2], homeVisible: flags[3])

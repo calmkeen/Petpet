@@ -7,6 +7,7 @@ struct WatchHomeView: View {
     @ObservedObject var petViewModel: PetProgressViewModel
     @ObservedObject var cloudViewModel: WatchCloudController
     @ObservedObject var streakViewModel: WatchStreakViewModel
+    @ObservedObject var customization: WatchCustomizationModel
     var games: WatchGameServices?
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.isLuminanceReduced) private var luminanceReduced
@@ -25,7 +26,8 @@ struct WatchHomeView: View {
         NavigationStack {
             TabView(selection: $selectedSection) {
                 home.tag(WatchSection.home)
-                PetOverviewView(viewModel: petViewModel, stepViewModel: viewModel, cloudViewModel: cloudViewModel)
+                PetOverviewView(viewModel: petViewModel, stepViewModel: viewModel, cloudViewModel: cloudViewModel,
+                                customization: customization)
                     .tag(WatchSection.statistics)
                 if let games {
                     WatchGameOverview(services:games,pet:petViewModel).tag(WatchSection.games)
@@ -46,6 +48,7 @@ struct WatchHomeView: View {
         }
         // Keep tracking alive while browsing the pet and food pages.
         .task {
+            await customization.load()
             await cloudViewModel.start()
             guard scenePhase == .active else { return }
             await petViewModel.start()
@@ -73,10 +76,10 @@ struct WatchHomeView: View {
 
     private var home: some View {
         TimelineView(.periodic(from: Date(timeIntervalSince1970: floor(Date().timeIntervalSince1970 / 60) * 60), by: 60)) { context in
-            let period = WatchAppearance.period(at: context.date)
+            let period = customization.selection.background(at: context.date, automaticPeriod: WatchAppearance.period(at: context.date))
             GeometryReader { geometry in
                 ZStack {
-                    Image(period.backgroundImageName)
+                    Image(period.imageName)
                         .resizable().scaledToFill()
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .clipped()
@@ -92,19 +95,20 @@ struct WatchHomeView: View {
         } message: { Text(viewModel.errorMessage ?? "걸음수를 다시 불러와 주세요.") }
     }
 
-    private func homeContents(period: PetDaylightPeriod, canvas: CGSize) -> some View {
+    private func homeContents(period: PetBackgroundAppearance, canvas: CGSize) -> some View {
         // Android/Figma: wallpaper, a central pet and steps beneath it. The
         // watchOS clock stays in its system position; the Crown owns paging.
         let petWidth = min(canvas.width * 0.60, canvas.height * 0.53)
-        let petHeight = petWidth * 336 / 256
+        let chosenCharacter = customization.selection.character
+        let petHeight = petWidth * CGFloat(chosenCharacter.canvasHeight / chosenCharacter.canvasWidth)
         let touchWidth = max(44, petWidth)
         let textColor: Color = period.usesLightText ? .white : .black
         return ZStack {
             // A disabled Button can throttle its SpriteView label on watchOS.
             // Keep rendering outside that control; only the clear hit target
             // waits for the current greeting to finish.
-            WatchPetSpriteView(state: character.state, backgroundImageName: period.backgroundImageName,
-                               backgroundCanvas: canvas, backgroundCoordinateSpace: "pet.home")
+            WatchPetSpriteView(state: character.state, backgroundImageName: period.imageName,
+                               backgroundCanvas: canvas, backgroundCoordinateSpace: "pet.home", characterID: chosenCharacter.id)
                 .frame(width: petWidth, height: petHeight)
                 .allowsHitTesting(false)
                 .position(x: canvas.width / 2, y: canvas.height * 0.51)
@@ -113,7 +117,7 @@ struct WatchHomeView: View {
                 Task {
                     // Animate and confirm only a touch that reached storage.
                     if await petViewModel.touch() {
-                        character.handleTouch()
+                        character.handleTouch(greetingDuration: PetSpriteAnimation(.touching, characterID: chosenCharacter.id).cycleDuration)
                         showTouchFeedback(petViewModel.message)
                     } else if petViewModel.errorMessage != nil {
                         showTouchFeedback("저장 실패 · 다시 눌러 주세요")
@@ -201,6 +205,8 @@ struct WatchHomeView: View {
     WatchHomeView(viewModel: home, petViewModel: pet, cloudViewModel: WatchCloudController(
         game: FileGameRepository(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)),
         transport: PreviewCloudTransport(), home: home, pet: pet, directory: FileManager.default.temporaryDirectory
-    ), streakViewModel: WatchStreakViewModel(history: history, home: home))
+    ), streakViewModel: WatchStreakViewModel(history: history, home: home),
+                  customization: WatchCustomizationModel(repository: FilePetCustomizationRepository(
+                    fileURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString))))
 }
 #endif

@@ -1,0 +1,80 @@
+{
+  "date": "2026-11-13",
+  "branch": "feature/pet-customization",
+  "baseCommit": "33b9945bab49aaf7622de621423f572ca0d1c65a",
+  "implementationHead": "3d3ea6744c5d3a28de5276acbdc114ec03528a86",
+  "scope": "Existing artwork; customization framework first, per user preference",
+  "catalog": {
+    "characters": [
+      "snow-fox"
+    ],
+    "backgrounds": [
+      "automatic",
+      "dawn",
+      "day",
+      "sunset",
+      "night"
+    ],
+    "motions": [
+      "idle",
+      "greeting",
+      "running"
+    ]
+  },
+  "validation": {
+    "xcode": "27.2 (27B52)",
+    "appBuilds": [
+      {
+        "configuration": "Debug",
+        "platform": "generic iOS Simulator",
+        "architecture": "arm64",
+        "includesWatchApp": true,
+        "succeeded": true,
+        "log": "/private/tmp/petpet-customization-build/debug-final.log"
+      },
+      {
+        "configuration": "Release",
+        "platform": "generic iOS Simulator",
+        "architecture": "arm64",
+        "includesWatchApp": true,
+        "succeeded": true,
+        "log": "/private/tmp/petpet-customization-build/release-final.log"
+      }
+    ],
+    "coreAndTestsCompiled": true,
+    "newRegressionCasesCompiled": 6,
+    "coreBuildLog": "/private/tmp/petpet-customization-core-build.log",
+    "executedTests": 0,
+    "simulatorBooted": false,
+    "appInstalledOrLaunched": false,
+    "physicalDevicesUsed": false
+  },
+  "limitations": [
+    "New character/background artwork not supplied or invented",
+    "Cosmetics are watch-owned local preferences, not server backup data",
+    "Independent progression per character, ownership/unlocks and minigame artwork changes are outside this foundation",
+    "Runtime/UI and watch-to-phone execution verification deferred to separate review"
+  ],
+  "sourceSHA256": {
+    "Packages/PetPetCore/Sources/PetPetCore/Application/WatchSnapshotPublisher.swift": "58ce4ce5aeac805f82aa8761fed0c7c8ccc990d107ee35e4029747c51a85bd98",
+    "Packages/PetPetCore/Sources/PetPetCore/Data/Local/FilePetCustomizationRepository.swift": "957dc59d6443b96a6806cb2673484919c437b4d8e267a9fea2e65cc235e61a8f",
+    "Packages/PetPetCore/Sources/PetPetCore/Data/Local/FileWatchSnapshotOutbox.swift": "25877041c105e322cf2d6969a1000f6e531a5a1d7a632967f0fd4f76d01d4f78",
+    "Packages/PetPetCore/Sources/PetPetCore/Domain/Mate/PetAppearance.swift": "3885df574a898865c15810ea6d9e8bb17883e8315659cf15d0dfa049cfacaa99",
+    "Packages/PetPetCore/Sources/PetPetCore/Domain/Mate/PetCustomization.swift": "fcb72923844db8786bd1b1d6435fc158a5cff3ff0402a5b374b4b6c7384b950d",
+    "Packages/PetPetCore/Sources/PetPetCore/Domain/Sync/WatchSnapshot.swift": "aac028601ddc7e251585a2545316ed1a9ede11163ad7d906249aa71b08f00724",
+    "Packages/PetPetCore/Tests/PetPetCoreTests/PetCustomizationTests.swift": "497147846194affd2163944d98439d12065fa67f267e6ca76ecc243e0d79bbc1",
+    "PetPet Watch App/App/PetPetWatchApp.swift": "d5d0d8b224d4ea86533ca0715a2693b2cd720bba54ba34298a399c493a38f19a",
+    "PetPet Watch App/App/WatchAppModel.swift": "6fe92c7664cbb2b99279f5c45ffbc47e472568d985cb891f0a1d2a90349b66e8",
+    "PetPet Watch App/Features/Character/Presentation/CharacterActivityViewModel.swift": "df818aeff1d787eaa44e111eab1e0beca52a39a7af43c1904394dbef8d8aa6be",
+    "PetPet Watch App/Features/Character/Presentation/WatchCustomizationModel.swift": "bfe360e7555fdb5d431a451f9a7b657f8138f67eca2c1023339120e0db9501eb",
+    "PetPet Watch App/Features/Character/Presentation/WatchCustomizationView.swift": "cf6f45fc777a7c4d5b24deae5015a60fa60ecc184e52ab9437a949d87bb06e98",
+    "PetPet Watch App/Features/Character/Presentation/WatchPetRenderer.swift": "4e3429eb9eaf9ba347af861e141f77ae3149d0d59293a2e40693e5b49f8bea83",
+    "PetPet Watch App/Features/Character/Presentation/WatchPetSpriteView.swift": "334b1de97b5a0caddd7eb76414d76d3024985bfc191611f71e34598f195ada56",
+    "PetPet Watch App/Features/Home/Presentation/WatchHomeView.swift": "55889f025284256895bf0f041287625021dd77d81f6d7ce7bc5ca968b4781a78",
+    "PetPet Watch App/Features/Pet/Presentation/PetOverviewView.swift": "0a8dcc3155fdca4455130c0bdb6827ef893ee6254b26eb04a91e2406f1eddffa",
+    "PetPet Watch App/Infrastructure/Connectivity/WatchSyncController.swift": "d22e4c48f123ee991728b7a1ec4ab1fc51920eaad3e8bba4d919ca329cb98ccc",
+    "PetPet/Features/Home/Presentation/NativePhonePetSprite.swift": "65ce80999675c57071a701856a3f43ea71808c886c85ac4397bef229bfe2262c",
+    "PetPet/Features/Home/Presentation/PhoneHomeView.swift": "9cb83a40767976906501071c783d3122f7df8e812121f9dc6e7541c7086bc153",
+    "PetPet/Features/Home/Presentation/PhonePetPortrait.swift": "c93b8d5860499f34597fdad7703d8bd71b7476460f3093c295b16362a4e6161e"
+  }
+}
