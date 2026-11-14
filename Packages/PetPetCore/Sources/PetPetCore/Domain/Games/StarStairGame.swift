@@ -5,6 +5,11 @@ public enum StairDirection: String, Codable, Sendable { case left, right
     public var delta: Int { self == .left ? -1 : 1 }
 }
 public enum MiniGameStatus: String, Codable, Sendable { case ready, playing, finished }
+/// One transient feedback event per accepted input or expired round.
+/// Keeping this separate from status text also covers the final lost life.
+public enum StarStairFeedback: Equatable, Sendable {
+    case correct(StairDirection), wrong, timeout
+}
 public struct StarStair: Equatable, Sendable, Identifiable {
     public let id: Int
     public let lane: Int
@@ -35,18 +40,22 @@ public struct StarStairGame: Sendable {
         stairs = [StarStair(id: 0, lane: 0, direction: nil)]
         remaining = 1.5; feedback = ""; lastDirection = nil; sameCount = 0; fill()
     }
-    public mutating func input(_ direction: StairDirection) {
-        guard status == .playing else { return }
-        guard direction == nextDirection else { fail("방향을 확인해 주세요"); return }
+    @discardableResult
+    public mutating func input(_ direction: StairDirection) -> StarStairFeedback? {
+        guard status == .playing else { return nil }
+        guard direction == nextDirection else { fail("방향을 확인해 주세요"); return .wrong }
         let oldLimit = timeLimit
         score += 1; combo += 1; maxCombo = max(maxCombo, combo)
         remaining = timeLimit; feedback = timeLimit < oldLimit ? "SPEED UP!" : "좋아요!"
         fill()
+        return .correct(direction)
     }
-    public mutating func advance(seconds: Double) {
-        guard status == .playing, seconds.isFinite, seconds > 0 else { return }
+    @discardableResult
+    public mutating func advance(seconds: Double) -> StarStairFeedback? {
+        guard status == .playing, seconds.isFinite, seconds > 0 else { return nil }
         remaining = max(0, remaining - seconds)
-        if remaining <= 0 { fail("시간 초과"); }
+        if remaining <= 0 { fail("시간 초과"); return .timeout }
+        return nil
     }
     public mutating func finish() { status = .finished; life = 0; remaining = 0 }
     private mutating func fail(_ text: String) {

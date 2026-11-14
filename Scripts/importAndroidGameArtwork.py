@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pack locally fetched, pinned Android game PNGs as watch assets. Requires macOS sips."""
+"""Pack pinned Android PNGs. Usage: source-directory [manifest.json]. Requires sips."""
 import hashlib
 import json
 from pathlib import Path
@@ -8,7 +8,8 @@ import sys
 
 root = Path(__file__).resolve().parents[1]
 source = Path(sys.argv[1] if len(sys.argv) > 1 else "/private/tmp/petpet-game-art")
-manifest = json.loads((root / "Artwork/AndroidGameSources.json").read_text())
+manifest_path = Path(sys.argv[2]) if len(sys.argv) > 2 else root / "Artwork/AndroidGameSources.json"
+manifest = json.loads(manifest_path.read_text())
 target = root / "PetPet Watch App/Assets.xcassets/Games"
 target.mkdir(exist_ok=True)
 info = {"author": "xcode", "version": 1}
