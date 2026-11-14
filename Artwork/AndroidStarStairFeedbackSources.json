@@ -1,0 +1,22 @@
+{
+  "repository": "https://github.com/Chaeros/StepMate",
+  "commit": "4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3",
+  "files": [
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_left_running1.png",
+      "gitBlobSHA": "b907052fe21e06d9f3d817c28f7492af4333fc7a"
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_left_running2.png",
+      "gitBlobSHA": "74982d4f4f0b3763c0e348484e12a47318ba1f89"
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_right_running1.png",
+      "gitBlobSHA": "120e3dadd5eabbcb8756a473c157daed3260aa48"
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_right_running2.png",
+      "gitBlobSHA": "b026a2a5b503e933f8c0735e3885212a7a4cfb53"
+    }
+  ]
+}

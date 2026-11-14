@@ -9,20 +9,22 @@ struct WatchStarStairView: View {
     @State private var crown = 0.0
     @State private var ending = false
     @StateObject private var result: WatchGameResultModel
+    @StateObject private var reaction = StarStairReactionModel()
     @Environment(\.scenePhase) private var phase
     @Environment(\.isLuminanceReduced) private var dimmed
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     init(services: WatchGameServices) { _result = StateObject(wrappedValue: WatchGameResultModel(services: services)) }
     var body: some View {
         Group {
             if game.status == .finished {
-                WatchGameResultView(model: result, replay: { result.clear(); game.start(); paused = false; lastTick = nil })
+                WatchGameResultView(model: result, replay: { result.clear(); startGame() })
             } else if game.status == .ready {
                 ScrollView {
                     VStack(spacing: 6) {
                         Text("별계단 훈련").font(.headline)
                         Text("다음 계단 방향을 눌러요.\n목숨 3개, 올라갈수록 빨라져요.").font(.caption2).multilineTextAlignment(.center).fixedSize(horizontal:false,vertical:true)
                         if let best = result.best { Text("최고 \(best.score)계단 · 콤보 \(best.maxCombo)").font(.caption2).foregroundStyle(.secondary) }
-                        Button("시작") { paused = false; game.start(); lastTick = nil }.buttonStyle(WatchActionStyle()).accessibilityIdentifier("game.start")
+                        Button("시작") { startGame() }.buttonStyle(WatchActionStyle()).accessibilityIdentifier("game.start")
                     }
                     .frame(maxWidth: .infinity).padding(.horizontal, 6).padding(.bottom, 8)
                 }.scrollBounceBehavior(.basedOnSize)
@@ -68,13 +70,15 @@ struct WatchStarStairView: View {
                 do { try await Task.sleep(for:.milliseconds(33)) } catch { return }
                 guard isTiming else { return }
                 let now = ProcessInfo.processInfo.systemUptime
-                if let lastTick { game.advance(seconds:now-lastTick) }; lastTick = now
+                if let lastTick { handle(game.advance(seconds:now-lastTick)) }; lastTick = now
                 finishIfNeeded()
             }
         }
-        .onChange(of: phase) { _, value in if value != .active { paused = true; lastTick = nil } }
-        .onChange(of: dimmed) { _, value in if value { paused = true; lastTick = nil } }
-        .onDisappear { paused = true; result.stop() }
+        .onChange(of: paused) { _, value in if value { reaction.stop() } }
+        .onChange(of: reduceMotion) { _, value in if value { reaction.stop() } }
+        .onChange(of: phase) { _, value in if value != .active { paused = true; lastTick = nil; reaction.stop() } }
+        .onChange(of: dimmed) { _, value in if value { paused = true; lastTick = nil; reaction.stop() } }
+        .onDisappear { paused = true; reaction.stop(); result.stop() }
     }
     private var isTiming: Bool { game.status == .playing && !paused && phase == .active && !dimmed }
     private var stairCanvas: some View {
@@ -87,7 +91,7 @@ struct WatchStarStairView: View {
                     Image("stepmate_game_startstair_purple").resizable().scaledToFit().frame(width: 30,height: 12)
                         .position(x: proxy.size.width / 2 + CGFloat(stair.lane-game.currentLane) * 21, y: proxy.size.height - 8 - CGFloat(stair.id-game.score)*stepHeight)
                 }
-                Image("stepmate_fox_idle").resizable().scaledToFit().frame(width:petHeight*0.8,height:petHeight).position(x:proxy.size.width/2,y:proxy.size.height-8-petHeight/2)
+                Image(reaction.imageName).resizable().scaledToFit().frame(width:petHeight*0.8,height:petHeight).position(x:proxy.size.width/2,y:proxy.size.height-8-petHeight/2)
                 Image(systemName: game.nextDirection == .left ? "arrow.up.left" : "arrow.up.right").font(.caption.bold()).foregroundStyle(.yellow).position(x:proxy.size.width/2,y:12)
                 if game.feedback == "SPEED UP!" { Text(game.feedback).font(.caption2.bold()).foregroundStyle(.yellow).frame(maxWidth:.infinity,maxHeight:.infinity,alignment:.topTrailing) }
             }.clipped()
@@ -98,14 +102,23 @@ struct WatchStarStairView: View {
         // Charge elapsed time before accepting input so an expired round cannot be rescued between ticks.
         let now = ProcessInfo.processInfo.systemUptime
         let previousLife = game.life
-        if let lastTick { game.advance(seconds: now-lastTick) }; lastTick = now
+        if let lastTick { handle(game.advance(seconds: now-lastTick)) }; lastTick = now
         guard game.status == .playing else { finishIfNeeded(); return }
-        guard game.life == previousLife else { WKInterfaceDevice.current().play(.failure); return }
-        let life = game.life; game.input(direction)
-        if game.life < life { WKInterfaceDevice.current().play(.failure) }
+        guard game.life == previousLife else { return }
+        handle(game.input(direction))
         finishIfNeeded()
     }
     private func finishIfNeeded() {
-        if game.status == .finished, result.score == nil { result.finish(GameScore(game: .starStair, score: game.score, maxCombo: game.maxCombo)) }
+        if game.status == .finished, result.score == nil {
+            reaction.stop()
+            result.finish(GameScore(game: .starStair, score: game.score, maxCombo: game.maxCombo))
+        }
+    }
+    private func handle(_ feedback: StarStairFeedback?) {
+        guard let feedback else { return }
+        reaction.receive(feedback, animate: isTiming && !reduceMotion, haptics: phase == .active && !dimmed)
+    }
+    private func startGame() {
+        reaction.stop(); paused = false; game.start(); lastTick = nil
     }
 }

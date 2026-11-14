@@ -1,0 +1,101 @@
+{
+  "date": "2026-11-14",
+  "branch": "feature/star-stair-feedback",
+  "baseCommit": "33b9945bab49aaf7622de621423f572ca0d1c65a",
+  "implementationCommit": "0f4a7e1fa9c5ec44c8af5c615ba72f0a63950cc2",
+  "androidSourceCommit": "4e2b5e54902efd9630dc5fe7595ca0fb2656d0e3",
+  "changes": [
+    "Directional success frames: 80ms then 100ms, latest reaction wins",
+    "One failure haptic per wrong/timeout event, including final life",
+    "Cancel visual reactions on pause/replay/background/dimmed/reduce-motion/exit"
+  ],
+  "validation": {
+    "appBuilds": [
+      {
+        "configuration": "Debug",
+        "platform": "generic iOS Simulator",
+        "includesWatchApp": true,
+        "architecture": "arm64",
+        "succeeded": true,
+        "exitCode": 0,
+        "log": "/private/tmp/petpet-stair-feedback-build/debug.log"
+      },
+      {
+        "configuration": "Release",
+        "platform": "generic iOS Simulator",
+        "includesWatchApp": true,
+        "architecture": "arm64",
+        "succeeded": true,
+        "exitCode": 0,
+        "log": "/private/tmp/petpet-stair-feedback-build/release.log"
+      }
+    ],
+    "coreAndTestsCompiled": true,
+    "newRegressionCasesCompiled": 5,
+    "coreBuildLog": "/private/tmp/petpet-stair-feedback-core-build.log",
+    "executedTests": 0,
+    "simulatorBooted": false,
+    "appInstalledOrLaunched": false,
+    "physicalDevicesUsed": false,
+    "preExistingSourceChangesUnmodified": true,
+    "preExistingDirtyPathsExcludedFromCommit": true,
+    "metadataUpdatedSinceInitialSnapshot": [
+      ".DS_Store",
+      "PetPet Watch App/.DS_Store",
+      "PetPet/.DS_Store",
+      "Docs/.DS_Store"
+    ]
+  },
+  "separatelyPending": "Simulator UI review and physical haptic feel verification have not been performed",
+  "preservedIndependentFeature": {
+    "branch": "feature/pet-customization",
+    "head": "4fbf6b6b20f2dfa1a34f3be4fc548618dc619ace",
+    "mergedIntoDevelop": false
+  },
+  "sourceSHA256": {
+    "Artwork/AndroidStarStairFeedbackSources.json": "7c5b742fe29da8d18ef4b6ed38165145847f65997b2f9647760f6124130d75a9",
+    "Packages/PetPetCore/Sources/PetPetCore/Domain/Games/StarStairGame.swift": "c8b610734a3358e2067c487673044bb67d71e9300bb1e619be05fd5099533181",
+    "Packages/PetPetCore/Tests/PetPetCoreTests/StarStairFeedbackTests.swift": "6200b966603b1b453c1fa7737dd704a2dee9674f4fd0311c40d68035866a8c08",
+    "PetPet Watch App/Assets.xcassets/Games/stepmate_game_snowfox_baby_left_running1.imageset/Contents.json": "e5e18411a59b11bbd6dbc0366668f8a6ef982ac0b3e54344b8f0ed8a0a0acd57",
+    "PetPet Watch App/Assets.xcassets/Games/stepmate_game_snowfox_baby_left_running1.imageset/image.png": "de017b76078cbb65186924448e9a9b121f71be0b2ae58ab844e4eb20e3d18322",
+    "PetPet Watch App/Assets.xcassets/Games/stepmate_game_snowfox_baby_left_running2.imageset/Contents.json": "e5e18411a59b11bbd6dbc0366668f8a6ef982ac0b3e54344b8f0ed8a0a0acd57",
+    "PetPet Watch App/Assets.xcassets/Games/stepmate_game_snowfox_baby_left_running2.imageset/image.png": "14fdd6dfc3b586c3e8e9c0534b03c4ccba5b1137a8762f4a11fca5425547d709",
+    "PetPet Watch App/Assets.xcassets/Games/stepmate_game_snowfox_baby_right_running1.imageset/Contents.json": "e5e18411a59b11bbd6dbc0366668f8a6ef982ac0b3e54344b8f0ed8a0a0acd57",
+    "PetPet Watch App/Assets.xcassets/Games/stepmate_game_snowfox_baby_right_running1.imageset/image.png": "faba6d05e11e338941496e6809e774b6acf96a32fb92628719a99fb1941e6949",
+    "PetPet Watch App/Assets.xcassets/Games/stepmate_game_snowfox_baby_right_running2.imageset/Contents.json": "e5e18411a59b11bbd6dbc0366668f8a6ef982ac0b3e54344b8f0ed8a0a0acd57",
+    "PetPet Watch App/Assets.xcassets/Games/stepmate_game_snowfox_baby_right_running2.imageset/image.png": "7a7f8ccb77aeb7a1350ccee25b7c7cd624b9e1c89edee8e540ce07133b31a58e",
+    "PetPet Watch App/Features/Games/Presentation/StarStairReactionModel.swift": "a43dd6460de5ea2aceaf02a01c05650511f4f14fe49346c420f30eaca5c787e2",
+    "PetPet Watch App/Features/Games/Presentation/WatchStarStairView.swift": "3b010b3e9097d6effb9880385f81e21430a101593fba11bb31b9dde3dd8d4e5f",
+    "Scripts/importAndroidGameArtwork.py": "d7a763248b086c1ad4f7df20fe48e41b132c367f76dd119c4be239476b6cb7dd"
+  },
+  "assets": [
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_left_running1.png",
+      "gitBlobSHA": "b907052fe21e06d9f3d817c28f7492af4333fc7a",
+      "packedImageSHA256": "de017b76078cbb65186924448e9a9b121f71be0b2ae58ab844e4eb20e3d18322",
+      "width": 495,
+      "height": 512
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_left_running2.png",
+      "gitBlobSHA": "74982d4f4f0b3763c0e348484e12a47318ba1f89",
+      "packedImageSHA256": "14fdd6dfc3b586c3e8e9c0534b03c4ccba5b1137a8762f4a11fca5425547d709",
+      "width": 428,
+      "height": 512
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_right_running1.png",
+      "gitBlobSHA": "120e3dadd5eabbcb8756a473c157daed3260aa48",
+      "packedImageSHA256": "faba6d05e11e338941496e6809e774b6acf96a32fb92628719a99fb1941e6949",
+      "width": 457,
+      "height": 512
+    },
+    {
+      "path": "app/src/main/res/drawable/snowfox_baby_right_running2.png",
+      "gitBlobSHA": "b026a2a5b503e933f8c0735e3885212a7a4cfb53",
+      "packedImageSHA256": "7a7f8ccb77aeb7a1350ccee25b7c7cd624b9e1c89edee8e540ce07133b31a58e",
+      "width": 428,
+      "height": 512
+    }
+  ]
+}
