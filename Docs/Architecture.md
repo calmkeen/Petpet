@@ -1,5 +1,7 @@
 # PetPet iOS·watchOS 구조
 
+현재 통합 기준과 미통합 선행 feature, Android 구조 대응은 [개발 공유 안내](Collaboration/README.md)를 먼저 확인한다. 기능별 인계는 [공유 절차와 예시](Collaboration/FeatureHandoff.md)를 따른다.
+
 ## 현재 완료 범위
 
 워치 홈, 하루 걸음수, 먹이·성장·스탯·호감도, iPhone 표시용 동기화를 구현했다. iPhone과 워치에는 Apple 로그인·각 기기의 Keychain 세션과 StepMate 백업·복원 클라이언트를 연결했으며, 워치는 서버 성공 확인 뒤 보상을 지급한다. Apple 인증 서버 추가와 capability 프로파일 설정·실제 계정 검증이 남아 있다. [설정과 검증 범위](AccountAndBackup.md).
@@ -8,7 +10,7 @@
 
 워치의 월별 로컬 스트릭과 아이폰의 서버 기록 히트맵, 양쪽 닉네임 편집기를 구현했다. `StepStreak`와 `NicknameEditor`는 공용 규칙을, `PhoneProfileCoordinator`·`WatchNicknameRelay`는 인증 API와 워치 요청의 경계를 담당한다. [규칙과 검증](StreakAndNickname.md).
 
-게임 2종·영구 최고 기록·랭킹과 시스템 음성 입력·AI SSE 대화도 구현했다. 인증 요청은 아이폰이 담당하며 Debug는 외부 통신 없는 모의 백엔드를 사용한다. [게임과 대화](GamesAndChat.md).
+게임 2종·영구 최고 기록·랭킹과 시스템 음성 입력·AI SSE 대화도 구현했다. 인증 요청은 선택한 호스트가 담당한다. 아이폰 중계 모드는 폰 세션을, 워치 단독 모드는 워치의 독립 세션을 사용하며 Debug는 해당 호스트 내부의 모의 백엔드를 사용한다. [게임과 대화](GamesAndChat.md).
 
 ```text
 PetPet/                         iPhone 앱 타깃
@@ -46,6 +48,8 @@ Packages/PetPetCore/
 ```
 
 ## 의존성과 상태 흐름
+
+아래는 센서·저장과 폰 중계 호스트의 기본 의존성이다. 단독/중계 양쪽의 요청 경로와 데이터 소유권은 [공유 안내의 흐름도](Collaboration/README.md#데이터와-서버-요청의-소유권)를 함께 따른다.
 
 ```mermaid
 flowchart LR
@@ -87,7 +91,7 @@ flowchart LR
 - 워치 수신 기록이 없고 로그인되어 있으면 서버 펫을 읽기 전용으로 표시한다. `FileAccountPetCache`는 계정별 펫과 조회 시각만 저장하며 워치 복원·보상·먹이를 변경하지 않는다. 공통 BackendClient 인증 무효화 알림으로 계정 화면과 워치 상태를 갱신한다. [아이폰 검토](PhoneAudit-2026-11-08.md).
 - `PetProfile`, `PetMood`, `FoodDefinition`, `FoodInventoryItem`, `PetStatistic`, `UserProfile`, `DailyStepRecord`는 Android의 실제 모델을 참고한 공용 타입이다. 이들의 Codable 표현을 서버 요청 DTO로 바로 사용하지 않는다. 날짜 포맷과 JSON 키는 각 API 계약에 맞는 별도 DTO에서 변환한다.
 - `FileGameRepository`는 펫·먹이·걸음수·날짜별 지급 내역·복원을 하나의 트랜잭션으로 저장한다. 보상은 선택한 호스트가 서버 성공을 기록한 영수증을 적용할 때만 지급한다. 이전 로컬 지급 헬퍼는 기존 파일 구현의 테스트·이관 참고용이며 실제 앱 화면에서 호출하지 않는다. [상세 규칙](FeedingAndGrowth.md).
-- `StepHistoryRepository`는 날짜별/전체 기록 조회를 제공한다. 서버 백업은 전체 기록을 별도 파일로 내보내며 표시용 7일 캐시를 사용하지 않는다. 게임 규칙은 공용 엔진, 최고 기록은 별도 파일에 둔다. `PhoneFeatureCoordinator`가 인증된 랭킹·AI 요청을 수행하고 워치에 제한 크기 응답을 전송한다.
+- `StepHistoryRepository`는 날짜별/전체 기록 조회를 제공한다. 서버 백업은 전체 기록을 별도 파일로 내보내며 표시용 7일 캐시를 사용하지 않는다. 게임 규칙은 공용 엔진, 최고 기록은 별도 파일에 둔다. `WatchFeatureRouter`가 단독/중계 경로를 선택한다. 선택한 호스트의 `PhoneFeatureCoordinator`가 인증된 랭킹·AI 요청을 수행하며 중계 모드는 워치에 제한 크기 응답을 전송한다.
 - 빈 `GestureEvent`와 사용되지 않던 사용자·캐릭터 모델 초안은 정리했다. 캐릭터 기분과 애니메이션 상태는 각각 `PetMood`와 `CharacterActivity`로 구분한다.
 
 ## 기능을 추가하는 순서
@@ -102,13 +106,15 @@ flowchart LR
 
 ## 검증
 
+현재 기본 개발 범위는 **빌드 확인까지**다. 다음 명령은 앱·테스트 타깃을 컴파일만 하며 시뮬레이터를 부팅하지 않는다. 과거 문서의 XCTest·실기기 절차는 별도로 요청받은 검토에서만 수행한다.
+
 ```sh
-swift test --package-path Packages/PetPetCore
+swift build --package-path Packages/PetPetCore --build-tests
 xcodebuild -project PetPet.xcodeproj -scheme PetPet -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
 xcodebuild -project PetPet.xcodeproj -scheme 'PetPet Watch App' -configuration Release -destination 'generic/platform=watchOS Simulator' CODE_SIGNING_ALLOWED=NO build
 ```
 
-실기기에서는 동작 및 피트니스 권한 허용 후 오늘 걸음수 증가를 확인하고, 화면을 벗어나거나 앱을 재실행해도 오늘 값이 유지·복구되는지 확인한다. 날짜 전환은 새 날짜를 시작하고 이전 기록을 보존해야 한다. 권한 거부·센서 미지원·저장 실패는 안내 문구로 표시한다.
+향후 별도 실행 검토에서는 오늘 걸음수 증가·재실행 복구·날짜 전환·권한 거부·센서 미지원·저장 실패를 확인한다. 실제 기기 검증도 사용자가 따로 요청한 범위에서만 수행한다.
 
 ## 워치 단독 서버 호스트 (2026-11-12)
 
